@@ -1,0 +1,276 @@
+{
+  "name": "Controle de chamados em aberto",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 12
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -944,
+        64
+      ],
+      "id": "69689fdc-f9a4-4b32-9666-a2030cb72c32",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "kUhZV8Nf7J3JhUu3",
+          "mode": "list",
+          "cachedResultName": "historico_tickets",
+          "cachedResultUrl": "/projects/3GncOxuzck8dOet9/datatables/kUhZV8Nf7J3JhUu3"
+        },
+        "limit": 100
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -720,
+        64
+      ],
+      "id": "5fb8c726-cd02-4d5b-9aab-0e27cd95fcb8",
+      "name": "Get row(s)"
+    },
+    {
+      "parameters": {
+        "url": "https://glpi.wmsaude.com.br/api.php/v1/Ticket",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "criteria[0][field]",
+              "value": "1"
+            },
+            {
+              "name": "criteria[0][searchtype]",
+              "value": "equals"
+            },
+            {
+              "name": "criteria[0][value]",
+              "value": "={{ $json.ticket_id }}"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "App-Token",
+              "value": "JNEF4dhTLaty1BHSqxdEYHV2jhu1god37IHFHqOL"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -496,
+        64
+      ],
+      "id": "88ba9812-2543-41f0-b702-3e52f702e0bd",
+      "name": "Busca tickets no GLPI",
+      "executeOnce": false,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "aLAgkGobWooRkbRp",
+          "name": "Token de Sessao GLPI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "deleteRows",
+        "dataTableId": {
+          "__rl": true,
+          "value": "kUhZV8Nf7J3JhUu3",
+          "mode": "list",
+          "cachedResultName": "historico_tickets",
+          "cachedResultUrl": "/projects/3GncOxuzck8dOet9/datatables/kUhZV8Nf7J3JhUu3"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "ticket_id",
+              "keyValue": "={{ $('Busca tickets no GLPI').item.json.data[0][\"2\"] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "7d361d9a-bba8-43b8-9c57-8f69c0602fbb",
+      "name": "Delete row(s)"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "bbc5535a-9776-4d82-8fcf-1028d05de937",
+              "leftValue": "={{ $json.data[0]['12'] }}",
+              "rightValue": 5,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "ca272499-a557-4033-a4d5-bf0b3e356b8e",
+              "leftValue": "={{ $json.data[0]['12'] }}",
+              "rightValue": 6,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -288,
+        64
+      ],
+      "id": "8c4b4291-27ad-4054-a15e-d9117648ad97",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://136.248.125.55:3000/api/v1/accounts/2/conversations/{{$('Get row(s)').item.json.convesation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"Olá! Trazendo boas notícias: a solicitação referente ao protocolo {{ $('Get row(s)').item.json.ticket_id }} foi solucionada!\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "50962025-b7ad-46ee-bcc1-389449bcd9da",
+      "name": "Envia mensagem informando que o ticket foi fechado / solucionado",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "aLAgkGobWooRkbRp",
+          "name": "Token de Sessao GLPI"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s)": {
+      "main": [
+        [
+          {
+            "node": "Busca tickets no GLPI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Busca tickets no GLPI": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Envia mensagem informando que o ticket foi fechado / solucionado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Envia mensagem informando que o ticket foi fechado / solucionado": {
+      "main": [
+        [
+          {
+            "node": "Delete row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "63674d77-8f5e-44a9-ad24-7d1e6cc2b5cf",
+  "meta": {
+    "instanceId": "20d61d4346ce6060f90882f582ec82333f0d0ef83add04f61cda543f312ca8da"
+  },
+  "id": "9wH1KL1_xqQHkpMl4hXHQ",
+  "tags": [
+    {
+      "updatedAt": "2026-03-12T18:10:41.178Z",
+      "createdAt": "2026-03-12T18:10:41.178Z",
+      "id": "F3k4hPbgjXLPrNCz",
+      "name": "Triagem-GLPI"
+    }
+  ]
+}

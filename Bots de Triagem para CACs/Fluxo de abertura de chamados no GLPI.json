@@ -1,0 +1,4313 @@
+{
+  "name": "Fluxo de abertura de chamados no GLPI",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "fluxo-principal",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -8672,
+        3648
+      ],
+      "id": "9037f4d7-9845-4ad7-8ac3-30038084fc1c",
+      "name": "init",
+      "webhookId": "29e15898-b465-4843-a1c7-98e1b9064ad3"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "=wmsaude:{{ $('init').item.json.body.account.id }}:timeout:conv:{{ $('init').item.json.body.conversation.messages[0].conversation_id }}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -8240,
+        3648
+      ],
+      "id": "e86d6cd1-3e80-45fe-9433-91619bdc9346",
+      "name": "Cancela Timeout",
+      "credentials": {
+        "redis": {
+          "id": "MynVI7yhhqqlbCcd",
+          "name": "Autenticacao Redis para GLPI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('init').item.json.body.conversation.labels }}",
+                    "rightValue": "validar_dados",
+                    "operator": {
+                      "type": "array",
+                      "operation": "contains",
+                      "rightType": "any"
+                    },
+                    "id": "dba26ff8-d80d-46d2-8d37-7cac00c68cec"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "d506008a-2db3-461d-8021-16641a9f27d8",
+                    "leftValue": "={{ $('init').item.json.body.conversation.custom_attributes.step_triagem }}",
+                    "rightValue": "triagem",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "f43b32f0-db1c-424a-b375-7256e8e97cdf",
+                    "leftValue": "={{ $('init').item.json.body.conversation.custom_attributes.step_triagem }}",
+                    "rightValue": "descricao",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "5af38684-80c3-41af-8449-c9de9d22fa4f",
+                    "leftValue": "={{ $('init').item.json.body.conversation.custom_attributes.step_triagem }}",
+                    "rightValue": "infos_chamados_abertos",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": 0
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -7936,
+        3616
+      ],
+      "id": "ece87a36-e89b-4b6c-9c2f-fbb9b75a0802",
+      "name": "Identifica onde o usuário está"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"content\": \"Informe o seu **NOME**, por favor!\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -5968,
+        2048
+      ],
+      "id": "72ebed62-acc5-47b7-ad61-29d6784db194",
+      "name": "Pede nome ao cliente",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "pEJ4DhM9dl1y70fn",
+          "name": "Token de Acesso ChatWoot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"custom_attributes\": {\n    \"step_triagem\": \"nome_pendente\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -5744,
+        2048
+      ],
+      "id": "1aff2e1d-ba8d-41ce-af0c-91f6a46551b2",
+      "name": "Adiciona o passo: nome_pendente",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "pEJ4DhM9dl1y70fn",
+          "name": "Token de Acesso ChatWoot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1c56a91f-835f-4199-9ea8-a35bf05d75c9",
+              "leftValue": "={{ $json.body.message_type }}",
+              "rightValue": "incoming",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "61ff073e-82e8-43ac-b082-bdb963d9b40e",
+              "leftValue": "={{ $json.body.conversation.contact_inbox.inbox_id }}",
+              "rightValue": 10,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "6973a35a-c4ab-4182-9123-b6cc6dd2babb",
+              "leftValue": "={{ $json.body.conversation.custom_attributes.step_triagem }}",
+              "rightValue": "em_atendimento",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        -8448,
+        3648
+      ],
+      "id": "985f0b92-c479-42e9-8a29-7e4406e6f118",
+      "name": "Verifica se é mensagem do cliente"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/contacts/{{ $('init').item.json.body.conversation.contact_inbox.contact_id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"name\": \"{{ $('init').item.json.body.content }}\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -5872,
+        1744
+      ],
+      "id": "5168d572-d347-4560-90ba-1a2176352271",
+      "name": "Salva nome do cliente no contato",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "VcO9g4Orh1qQUPrU",
+          "name": "Token Acesso ADM ChatWoot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"custom_attributes\": {\n    \"step_triagem\": \"\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -5600,
+        1744
+      ],
+      "id": "73e0d18d-0f44-4c04-8b0c-2d07967a191e",
+      "name": "Tira o passo: nome_pendente",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "pEJ4DhM9dl1y70fn",
+          "name": "Token de Acesso ChatWoot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "7cc3032f-4256-4d74-bfb8-e69f2d3c765d",
+                    "leftValue": "={{ $('init').item.json.body.conversation.custom_attributes.step_triagem }}",
+                    "rightValue": "nome_pendente",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('init').item.json.body.conversation.messages[0].sender.name }}",
+                    "rightValue": "[0-9!@#$%^&*(),.?\":{}|<>]",
+                    "operator": {
+                      "type": "string",
+                      "operation": "regex"
+                    },
+                    "id": "75c508c5-8cb8-459b-87cc-78458d567cec"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "80d61297-5a90-44c1-930a-2fb5355ae4a1",
+                    "leftValue": "={{ $('init').item.json.body.conversation.messages[0].sender.name }}",
+                    "rightValue": "[0-9!@#$%^&*(),.?\":{}|<>]",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEndsWith"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -6240,
+        2160
+      ],
+      "id": "7e6d5e93-ad49-4d3d-ab5a-eebd82f51d85",
+      "name": "Verifica se tem nome"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "197a318e-dd82-455f-bfd9-6ce91513b733",
+                    "leftValue": "={{ $('init').item.json.body.conversation.messages[0].sender.email }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "59242af5-77fc-4bdf-b9d6-b5b187a54a84",
+                    "leftValue": "={{ $('init').item.json.body.conversation.custom_attributes.step_triagem }}",
+                    "rightValue": "email_pendente",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('init').item.json.body.conversation.messages[0].sender.email }}",
+                    "rightValue": "={{ null }}",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    },
+                    "id": "75c508c5-8cb8-459b-87cc-78458d567cec"
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -5008,
+        2192
+      ],
+      "id": "d10b649f-a722-4e5e-ab43-95165f40e089",
+      "name": "Verifica se tem email"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"content\": \"Informe o seu e-mail para utilizarmos em seu cadastro.\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -4688,
+        2240
+      ],
+      "id": "7ebf323a-cb73-43da-9bf6-3b51598fee9c",
+      "name": "Pede email ao cliente",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "pEJ4DhM9dl1y70fn",
+          "name": "Token de Acesso ChatWoot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"custom_attributes\": {\n    \"step_triagem\": \"email_pendente\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -4464,
+        2240
+      ],
+      "id": "a9bce1c5-c1b4-4391-9ede-610a7b710484",
+      "name": "Adiciona o passo: email_pendente",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "pEJ4DhM9dl1y70fn",
+          "name": "Token de Acesso ChatWoot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/contacts/{{ $('init').item.json.body.conversation.contact_inbox.contact_id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"email\": \"{{ $('init').item.json.body.content }}\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -4400,
+        1888
+      ],
+      "id": "30804d3c-ed1f-4406-aaf3-cd0220e245c7",
+      "name": "Salva email do cliente no contato",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "VcO9g4Orh1qQUPrU",
+          "name": "Token Acesso ADM ChatWoot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"custom_attributes\": {\n    \"step_triagem\": \"\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -4176,
+        1888
+      ],
+      "id": "de7952ea-c193-47fe-8f96-3a7a46c75b0c",
+      "name": "Tira o passo: email_pendente",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "pEJ4DhM9dl1y70fn",
+          "name": "Token de Acesso ChatWoot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"content\": \"Qual a sua ocupação? (Recepcionista, Técnica(o) de Enfermagem, Enfermeira(o), ACS ...)\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -3472,
+        2336
+      ],
+      "id": "9186e43e-3f4a-413f-a140-63bcccd01140",
+      "name": "Pede ocupação ao cliente",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "pEJ4DhM9dl1y70fn",
+          "name": "Token de Acesso ChatWoot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"custom_attributes\": {\n    \"step_triagem\": \"ocupacao_pendente\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -3248,
+        2336
+      ],
+      "id": "db4906aa-334a-4f7c-b845-d80130658314",
+      "name": "Adiciona o passo: ocupacao_pendente",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "pEJ4DhM9dl1y70fn",
+          "name": "Token de Acesso ChatWoot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "HYIlOkvHPxfU3luu",
+          "mode": "list",
+          "cachedResultName": "dados_clientes",
+          "cachedResultUrl": "/projects/3GncOxuzck8dOet9/datatables/HYIlOkvHPxfU3luu"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ocupacao": "={{ $('init').item.json.body.content }}",
+            "contact_id": "={{ $('init').item.json.body.conversation.contact_inbox.contact_id }}",
+            "conversation_id": "={{ $('init').item.json.body.conversation.messages[0].conversation_id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "ocupacao",
+              "displayName": "ocupacao",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "uf_municipio",
+              "displayName": "uf_municipio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "estabelecimento",
+              "displayName": "estabelecimento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "contact_id",
+              "displayName": "contact_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "conversation_id",
+              "displayName": "conversation_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -3472,
+        2176
+      ],
+      "id": "2a88a2bd-9d12-478a-a148-87ed6fa28f49",
+      "name": "Insere ocupacao"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "197a318e-dd82-455f-bfd9-6ce91513b733",
+                    "leftValue": "={{ $('init').item.json.body.conversation.custom_attributes.controle_triagem }}",
+                    "rightValue": "uf_munic",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "94f31122-dd81-41e8-b967-a517c191272d",
+                    "leftValue": "={{ $('init').item.json.body.conversation.custom_attributes.controle_triagem }}",
+                    "rightValue": "estabelecimento",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "59242af5-77fc-4bdf-b9d6-b5b187a54a84",
+                    "leftValue": "={{ $('init').item.json.body.conversation.custom_attributes.step_triagem }}",
+                    "rightValue": "ocupacao_pendente",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -3872,
+        2144
+      ],
+      "id": "e57df96f-9e77-477f-ba6a-86f9d1ce661b",
+      "name": "Verifica se tem ocupacao"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "197a318e-dd82-455f-bfd9-6ce91513b733",
+                    "leftValue": "={{ $('init').item.json.body.conversation.custom_attributes.controle_triagem }}",
+                    "rightValue": "estabelecimento",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "59242af5-77fc-4bdf-b9d6-b5b187a54a84",
+                    "leftValue": "={{ $('init').item.json.body.conversation.custom_attributes.step_triagem }}",
+                    "rightValue": "uf_munic_pendente",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -2672,
+        2112
+      ],
+      "id": "fc36136c-81c3-4a60-a6aa-cf1fb10a7449",
+      "name": "Verifica se tem uf_munic"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"content\": \"Informe o muncípio e UF (Salvador - BA) para o qual deseja atendimento.\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -2240,
+        2432
+      ],
+      "id": "c9b97cb7-da1b-46c1-81dc-a26fbfc321a6",
+      "name": "Pede o uf_munic ao cliente",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "pEJ4DhM9dl1y70fn",
+          "name": "Token de Acesso ChatWoot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"custom_attributes\": {\n    \"step_triagem\": \"uf_munic_pendente\",\n    \"controle_triagem\": \"uf_munic\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -2016,
+        2432
+      ],
+      "id": "1b21cab5-eb7f-49c6-afc9-0a7c4f2ccacd",
+      "name": "Adiciona o passo: uf_munic_pendente",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "pEJ4DhM9dl1y70fn",
+          "name": "Token de Acesso ChatWoot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "value": "HYIlOkvHPxfU3luu",
+          "mode": "list",
+          "cachedResultName": "dados_clientes",
+          "cachedResultUrl": "/projects/3GncOxuzck8dOet9/datatables/HYIlOkvHPxfU3luu"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "contact_id",
+              "keyValue": "={{ $('init').item.json.body.conversation.contact_inbox.contact_id }}"
+            },
+            {
+              "keyName": "conversation_id",
+              "keyValue": "={{ $('init').item.json.body.conversation.messages[0].conversation_id }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "uf_municipio": "={{ $('init').item.json.body.content }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "ocupacao",
+              "displayName": "ocupacao",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "uf_municipio",
+              "displayName": "uf_municipio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "estabelecimento",
+              "displayName": "estabelecimento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "contact_id",
+              "displayName": "contact_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "conversation_id",
+              "displayName": "conversation_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -2240,
+        2272
+      ],
+      "id": "0cfea6c5-3259-4f3b-9855-b1df436bd252",
+      "name": "Insere uf_munic"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"custom_attributes\": {\n    \"controle_triagem\": \"uf_munic\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -3248,
+        2176
+      ],
+      "id": "de3b7908-bd19-4b89-9b4b-6374dce55675",
+      "name": "Adiciona o controle do prox passo: uf_munic",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "pEJ4DhM9dl1y70fn",
+          "name": "Token de Acesso ChatWoot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"custom_attributes\": {\n    \"step_triagem\": \"estabelecimento\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -2016,
+        2272
+      ],
+      "id": "9c9e5c0b-0e5e-495e-96a5-6fc64bbf96fc",
+      "name": "Adiciona o controle do prox passo: estabelecimento",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "pEJ4DhM9dl1y70fn",
+          "name": "Token de Acesso ChatWoot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "197a318e-dd82-455f-bfd9-6ce91513b733",
+                    "leftValue": "={{ $('init').item.json.body.conversation.custom_attributes.controle_triagem }}",
+                    "rightValue": "final",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "59242af5-77fc-4bdf-b9d6-b5b187a54a84",
+                    "leftValue": "={{ $('init').item.json.body.conversation.custom_attributes.step_triagem }}",
+                    "rightValue": "estabelecimento_pendente",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -1376,
+        2096
+      ],
+      "id": "6e9eeb17-21fe-436b-b5ee-c3402f8bd0fc",
+      "name": "Verifica se tem estabelecimento"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"custom_attributes\": {\n    \"step_triagem\": \"final\",\n    \"controle_triagem\": \"final\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -736,
+        1984
+      ],
+      "id": "7e205141-6301-4192-8a06-192cdfb735c5",
+      "name": "Adiciona o controle do prox passo: estabelecimento1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "pEJ4DhM9dl1y70fn",
+          "name": "Token de Acesso ChatWoot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "value": "HYIlOkvHPxfU3luu",
+          "mode": "list",
+          "cachedResultName": "dados_clientes",
+          "cachedResultUrl": "/projects/3GncOxuzck8dOet9/datatables/HYIlOkvHPxfU3luu"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "contact_id",
+              "keyValue": "={{ $('init').item.json.body.conversation.contact_inbox.contact_id }}"
+            },
+            {
+              "keyName": "conversation_id",
+              "keyValue": "={{ $('init').item.json.body.conversation.messages[0].conversation_id }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "estabelecimento": "={{ $('init').item.json.body.content }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "ocupacao",
+              "displayName": "ocupacao",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "uf_municipio",
+              "displayName": "uf_municipio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "estabelecimento",
+              "displayName": "estabelecimento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "contact_id",
+              "displayName": "contact_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "conversation_id",
+              "displayName": "conversation_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -960,
+        1984
+      ],
+      "id": "53ec395c-9754-483e-b21f-3b1b94683748",
+      "name": "Insere estabelecimento"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"content\": \"Qual o nome do estabelecimento para o qual deseja atendimento (PSF - Santa Clara)?\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -960,
+        2144
+      ],
+      "id": "14b52fe9-03de-440a-afff-5ad569d9efc3",
+      "name": "Pede o estabelecimento ao cliente",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "pEJ4DhM9dl1y70fn",
+          "name": "Token de Acesso ChatWoot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"custom_attributes\": {\n    \"step_triagem\": \"estabelecimento_pendente\",\n    \"controle_triagem\": \"estabelecimento\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -736,
+        2144
+      ],
+      "id": "47200f7f-4aec-44d9-8974-8ee38271c152",
+      "name": "Adiciona o passo: estabelecimento_pendente",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "pEJ4DhM9dl1y70fn",
+          "name": "Token de Acesso ChatWoot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"custom_attributes\": {\n    \"step_triagem\": \"triagem\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -416,
+        1840
+      ],
+      "id": "46511d13-20f4-4bc8-a178-329e94435c5e",
+      "name": "Adiciona o passo: triagem",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "pEJ4DhM9dl1y70fn",
+          "name": "Token de Acesso ChatWoot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://136.248.125.55:3000/api/v1/accounts/2/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/labels",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"labels\": [\n    \"falta_dados\",\n    \"validar_dados\"\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -6512,
+        2176
+      ],
+      "id": "47f774bd-5b61-477a-b86d-322d64c17ffe",
+      "name": "Adiciona etiqueta: falta_dados",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "VcO9g4Orh1qQUPrU",
+          "name": "Token Acesso ADM ChatWoot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://136.248.125.55:3000/api/v1/accounts/2/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/labels",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"labels\": [\n    \"\"\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -192,
+        1840
+      ],
+      "id": "36c91241-ac21-463c-8cd3-aa486c7ed65e",
+      "name": "Retira as etiquetas para dar continuidade a triagem",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "VcO9g4Orh1qQUPrU",
+          "name": "Token Acesso ADM ChatWoot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://136.248.125.55:3000/api/v1/accounts/2/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/labels",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"labels\": [\n    \"\"\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -6512,
+        2352
+      ],
+      "id": "617a01a1-c376-46ca-87b4-98bf5aaa2bf6",
+      "name": "Retira as etiquetas para dar continuidade a triagem (1)",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "VcO9g4Orh1qQUPrU",
+          "name": "Token Acesso ADM ChatWoot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"custom_attributes\": {\n    \"step_triagem\": \"triagem\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -6240,
+        2352
+      ],
+      "id": "130acc03-4454-4e0b-9029-7160f5189b26",
+      "name": "Adiciona o passo: triagem (1)",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "pEJ4DhM9dl1y70fn",
+          "name": "Token de Acesso ChatWoot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"Olá {{ $('init').item.json.body.conversation.messages[0].sender.name }}, obrigado por entrar em contato com a **WM Saúde**.\\n\\nEscolha uma das seguintes opções de acordo com a sua necessidade:\\n\\n1 - 💻 Dúvidas ou suporte técnico\\n2 - 🧾 Informações sobre protocolos abertos em seu nome.\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        288,
+        1840
+      ],
+      "id": "e585eba4-0874-45e4-ab12-8fd9ff0267f9",
+      "name": "Menu de triagem básica",
+      "executeOnce": false,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "pEJ4DhM9dl1y70fn",
+          "name": "Token de Acesso ChatWoot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"Olá {{ $('init').item.json.body.conversation.messages[0].sender.name }}, obrigado por entrar em contato com a **WM Saúde**.\\n\\nEscolha uma das seguintes opções de acordo a sua necessidade:\\n\\n1 - 💻 Dúvidas ou suporte técnico\\n2 - 🧾 Informações sobre protocolos abertos em meu nome.\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -5984,
+        2352
+      ],
+      "id": "25e376cc-b2bc-4db8-953a-d08b7f217cb4",
+      "name": "Menu de triagem básica (1)",
+      "executeOnce": false,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "pEJ4DhM9dl1y70fn",
+          "name": "Token de Acesso ChatWoot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "197a318e-dd82-455f-bfd9-6ce91513b733",
+                    "leftValue": "={{ $('init').item.json.body.content }}",
+                    "rightValue": "1",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "59242af5-77fc-4bdf-b9d6-b5b187a54a84",
+                    "leftValue": "={{ $('init').item.json.body.content }}",
+                    "rightValue": "2",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "76774153-cd53-4da0-9ec6-e8720498f742",
+                    "leftValue": "={{ $('init').item.json.body.content }}",
+                    "rightValue": "3",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -7056,
+        2992
+      ],
+      "id": "31cb0cab-7a98-47d6-9459-34f196d015d0",
+      "name": "Verifica qual a opção digitada pelo cliente"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"content\": \"Não conseguir entender a opção digitada, digite a opção novamente.\\n\\n1 - 💻 Dúvidas ou suporte técnico\\n2 - 🧾 Informações sobre protocolos abertos em seu nome.\\n3 - ❌ Finalizar atendimento.\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -6672,
+        3376
+      ],
+      "id": "880ab16a-c82f-4edb-bf36-d7e3c142577f",
+      "name": "Mensagem avisando que não entendeu a opção digitada",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "pEJ4DhM9dl1y70fn",
+          "name": "Token de Acesso ChatWoot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "kUhZV8Nf7J3JhUu3",
+          "mode": "list",
+          "cachedResultName": "historico_tickets",
+          "cachedResultUrl": "/projects/3GncOxuzck8dOet9/datatables/kUhZV8Nf7J3JhUu3"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "contact_id",
+              "keyValue": "={{ $('init').item.json.body.conversation.contact_inbox.contact_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -6672,
+        2880
+      ],
+      "id": "47c0b56e-73c9-412b-ab4f-9c4c0561e7e4",
+      "name": "Pega ticket aberto no nome do cliente",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "HYIlOkvHPxfU3luu",
+          "mode": "list",
+          "cachedResultName": "dados_clientes",
+          "cachedResultUrl": "/projects/3GncOxuzck8dOet9/datatables/HYIlOkvHPxfU3luu"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "contact_id",
+              "keyValue": "={{ $('init').item.json.body.conversation.contact_inbox.contact_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -7024,
+        2192
+      ],
+      "id": "f8816101-8849-4a6b-a782-e4a75581c08b",
+      "name": "Pega dados pessoais do cliente",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "24075351-ff98-4351-aacd-b907400b12ff",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "number",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -6400,
+        2880
+      ],
+      "id": "4466c513-5a80-479e-a468-b1a3264dde28",
+      "name": "Verifica se existe dados de ticket para esse cliente"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b8eb4eef-149d-4aae-b136-3da3b1864060",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "empty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "3277eadd-7d18-4302-81e1-5d288ad15365",
+              "leftValue": "={{ $('init').item.json.body.conversation.labels }}",
+              "rightValue": "falta_dados",
+              "operator": {
+                "type": "array",
+                "operation": "contains",
+                "rightType": "any"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {
+          "ignoreCase": false
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -6800,
+        2192
+      ],
+      "id": "779818cf-65d9-422e-a155-31164ac08485",
+      "name": "Verifica se existe dados pessoais do cliente"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"content\": \"Não identifiquei nenhum chamado aberto vinculado ao seu nome. Sem problemas!\\n\\nComo posso te ajudar hoje? Digite a opção desejada\\n\\n1 - 💻 Dúvidas ou suporte técnico\\n3 - ❌ Finalizar atendimento.\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -6096,
+        2976
+      ],
+      "id": "e24dcfa5-4ce0-4ab9-b050-9de0cbbb7869",
+      "name": "Mensagem avisando que não há ticket em aberto no nome do cliente",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "pEJ4DhM9dl1y70fn",
+          "name": "Token de Acesso ChatWoot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"Localizei os seguintes chamados em aberto no seu nome:\\n\\n📝 Protocolos:\\n{{ $('Pega ticket aberto no nome do cliente').all().map(item => '• ' + item.json.ticket_id).join('\\\\n') }}\\n\\nVocê gostaria de tratar sobre algum deles? Se sim, digite apenas o número do protocolo.\\n\\nCaso queira abrir um assunto novo, digite 0.\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -6096,
+        2816
+      ],
+      "id": "423c33aa-39ab-4f40-9ede-1f5aadbe6c91",
+      "name": "Mensagem informando todos os chamados aberto no nome do cliente",
+      "executeOnce": true,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "pEJ4DhM9dl1y70fn",
+          "name": "Token de Acesso ChatWoot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"custom_attributes\": {\n    \"step_triagem\": \"infos_chamados_abertos\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -5792,
+        2816
+      ],
+      "id": "6562e045-51f7-4939-8e1d-264c17792bd0",
+      "name": "Adiciona o passo: infos_chamados_aberto",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "pEJ4DhM9dl1y70fn",
+          "name": "Token de Acesso ChatWoot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"content\": \"Seu atendimento foi finalizado. Se ainda estiver precisando de algo envie uma mensagem para iniciarmos seu atendimento.\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -6096,
+        3216
+      ],
+      "id": "c1e47725-f87b-45fe-bc5f-996da03fdd96",
+      "name": "Mensagem avisando que o atendimento foi finalizado",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "pEJ4DhM9dl1y70fn",
+          "name": "Token de Acesso ChatWoot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://136.248.125.55:3000/api/v1/accounts/2/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/assignments",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"team_id\": 6\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -6672,
+        2656
+      ],
+      "id": "80fdf002-c105-429f-856d-ca58a01879de",
+      "name": "Adiciona ao time Suporte N1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "pEJ4DhM9dl1y70fn",
+          "name": "Token de Acesso ChatWoot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"Olá, {{ $('init').item.json.body.conversation.messages[0].sender.name }}. Direcionei sua solicitação para o nosso time de especialistas.\\n\\nSe desejar acelerar o seu atendimento, descreva o problema para o qual precisa de apoio.\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -6400,
+        2656
+      ],
+      "id": "94fd494b-935a-4e5a-89ca-e72b0589ff9e",
+      "name": "Mensagem solicitando informações",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "pEJ4DhM9dl1y70fn",
+          "name": "Token de Acesso ChatWoot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://136.248.125.55:3000/api/v1/accounts/2/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/labels",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"labels\": [\n    \"validar_dados\"\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -6400,
+        3216
+      ],
+      "id": "84ca1b87-6334-4ff6-a25b-b8ccd137e7e5",
+      "name": "Adiciona etiqueta: valida_dados",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "VcO9g4Orh1qQUPrU",
+          "name": "Token Acesso ADM ChatWoot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('init').item.json.body.conversation.messages[0].processed_message_content }}",
+                    "rightValue": "0",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "e96c646e-4ef9-4571-aade-bd72b9a2ce3f"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "c413effb-1cfb-414f-8ef3-3012891db186",
+                    "leftValue": "={{ $('init').item.json.body.conversation.messages[0].processed_message_content }}",
+                    "rightValue": "[^0-9]",
+                    "operator": {
+                      "type": "string",
+                      "operation": "regex"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "55c0c90e-0422-4317-a3fd-a5e73ed31119",
+                    "leftValue": "={{ $('init').item.json.body.conversation.messages[0].processed_message_content }}",
+                    "rightValue": "[^a-zA-ZÀ-ÿ\\W_]",
+                    "operator": {
+                      "type": "string",
+                      "operation": "regex"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -7472,
+        3936
+      ],
+      "id": "f6b9e3fb-3e9e-4896-ab4c-17368bd49ec1",
+      "name": "Verifica se número digitado pelo cliente é válido"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"Seu atendimento foi encerrado com sucesso. ✅ Caso precise de algo mais, basta enviar uma nova mensagem e estarei pronto para ajudar novamente. Tenha um excelente dia!\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -7104,
+        3888
+      ],
+      "id": "f76ce527-1376-4367-85a7-8aee0c9e27f0",
+      "name": "Mensagem enviando que está finalizando o atendimento",
+      "executeOnce": false,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "pEJ4DhM9dl1y70fn",
+          "name": "Token de Acesso ChatWoot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"custom_attributes\": {\n    \"step_triagem\": \"\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -6768,
+        3888
+      ],
+      "id": "b400267b-3404-4774-b6c5-5a16beeb1e3b",
+      "name": "Tira os passos para não impedir futuro atendimento (1)",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "pEJ4DhM9dl1y70fn",
+          "name": "Token de Acesso ChatWoot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"custom_attributes\": {\n    \"step_triagem\": \"\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -6672,
+        3216
+      ],
+      "id": "7f0c6426-f686-4568-a7fd-24733b508a90",
+      "name": "Tira os passos para não impedir futuro atendimento",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "pEJ4DhM9dl1y70fn",
+          "name": "Token de Acesso ChatWoot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://136.248.125.55:3000/api/v1/accounts/2/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/labels",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"labels\": [\n    \"validar_dados\"\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -6480,
+        3888
+      ],
+      "id": "b8d827cb-13c9-442d-bb33-1cbc428343a9",
+      "name": "Adiciona etiqueta: valida_dados (1)",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "VcO9g4Orh1qQUPrU",
+          "name": "Token Acesso ADM ChatWoot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "21dbf00c-8788-4b70-a5cb-bedea9dd75e9",
+              "leftValue": "={{ $json.ticket_id }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -6768,
+        4224
+      ],
+      "id": "25f1c778-4a9c-4f7b-8044-7c7af5b71456",
+      "name": "Verifica se o ticket digitado pelo cliente existe"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"Não conseguir achar o ticket informado, irei te mostrar novamente os chamados.\\n\\nLembrando que informe apenas o número do protocolo, sem mais nada na mensagem.\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -6480,
+        4368
+      ],
+      "id": "971639fc-7f11-4415-8c3b-ab56ed1ec030",
+      "name": "Mensagem informando que não possível achar o ticket que o cliente digitou",
+      "executeOnce": true,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "pEJ4DhM9dl1y70fn",
+          "name": "Token de Acesso ChatWoot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://glpi.wmsaude.com.br/api.php/v1/Ticket/{{ $json.ticket_id }}/",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "App-Token",
+              "value": "JNEF4dhTLaty1BHSqxdEYHV2jhu1god37IHFHqOL"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -6480,
+        4208
+      ],
+      "id": "dfcbac1f-caf1-4226-926b-dcc0e153fc05",
+      "name": "Buscar dados do cliente no GLPI",
+      "executeOnce": false,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "aLAgkGobWooRkbRp",
+          "name": "Token de Sessao GLPI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://136.248.125.55:3000/api/v1/accounts/2/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/assignments",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"team_id\": 6\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -6192,
+        4208
+      ],
+      "id": "37af5406-bc5f-4958-bf5e-26cfd51c19ff",
+      "name": "Adiciona ao time Suporte N1 (1)",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "pEJ4DhM9dl1y70fn",
+          "name": "Token de Acesso ChatWoot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"Perfeito! Já direcionei sua solicitação para o nosso setor técnico. 🛠️\\n\\nEnquanto um analista se prepara para te atender, você pode adiantar detalhes, enviar fotos ou prints do problema aqui mesmo. Isso ajuda muito na agilidade da solução!\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -5904,
+        4208
+      ],
+      "id": "61c2054d-ab04-497e-a9e7-b84ffbdb4733",
+      "name": "Mensagem informando que o cliente foi encaminhado para o setor responsável",
+      "executeOnce": true,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "pEJ4DhM9dl1y70fn",
+          "name": "Token de Acesso ChatWoot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"custom_attributes\": {\n    \"protocolo\": \"{{ $('init').item.json.body.content }}\",\n    \"link_chamado\": \"https://glpi.wmsaude.com.br/front/ticket.form.php?id={{ $('init').item.json.body.content }}\",\n    \"step_triagem\": \"em_atendimento\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -5600,
+        4208
+      ],
+      "id": "c47b39ce-0ce8-4a51-ba1a-c3e9ecdf5800",
+      "name": "Adiciona protocolo e chamado aos atributos da conversa e coloca o passo em_atendimento (1)",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "pEJ4DhM9dl1y70fn",
+          "name": "Token de Acesso ChatWoot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"Localizei os seguintes chamados em aberto no seu nome:\\n\\n📝 Protocolos:{{ $(\"Pega ticket aberto no nome do cliente\").all().map(item => '• ' + item.json.ticket_id).join('\\n') }}\\n\\nVocê gostaria de tratar sobre algum deles? Se sim, digite apenas o número do protocolo.\\n\\nCaso queira abrir um assunto novo, digite 0.\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -6192,
+        4368
+      ],
+      "id": "dbdbc8f9-7b92-4162-a867-48cdd10f9775",
+      "name": "Mensagem informando todos os chamados aberto no nome do cliente (1)",
+      "executeOnce": true,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "pEJ4DhM9dl1y70fn",
+          "name": "Token de Acesso ChatWoot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "kUhZV8Nf7J3JhUu3",
+          "mode": "list",
+          "cachedResultName": "historico_tickets",
+          "cachedResultUrl": "/projects/3GncOxuzck8dOet9/datatables/kUhZV8Nf7J3JhUu3"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "contact_id",
+              "keyValue": "={{ $('init').item.json.body.conversation.contact_inbox.contact_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -7104,
+        4224
+      ],
+      "id": "8734996e-617e-4b6d-94d3-56808ce232bd",
+      "name": "Pega ticket aberto no nome do cliente (1)",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "=wmsaude:{{ $('init').item.json.body.account.id }}:timeout:conv:{{ $('init').item.json.body.conversation.messages[0].conversation_id }}",
+        "value": "aguardando_resposta",
+        "expire": true,
+        "ttl": 300
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -5536,
+        2048
+      ],
+      "id": "7edae187-0d67-4062-9455-9d795dc68eae",
+      "name": "Cria regra de timeout",
+      "credentials": {
+        "redis": {
+          "id": "MynVI7yhhqqlbCcd",
+          "name": "Autenticacao Redis para GLPI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "=wmsaude:{{ $('init').item.json.body.account.id }}:timeout:conv:{{ $('init').item.json.body.conversation.messages[0].conversation_id }}",
+        "value": "aguardando_resposta",
+        "expire": true,
+        "ttl": 300
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -5744,
+        2352
+      ],
+      "id": "d6417882-206c-4737-9ebb-b645bc1379ce",
+      "name": "Cria regra de timeout (1)",
+      "credentials": {
+        "redis": {
+          "id": "MynVI7yhhqqlbCcd",
+          "name": "Autenticacao Redis para GLPI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "=wmsaude:{{ $('init').item.json.body.account.id }}:timeout:conv:{{ $('init').item.json.body.conversation.messages[0].conversation_id }}",
+        "value": "aguardando_resposta",
+        "expire": true,
+        "ttl": 300
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -4240,
+        2240
+      ],
+      "id": "d13ef40d-412b-46ae-bdc9-1e9ac8257733",
+      "name": "Cria regra de timeout (2)",
+      "credentials": {
+        "redis": {
+          "id": "MynVI7yhhqqlbCcd",
+          "name": "Autenticacao Redis para GLPI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "=wmsaude:{{ $('init').item.json.body.account.id }}:timeout:conv:{{ $('init').item.json.body.conversation.messages[0].conversation_id }}",
+        "value": "aguardando_resposta",
+        "expire": true,
+        "ttl": 300
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -2992,
+        2336
+      ],
+      "id": "7b0cf1fa-1b6a-4dcc-9afe-c7a81f467b29",
+      "name": "Cria regra de timeout (3)",
+      "credentials": {
+        "redis": {
+          "id": "MynVI7yhhqqlbCcd",
+          "name": "Autenticacao Redis para GLPI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "=wmsaude:{{ $('init').item.json.body.account.id }}:timeout:conv:{{ $('init').item.json.body.conversation.messages[0].conversation_id }}",
+        "value": "aguardando_resposta",
+        "expire": true,
+        "ttl": 300
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -1792,
+        2432
+      ],
+      "id": "a8734aab-24aa-4e0e-9c0a-bb1ae3e92988",
+      "name": "Cria regra de timeout (4)",
+      "credentials": {
+        "redis": {
+          "id": "MynVI7yhhqqlbCcd",
+          "name": "Autenticacao Redis para GLPI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "=wmsaude:{{ $('init').item.json.body.account.id }}:timeout:conv:{{ $('init').item.json.body.conversation.messages[0].conversation_id }}",
+        "value": "aguardando_resposta",
+        "expire": true,
+        "ttl": 300
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -496,
+        2144
+      ],
+      "id": "f77fb836-c741-4150-bef1-db8f6894f3e1",
+      "name": "Cria regra de timeout (5)",
+      "credentials": {
+        "redis": {
+          "id": "MynVI7yhhqqlbCcd",
+          "name": "Autenticacao Redis para GLPI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "=wmsaude:{{ $('init').item.json.body.account.id }}:timeout:conv:{{ $('init').item.json.body.conversation.messages[0].conversation_id }}",
+        "value": "aguardando_resposta",
+        "expire": true,
+        "ttl": 300
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        544,
+        1840
+      ],
+      "id": "c527b9d2-4609-4a1d-9f85-f9e175bbb103",
+      "name": "Cria regra de timeout (6)",
+      "credentials": {
+        "redis": {
+          "id": "MynVI7yhhqqlbCcd",
+          "name": "Autenticacao Redis para GLPI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "=wmsaude:{{ $('init').item.json.body.account.id }}:timeout:conv:{{ $('init').item.json.body.conversation.messages[0].conversation_id }}",
+        "value": "aguardando_resposta",
+        "expire": true,
+        "ttl": 300
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -5552,
+        2816
+      ],
+      "id": "85aee1e7-1a49-4fa5-b648-8db2b03b6ee0",
+      "name": "Cria regra de timeout (8)",
+      "credentials": {
+        "redis": {
+          "id": "MynVI7yhhqqlbCcd",
+          "name": "Autenticacao Redis para GLPI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "=wmsaude:{{ $('init').item.json.body.account.id }}:timeout:conv:{{ $('init').item.json.body.conversation.messages[0].conversation_id }}",
+        "value": "aguardando_resposta",
+        "expire": true,
+        "ttl": 300
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -6400,
+        3376
+      ],
+      "id": "1ec06bb4-545b-46b8-a497-ea43a75984db",
+      "name": "Cria regra de timeout (10)",
+      "credentials": {
+        "redis": {
+          "id": "MynVI7yhhqqlbCcd",
+          "name": "Autenticacao Redis para GLPI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "=wmsaude:{{ $('init').item.json.body.account.id }}:timeout:conv:{{ $('init').item.json.body.conversation.messages[0].conversation_id }}",
+        "value": "aguardando_resposta",
+        "expire": true,
+        "ttl": 300
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -5792,
+        2976
+      ],
+      "id": "86a94bb6-00f8-481e-8f37-9e9011d25394",
+      "name": "Cria regra de timeout (9)",
+      "credentials": {
+        "redis": {
+          "id": "MynVI7yhhqqlbCcd",
+          "name": "Autenticacao Redis para GLPI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "=wmsaude:{{ $('init').item.json.body.account.id }}:timeout:conv:{{ $('init').item.json.body.conversation.messages[0].conversation_id }}",
+        "value": "aguardando_resposta",
+        "expire": true,
+        "ttl": 300
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -5904,
+        4368
+      ],
+      "id": "9d2a7879-97a9-46a3-86f0-8b84d3eb8725",
+      "name": "Cria regra de timeout (11)",
+      "credentials": {
+        "redis": {
+          "id": "MynVI7yhhqqlbCcd",
+          "name": "Autenticacao Redis para GLPI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"content\": \"Seu cadastro foi finalizado. Vamos agora dar continuidade ao seu atendimento.\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        32,
+        1616
+      ],
+      "id": "234eb183-baeb-4a72-85cc-1e23c3d76877",
+      "name": "Finaliza cadastro do cliente1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "pEJ4DhM9dl1y70fn",
+          "name": "Token de Acesso ChatWoot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"custom_attributes\": {\n    \"protocolo\": \"{{ $('Cria ticket no GLPI com descrição do cliente').item.json.id }}\",\n    \"link_chamado\": \"https://glpi.wmsaude.com.br/front/ticket.form.php?id={{ $('Cria ticket no GLPI com descrição do cliente').item.json.id }}\",\n    \"step_triagem\": \"em_atendimento\",\n    \"ocupacao\": \"{{ $('Pega dados pessoais do cliente (1)').item.json.ocupacao }}\",\n    \"localidade\": \"{{ $('Pega dados pessoais do cliente (1)').item.json.uf_municipio }}\",\n    \"estabelecimento\": \"{{ $('Pega dados pessoais do cliente (1)').item.json.estabelecimento }}\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -4736,
+        2656
+      ],
+      "id": "eb2bd995-ea43-4fc9-abb5-5fb02f8fc918",
+      "name": "Adiciona protocolo e chamado aos atributos da conversa e coloca o passo em_atendimento",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "pEJ4DhM9dl1y70fn",
+          "name": "Token de Acesso ChatWoot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "kUhZV8Nf7J3JhUu3",
+          "mode": "list",
+          "cachedResultName": "historico_tickets",
+          "cachedResultUrl": "/projects/3GncOxuzck8dOet9/datatables/kUhZV8Nf7J3JhUu3"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "contact_id": "={{ $('init').item.json.body.conversation.contact_inbox.contact_id }}",
+            "convesation_id": "={{ $('init').item.json.body.conversation.messages[0].conversation_id }}",
+            "ticket_id": "={{ $('Cria ticket no GLPI com descrição do cliente').item.json.id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "contact_id",
+              "displayName": "contact_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ticket_id",
+              "displayName": "ticket_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "convesation_id",
+              "displayName": "convesation_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -4448,
+        2656
+      ],
+      "id": "09c0da28-b195-444e-9c12-e358b3339a3f",
+      "name": "Insere ticket na base de dados"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"O seu protocolo de atendimento é o nº {{ $('Cria ticket no GLPI com descrição do cliente').item.json.id }}.\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -4992,
+        2656
+      ],
+      "id": "fa83e632-e2d1-46fa-be29-9d60cb1ee348",
+      "name": "Mensagem informando o protocolo para o cliente",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "pEJ4DhM9dl1y70fn",
+          "name": "Token de Acesso ChatWoot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://glpi.wmsaude.com.br/api.php/v1/Ticket",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "App-Token",
+              "value": "JNEF4dhTLaty1BHSqxdEYHV2jhu1god37IHFHqOL"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"input\": {\n    \"name\": \"Chamado via Chatwoot: {{ $('init').item.json.body.conversation.messages[0].sender.name }}\",\n    \"content\": \"<table><tr><td><b>Solicitante:</b></td><td>{{ $('init').item.json.body.conversation.messages[0].sender.name }}</td></tr><tr><td><b>E-mail:</b></td><td>{{ $('init').item.json.body.conversation.messages[0].sender.email }}</td></tr><tr><td><b>Telefone:</b></td><td> {{ $('init').item.json.body.conversation.messages[0].sender.phone_number }}</td></tr><tr><td><b>Link da conversa:</b></td><td><a href='https://suporte.wmsaude.com.br/app/accounts/2/inbox/22/conversations/{{ $('init').item.json.body.conversation.id }}' target='_blank'>Acessar no Chatwoot</a></td></tr></table>\",\n    \"_groups_id_assign\": [ 6 ],\n    \"_municpiorequerentefield\": [ {{ $json.id_municipio_glpi || 87 }} ],\n    \"externalid\": \"{{ $('init').item.json.body.conversation.id }}\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -5536,
+        2656
+      ],
+      "id": "291b2c66-6e61-4d1b-b6db-11b0f8c93620",
+      "name": "Cria ticket no GLPI com descrição do cliente",
+      "alwaysOutputData": false,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "aLAgkGobWooRkbRp",
+          "name": "Token de Sessao GLPI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "HYIlOkvHPxfU3luu",
+          "mode": "list",
+          "cachedResultName": "dados_clientes",
+          "cachedResultUrl": "/projects/3GncOxuzck8dOet9/datatables/HYIlOkvHPxfU3luu"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "contact_id",
+              "keyValue": "={{ $('init').item.json.body.conversation.contact_inbox.contact_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -6096,
+        2656
+      ],
+      "id": "f1cc3982-6b19-43dc-9e3f-772eb3b1183c",
+      "name": "Pega dados pessoais do cliente (1)",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Pega o valor correto da base de dados (agora a usar 'uf_municipio')\nconst valorOriginal = $json.uf_municipio || \"\";\n\n// 2. Dicionário de Cidades (ID 1 a 86)\nconst mapaCidades = {\n    // Estados (IDs 1 a 6)\n    \"bahia\": 1, \"piaui\": 2, \"ceara\": 3, \"minas gerais\": 4, \"maranhao\": 5, \"para\": 6,\n\n    // Cidades da Bahia\n    \"anage\": 7, \"angical\": 8, \"barra da estiva\": 9, \"barra do choca\": 10, \"brejolandia\": 11,\n    \"cacule\": 12, \"caetanos\": 13, \"canapolis\": 14, \"candiba\": 15, \"carinhanha\": 16,\n    \"cocos\": 17, \"dom basilio\": 18, \"erico cardoso\": 19, \"feira da mata\": 20, \"guanambi\": 21,\n    \"ibicui\": 22, \"ibipitanga\": 23, \"itabuna\": 24, \"itagiba\": 25, \"itagimirim\": 26,\n    \"itambe\": 27, \"itapebi\": 28, \"itororo\": 29, \"ituacu\": 30, \"iuiu\": 31, \"jaborandi\": 32,\n    \"jussiape\": 33, \"macaubas\": 34, \"malhada\": 35, \"morpara\": 36, \"nova canaa\": 37,\n    \"palmas de monte alto\": 38, \"palmeiras\": 39, \"paramirim\": 40, \"pindai\": 41, \"planalto\": 42,\n    \"riacho de santana\": 43, \"ribeirao do largo\": 44, \"rio de contas\": 45, \"rio do pires\": 46,\n    \"sao felix do coribe\": 47, \"sebastiao laranjeiras\": 48, \"serra dourada\": 49,\n    \"tabocas do brejo velho\": 50, \"tanhacu\": 51, \"tanque novo\": 52, \"tremedal\": 53,\n    \"una\": 54, \"urandi\": 55, \"vitoria da conquista\": 56,\n\n    // Cidades do Piauí\n    \"baixa grande do ribeiro\": 57, \"beneditinos\": 58, \"buriti dos montes\": 59, \"campo maior\": 60,\n    \"canto do buriti\": 61, \"castelo do piaui\": 62, \"colonia do gurgueia\": 63, \"curimata\": 64,\n    \"elesbao veloso\": 66, \"inhuma\": 67, \"isaias coelho\": 68, \"jaicos\": 69, \"juazeiro do piaui\": 70,\n    \"lagoa alegre\": 71, \"marcolandia\": 72, \"matias olimpio\": 73, \"piracuruca\": 74, \"piripiri\": 75,\n    \"santa filomena\": 76, \"sigefredo pacheco\": 77, \"valenca do piaui\": 78,\n\n    // Cidades do Ceará\n    \"brejo santo\": 79, \"itaicaba\": 80, \"senador de sa\": 82,\n\n    // Cidades de Minas Gerais\n    \"espinosa\": 83, \"pedra azul\": 84,\n\n    // Maranhão e Pará\n    \"colinas\": 85, \"ponta de pedras\": 86\n};\n\n// 3. Função para extrair apenas a cidade e normalizar o texto\nconst extrairENormalizar = (texto) => {\n    if (!texto) return \"\";\n    \n    // Passa para minúsculas e remove os acentos logo de cara\n    let textoLimpo = String(texto).toLowerCase().normalize(\"NFD\").replace(/[\\u0300-\\u036f]/g, \"\");\n\n    // Regex para encontrar siglas de estados no final da frase (com ou sem hífen ou espaços)\n    // O \\b garante que é uma palavra isolada (ex: ignora o \"ba\" no final de \"candiba\")\n    // Cobri todas as UFs para deixar a automação à prova de balas\n    textoLimpo = textoLimpo.replace(/\\s*-?\\s*\\b(ac|al|ap|am|ba|ce|df|es|go|ma|mt|ms|mg|pa|pb|pr|pe|pi|rj|rn|rs|ro|rr|sc|sp|se|to)\\b$/, \"\");\n    \n    // Remove os espaços extras que possam sobrar nas pontas\n    return textoLimpo.trim();\n};\n\nconst cidadeLimpa = extrairENormalizar(valorOriginal);\n\n// 4. Encontra o ID no mapa (se a cidade não existir na lista, retorna null)\nconst id_cidade_glpi = mapaCidades[cidadeLimpa] || null;\n\n// 5. Retorno para o nó seguinte\nreturn {\n    texto_original: valorOriginal,\n    cidade_processada: cidadeLimpa,\n    id_municipio_glpi: id_cidade_glpi\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -5792,
+        2656
+      ],
+      "id": "dd7591f5-1b7a-4a5b-8d8c-d602fd510001",
+      "name": "Tratando o Município"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "4859de8c-d5a3-4405-94bd-6193e28ca3a6",
+              "leftValue": "={{ $('init').item.json.body.content }}",
+              "rightValue": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+              "operator": {
+                "type": "string",
+                "operation": "regex"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -4688,
+        1904
+      ],
+      "id": "c09ad5df-ef3c-4daa-8751-ba26378e55b6",
+      "name": "Verifica se email é valido"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"content\": \"O e-mail informado parece estar em um formato inválido. Por favor, digite um endereço de e-mail válido contendo o '@' e o domínio (exemplo: usuario@email.com) para darmos continuidade à abertura do seu chamado.\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -4400,
+        2048
+      ],
+      "id": "e248b740-a84a-4b12-9ba1-ccf6f47d6beb",
+      "name": "Informa que não conseguiu entender o email informado e pede que envie novamente da forma correta",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "pEJ4DhM9dl1y70fn",
+          "name": "Token de Acesso ChatWoot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://glpi.wmsaude.com.br/api.php/v1/PluginFieldsTicketmunicpiorequerente",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "App-Token",
+              "value": "JNEF4dhTLaty1BHSqxdEYHV2jhu1god37IHFHqOL"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"input\": {\n    \"items_id\": {{ $json.id }},\n    \"itemtype\": \"Ticket\",\n    \"plugin_fields_municpiorequerentefielddropdowns_id\": {{ $('Tratando o Município').item.json.id_municipio_glpi || 88 }},\n    \"unidadedoclientefield\": \"{{ $('Pega dados pessoais do cliente (1)').item.json.estabelecimento }}\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -5264,
+        2656
+      ],
+      "id": "174df3e6-729c-4ffd-9284-16b7844934e2",
+      "name": "Informa o campo de município requerente e sua base",
+      "alwaysOutputData": false,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "aLAgkGobWooRkbRp",
+          "name": "Token de Sessao GLPI"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "init": [
+      {
+        "json": {
+          "headers": {
+            "accept": "application/json",
+            "user-agent": "rest-client/2.1.0 (linux x86_64) ruby/3.4.4p34",
+            "content-type": "application/json",
+            "content-length": "2382",
+            "accept-encoding": "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
+            "host": "136.248.125.55:5678"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "account": {
+              "id": 2,
+              "name": "WM Saúde"
+            },
+            "additional_attributes": {},
+            "content_attributes": {},
+            "content_type": "text",
+            "content": "Oi",
+            "conversation": {
+              "additional_attributes": {},
+              "can_reply": true,
+              "channel": "Channel::Whatsapp",
+              "contact_inbox": {
+                "id": 1104,
+                "contact_id": 5231,
+                "inbox_id": 10,
+                "source_id": "557999684200",
+                "created_at": "2026-05-11T17:38:57.639Z",
+                "updated_at": "2026-05-11T17:38:57.639Z",
+                "hmac_verified": false,
+                "pubsub_token": "rm1mUreg6woSZ4Q3KEA2BBYQ"
+              },
+              "id": 508,
+              "inbox_id": 10,
+              "messages": [
+                {
+                  "id": 34897,
+                  "content": "Oi",
+                  "account_id": 2,
+                  "inbox_id": 10,
+                  "conversation_id": 508,
+                  "message_type": 0,
+                  "created_at": 1778521304,
+                  "updated_at": "2026-05-11T17:41:44.529Z",
+                  "private": false,
+                  "status": "sent",
+                  "source_id": "wamid.HBgMNTU3OTk5Njg0MjAwFQIAEhggQUMxODI5RTRGNkVFNzg4NDJFQUVBNEM5MEI1NTFCMzEA",
+                  "content_type": "text",
+                  "content_attributes": {},
+                  "sender_type": "Contact",
+                  "sender_id": 5231,
+                  "external_source_ids": {},
+                  "additional_attributes": {},
+                  "processed_message_content": "Oi",
+                  "sentiment": {},
+                  "conversation": {
+                    "assignee_id": null,
+                    "unread_count": 1,
+                    "last_activity_at": 1778521304,
+                    "contact_inbox": {
+                      "source_id": "557999684200"
+                    }
+                  },
+                  "sender": {
+                    "additional_attributes": {},
+                    "custom_attributes": {},
+                    "email": null,
+                    "id": 5231,
+                    "identifier": null,
+                    "name": "Invenção",
+                    "phone_number": "+557999684200",
+                    "thumbnail": "",
+                    "blocked": false,
+                    "type": "contact"
+                  }
+                }
+              ],
+              "labels": [],
+              "meta": {
+                "sender": {
+                  "additional_attributes": {},
+                  "custom_attributes": {},
+                  "email": null,
+                  "id": 5231,
+                  "identifier": null,
+                  "name": "Invenção",
+                  "phone_number": "+557999684200",
+                  "thumbnail": "",
+                  "blocked": false,
+                  "type": "contact"
+                },
+                "assignee": null,
+                "assignee_type": null,
+                "team": null,
+                "hmac_verified": false
+              },
+              "status": "open",
+              "custom_attributes": {},
+              "snoozed_until": null,
+              "unread_count": 1,
+              "first_reply_created_at": null,
+              "priority": null,
+              "waiting_since": 1778521304,
+              "agent_last_seen_at": 0,
+              "contact_last_seen_at": 0,
+              "last_activity_at": 1778521304,
+              "timestamp": 1778521304,
+              "created_at": 1778521304,
+              "updated_at": 1778521304.5308511
+            },
+            "created_at": "2026-05-11T17:41:44.529Z",
+            "id": 34897,
+            "inbox": {
+              "id": 10,
+              "name": "Atendimento ao Cliente"
+            },
+            "message_type": "incoming",
+            "private": false,
+            "sender": {
+              "account": {
+                "id": 2,
+                "name": "WM Saúde"
+              },
+              "additional_attributes": {},
+              "avatar": "",
+              "custom_attributes": {},
+              "email": null,
+              "id": 5231,
+              "identifier": null,
+              "name": "Invenção",
+              "phone_number": "+557999684200",
+              "thumbnail": "",
+              "blocked": false
+            },
+            "source_id": "wamid.HBgMNTU3OTk5Njg0MjAwFQIAEhggQUMxODI5RTRGNkVFNzg4NDJFQUVBNEM5MEI1NTFCMzEA",
+            "event": "message_created"
+          },
+          "webhookUrl": "http://localhost:5678/webhook/fluxo-principal",
+          "executionMode": "production"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "init": {
+      "main": [
+        [
+          {
+            "node": "Verifica se é mensagem do cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cancela Timeout": {
+      "main": [
+        [
+          {
+            "node": "Identifica onde o usuário está",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Identifica onde o usuário está": {
+      "main": [
+        [
+          {
+            "node": "Pega dados pessoais do cliente",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Verifica qual a opção digitada pelo cliente",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [],
+        [
+          {
+            "node": "Verifica se número digitado pelo cliente é válido",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pede nome ao cliente": {
+      "main": [
+        [
+          {
+            "node": "Adiciona o passo: nome_pendente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifica se é mensagem do cliente": {
+      "main": [
+        [
+          {
+            "node": "Cancela Timeout",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Salva nome do cliente no contato": {
+      "main": [
+        [
+          {
+            "node": "Tira o passo: nome_pendente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifica se tem nome": {
+      "main": [
+        [
+          {
+            "node": "Salva nome do cliente no contato",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Pede nome ao cliente",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Verifica se tem email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifica se tem email": {
+      "main": [
+        [
+          {
+            "node": "Verifica se tem ocupacao",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Verifica se email é valido",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Pede email ao cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pede email ao cliente": {
+      "main": [
+        [
+          {
+            "node": "Adiciona o passo: email_pendente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Salva email do cliente no contato": {
+      "main": [
+        [
+          {
+            "node": "Tira o passo: email_pendente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pede ocupação ao cliente": {
+      "main": [
+        [
+          {
+            "node": "Adiciona o passo: ocupacao_pendente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insere ocupacao": {
+      "main": [
+        [
+          {
+            "node": "Adiciona o controle do prox passo: uf_munic",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifica se tem ocupacao": {
+      "main": [
+        [
+          {
+            "node": "Verifica se tem uf_munic",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Verifica se tem uf_munic",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Insere ocupacao",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Pede ocupação ao cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifica se tem uf_munic": {
+      "main": [
+        [
+          {
+            "node": "Verifica se tem estabelecimento",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Insere uf_munic",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Pede o uf_munic ao cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pede o uf_munic ao cliente": {
+      "main": [
+        [
+          {
+            "node": "Adiciona o passo: uf_munic_pendente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insere uf_munic": {
+      "main": [
+        [
+          {
+            "node": "Adiciona o controle do prox passo: estabelecimento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tira o passo: nome_pendente": {
+      "main": [
+        [
+          {
+            "node": "Verifica se tem email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adiciona o passo: email_pendente": {
+      "main": [
+        [
+          {
+            "node": "Cria regra de timeout (2)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adiciona o passo: ocupacao_pendente": {
+      "main": [
+        [
+          {
+            "node": "Cria regra de timeout (3)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tira o passo: email_pendente": {
+      "main": [
+        [
+          {
+            "node": "Verifica se tem ocupacao",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adiciona o controle do prox passo: uf_munic": {
+      "main": [
+        [
+          {
+            "node": "Verifica se tem uf_munic",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifica se tem estabelecimento": {
+      "main": [
+        [
+          {
+            "node": "Adiciona o passo: triagem",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Insere estabelecimento",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Pede o estabelecimento ao cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insere estabelecimento": {
+      "main": [
+        [
+          {
+            "node": "Adiciona o controle do prox passo: estabelecimento1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pede o estabelecimento ao cliente": {
+      "main": [
+        [
+          {
+            "node": "Adiciona o passo: estabelecimento_pendente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adiciona o controle do prox passo: estabelecimento": {
+      "main": [
+        [
+          {
+            "node": "Verifica se tem estabelecimento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adiciona o passo: triagem": {
+      "main": [
+        [
+          {
+            "node": "Retira as etiquetas para dar continuidade a triagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adiciona etiqueta: falta_dados": {
+      "main": [
+        [
+          {
+            "node": "Verifica se tem nome",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retira as etiquetas para dar continuidade a triagem": {
+      "main": [
+        [
+          {
+            "node": "Menu de triagem básica",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retira as etiquetas para dar continuidade a triagem (1)": {
+      "main": [
+        [
+          {
+            "node": "Adiciona o passo: triagem (1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adiciona o passo: triagem (1)": {
+      "main": [
+        [
+          {
+            "node": "Menu de triagem básica (1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifica qual a opção digitada pelo cliente": {
+      "main": [
+        [
+          {
+            "node": "Adiciona ao time Suporte N1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Pega ticket aberto no nome do cliente",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Tira os passos para não impedir futuro atendimento",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mensagem avisando que não entendeu a opção digitada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pega dados pessoais do cliente": {
+      "main": [
+        [
+          {
+            "node": "Verifica se existe dados pessoais do cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pega ticket aberto no nome do cliente": {
+      "main": [
+        [
+          {
+            "node": "Verifica se existe dados de ticket para esse cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifica se existe dados pessoais do cliente": {
+      "main": [
+        [
+          {
+            "node": "Adiciona etiqueta: falta_dados",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Retira as etiquetas para dar continuidade a triagem (1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifica se existe dados de ticket para esse cliente": {
+      "main": [
+        [
+          {
+            "node": "Mensagem informando todos os chamados aberto no nome do cliente",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mensagem avisando que não há ticket em aberto no nome do cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mensagem informando todos os chamados aberto no nome do cliente": {
+      "main": [
+        [
+          {
+            "node": "Adiciona o passo: infos_chamados_aberto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adiciona ao time Suporte N1": {
+      "main": [
+        [
+          {
+            "node": "Mensagem solicitando informações",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mensagem solicitando informações": {
+      "main": [
+        [
+          {
+            "node": "Pega dados pessoais do cliente (1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adiciona etiqueta: valida_dados": {
+      "main": [
+        [
+          {
+            "node": "Mensagem avisando que o atendimento foi finalizado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifica se número digitado pelo cliente é válido": {
+      "main": [
+        [
+          {
+            "node": "Mensagem enviando que está finalizando o atendimento",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [],
+        [
+          {
+            "node": "Pega ticket aberto no nome do cliente (1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mensagem enviando que está finalizando o atendimento": {
+      "main": [
+        [
+          {
+            "node": "Tira os passos para não impedir futuro atendimento (1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tira os passos para não impedir futuro atendimento": {
+      "main": [
+        [
+          {
+            "node": "Adiciona etiqueta: valida_dados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tira os passos para não impedir futuro atendimento (1)": {
+      "main": [
+        [
+          {
+            "node": "Adiciona etiqueta: valida_dados (1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifica se o ticket digitado pelo cliente existe": {
+      "main": [
+        [
+          {
+            "node": "Buscar dados do cliente no GLPI",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mensagem informando que não possível achar o ticket que o cliente digitou",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar dados do cliente no GLPI": {
+      "main": [
+        [
+          {
+            "node": "Adiciona ao time Suporte N1 (1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adiciona ao time Suporte N1 (1)": {
+      "main": [
+        [
+          {
+            "node": "Mensagem informando que o cliente foi encaminhado para o setor responsável",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mensagem informando que o cliente foi encaminhado para o setor responsável": {
+      "main": [
+        [
+          {
+            "node": "Adiciona protocolo e chamado aos atributos da conversa e coloca o passo em_atendimento (1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mensagem informando que não possível achar o ticket que o cliente digitou": {
+      "main": [
+        [
+          {
+            "node": "Mensagem informando todos os chamados aberto no nome do cliente (1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pega ticket aberto no nome do cliente (1)": {
+      "main": [
+        [
+          {
+            "node": "Verifica se o ticket digitado pelo cliente existe",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adiciona o passo: nome_pendente": {
+      "main": [
+        [
+          {
+            "node": "Cria regra de timeout",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Menu de triagem básica (1)": {
+      "main": [
+        [
+          {
+            "node": "Cria regra de timeout (1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adiciona o passo: uf_munic_pendente": {
+      "main": [
+        [
+          {
+            "node": "Cria regra de timeout (4)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adiciona o passo: estabelecimento_pendente": {
+      "main": [
+        [
+          {
+            "node": "Cria regra de timeout (5)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Menu de triagem básica": {
+      "main": [
+        [
+          {
+            "node": "Cria regra de timeout (6)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adiciona o passo: infos_chamados_aberto": {
+      "main": [
+        [
+          {
+            "node": "Cria regra de timeout (8)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mensagem avisando que não há ticket em aberto no nome do cliente": {
+      "main": [
+        [
+          {
+            "node": "Cria regra de timeout (9)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mensagem avisando que não entendeu a opção digitada": {
+      "main": [
+        [
+          {
+            "node": "Cria regra de timeout (10)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mensagem informando todos os chamados aberto no nome do cliente (1)": {
+      "main": [
+        [
+          {
+            "node": "Cria regra de timeout (11)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cria regra de timeout (1)": {
+      "main": [
+        []
+      ]
+    },
+    "Adiciona o controle do prox passo: estabelecimento1": {
+      "main": [
+        [
+          {
+            "node": "Adiciona o passo: triagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adiciona protocolo e chamado aos atributos da conversa e coloca o passo em_atendimento": {
+      "main": [
+        [
+          {
+            "node": "Insere ticket na base de dados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mensagem informando o protocolo para o cliente": {
+      "main": [
+        [
+          {
+            "node": "Adiciona protocolo e chamado aos atributos da conversa e coloca o passo em_atendimento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cria ticket no GLPI com descrição do cliente": {
+      "main": [
+        [
+          {
+            "node": "Informa o campo de município requerente e sua base",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pega dados pessoais do cliente (1)": {
+      "main": [
+        [
+          {
+            "node": "Tratando o Município",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tratando o Município": {
+      "main": [
+        [
+          {
+            "node": "Cria ticket no GLPI com descrição do cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifica se email é valido": {
+      "main": [
+        [
+          {
+            "node": "Salva email do cliente no contato",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Informa que não conseguiu entender o email informado e pede que envie novamente da forma correta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Informa o campo de município requerente e sua base": {
+      "main": [
+        [
+          {
+            "node": "Mensagem informando o protocolo para o cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "9224562d-3830-48a3-a81a-6d3845328a5f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "20d61d4346ce6060f90882f582ec82333f0d0ef83add04f61cda543f312ca8da"
+  },
+  "id": "fJ8H-BKlmeHPxZ4ueDiWi",
+  "tags": [
+    {
+      "updatedAt": "2026-03-12T18:10:41.178Z",
+      "createdAt": "2026-03-12T18:10:41.178Z",
+      "id": "F3k4hPbgjXLPrNCz",
+      "name": "Triagem-GLPI"
+    }
+  ]
+}

@@ -1,0 +1,484 @@
+{
+  "name": "Associação automática ChatWoot -> GLPI",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "fluxo-associacao",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1136,
+        112
+      ],
+      "id": "eb5f1584-06f4-45d3-b85f-90ac03fda525",
+      "name": "Webhook",
+      "webhookId": "1167f344-3518-4c7c-a575-b03970a8c1c8"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c18add2b-cbb7-4c19-b79d-f0251cabfa61",
+              "leftValue": "={{ $json.body.contact_inbox.inbox_id }}",
+              "rightValue": 10,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "5ba71344-e3ca-453b-92af-b43d31477b75",
+              "leftValue": "={{ $json.body.meta.team.name }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        -496,
+        16
+      ],
+      "id": "9c7a94a9-ba0e-4f65-8bbb-4ad68b0bf35a",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "url": "https://glpi.wmsaude.com.br/api.php/v1/Group",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "App-Token",
+              "value": "JNEF4dhTLaty1BHSqxdEYHV2jhu1god37IHFHqOL"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "d8b3382d-d57f-419d-97cc-12cfc49407a1",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "aLAgkGobWooRkbRp",
+          "name": "Token de Sessao GLPI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// ==========================================\n// 1. MAPA DE AGENTES (ID Chatwoot -> ID GLPI)\n// ==========================================\nconst mapaAgentes = {\n  // --- EQUIPA ANTIGA ---\n  \"3\": 10,  // MILENA DUTRA\n  \"4\": 8,   // MATHEUS TAVARES\n  \"5\": 9,   // JENIFFER VICTORIA\n  \"7\": 11,  // DAYANNA CLAUDINO\n  \"8\": 12,  // LUIZ FERNANDO\n  \"10\": 14, // ÍTALO WAGNER\n  \"11\": 15, // CRISTIANE CARVALHO\n  \"12\": 16, // MONIQUE KELLY\n  \"13\": 17, // GERSON JUNIOR\n  \"14\": 18, // RAFAEL CRUZ\n  \"15\": 20, // FELIPE JOVINO\n  \"16\": 19, // GUILHERME DA INVENÇÃO\n  \"17\": 21, // ADAILSON ROCHA\n  \"18\": 22, // EDIMILSON BASTOS\n  \"19\": 23, // DANIEL LOPES\n  \"20\": 24, // DANILO ROCHA\n  \"21\": 25, // JONATAS NATÃ \n  \"22\": 26, // JADEILSON ROCHA \n\n  // --- NOVA EQUIPA (Preenchidos pela ordem de exportação do CSV) ---\n  \n  // O utilizador WM Saúde é o primeiro do CSV. O GLPI costuma usar o ID 2 para o super-admin.\n  \"2\": 2,   // WM SAÚDE \n\n  \"25\": 27, // VITOR OLIVEIRA\n  \"26\": 28, // ISABELLA CHAVES\n  \"27\": 29, // DEBORAH MACHADO\n  \"28\": 30, // GRAZIELLY MARINHO\n  \"29\": 31, // ELERY MAYARA\n  \"30\": 32, // THAIS LADEIA\n  \"31\": 33, // DANIELA SOUZA\n  \"32\": 34, // MARIA LUISA (Sem e-mail no GLPI, mas vai associar pelo ID!)\n  \"33\": 35, // ANA FLAVIA\n  \"34\": 36, // ANA CAMILA\n  \"35\": 37, // JANAÍNA LUZ\n  \"36\": 38, // LUIS DANIEL\n  \"37\": 39, // SUCESSO DO CLIENTE - GROWBIT\n  \"38\": 40, // GUSTAVO ALBERTO\n\n  // A Rafaela não estava no CSV, por isso deixei com 0 para o fluxo não encravar.\n  // Quando a criar no GLPI, será provavelmente o ID 41.\n  \"39\": 0   // RAFAELA \n};\n\n// ==========================================\n// 2. PROCESSAR O AGENTE DO WEBHOOK\n// ==========================================\nlet agente_id_glpi = 0;\nlet nome_agente = \"Não atribuído\";\n\nconst idChatwoot = $node[\"Webhook\"].json.body.meta?.assignee?.id || \n                   $node[\"Webhook\"].json.body.data?.assignee?.id;\n\nif (idChatwoot && mapaAgentes[idChatwoot.toString()]) {\n    agente_id_glpi = mapaAgentes[idChatwoot.toString()];\n    nome_agente = $node[\"Webhook\"].json.body.meta?.assignee?.name || \"Detectado\";\n}\n\n// ==========================================\n// 3. PROCESSAR A EQUIPE (GRUPO)\n// ==========================================\nlet glpi_group_id = 0;\nconst teamNameChatwoot = $node[\"Webhook\"].json.body.meta?.team?.name || \n                         $node[\"Webhook\"].json.body.team?.name;\n\nif (teamNameChatwoot) {\n    const normalizar = (t) => t.trim().toLowerCase().normalize(\"NFD\").replace(/[\\u0300-\\u036f]/g, \"\");\n    const nomeNormalizadoChatwoot = normalizar(teamNameChatwoot);\n\n    const gruposGlpi = $input.all();\n    const grupoEncontrado = gruposGlpi.find(i => \n        i.json.name && normalizar(i.json.name) === nomeNormalizadoChatwoot\n    );\n    \n    if (grupoEncontrado) glpi_group_id = grupoEncontrado.json.id;\n}\n\n// ==========================================\n// 4. RETORNO FINAL\n// ==========================================\nreturn {\n    agente_id_glpi, \n    glpi_group_id,\n    id_chatwoot_detectado: idChatwoot || \"Nenhum\",\n    nome_agente_detectado: nome_agente,\n    tipo_glpi_id: 1 \n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        0
+      ],
+      "id": "5cbc7f4d-8c99-42bd-a28c-ac841f216cb9",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "5519193e-f737-40ef-b9bc-fbb90df0c027",
+              "leftValue": "={{ $('Webhook').first().json.body.custom_attributes.protocolo }}",
+              "rightValue": "={{ $('Webhook').first().json.body.custom_attributes.protocolo }}",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -272,
+        16
+      ],
+      "id": "98704e61-51a2-40f2-926b-2e325edbd776",
+      "name": "If",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://glpi.wmsaude.com.br/api.php/v1/Ticket/{{ $('Webhook').first().json.body.custom_attributes.protocolo }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "App-Token",
+              "value": "JNEF4dhTLaty1BHSqxdEYHV2jhu1god37IHFHqOL"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"input\": {\n    \"id\": {{ $('Webhook').first().json.body.custom_attributes.protocolo }},\n    \"_users_id_assign\": {{ $json.agente_id_glpi }},\n    \"_groups_id_assign\": {{ $json.glpi_group_id }},\n    \"type\": {{ $json.tipo_glpi_id }}\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        448,
+        0
+      ],
+      "id": "be21680b-ded8-45d4-8b2c-b935d75f745e",
+      "name": "HTTP Request1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "aLAgkGobWooRkbRp",
+          "name": "Token de Sessao GLPI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "2a68fdf2-b844-4362-91da-4ff15e5703a7",
+              "leftValue": "={{ $json.body.status }}",
+              "rightValue": "=resolved",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -864,
+        112
+      ],
+      "id": "f9865378-1166-4fce-839c-5995f900bf02",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{ $json.body.messages[0].account_id }}/conversations/{{ $json.body.messages[0].conversation_id }}/custom_attributes",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"custom_attributes\": {\n    \"o_usurio_esta_passando_por_onde\": \"\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -496,
+        224
+      ],
+      "id": "bbbb448a-287c-4047-9500-493e6ed074cb",
+      "name": "HTTP Request2",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "VcO9g4Orh1qQUPrU",
+          "name": "Token Acesso ADM ChatWoot"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "accept": "application/json",
+            "user-agent": "rest-client/2.1.0 (linux x86_64) ruby/3.4.4p34",
+            "content-type": "application/json",
+            "content-length": "2402",
+            "accept-encoding": "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
+            "host": "136.248.125.55:5678"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "additional_attributes": {},
+            "can_reply": true,
+            "channel": "Channel::Whatsapp",
+            "contact_inbox": {
+              "id": 1210,
+              "contact_id": 5335,
+              "inbox_id": 10,
+              "source_id": "557999684200",
+              "created_at": "2026-05-12T13:43:39.834Z",
+              "updated_at": "2026-05-12T13:43:39.834Z",
+              "hmac_verified": false,
+              "pubsub_token": "7YuZC4nY896nLFtcVcQFFyXx"
+            },
+            "id": 628,
+            "inbox_id": 10,
+            "messages": [
+              {
+                "id": 39865,
+                "content": "O seu protocolo de atendimento é o nº 412.",
+                "account_id": 2,
+                "inbox_id": 10,
+                "conversation_id": 628,
+                "message_type": 1,
+                "created_at": 1778593576,
+                "updated_at": "2026-05-12T13:46:18.961Z",
+                "private": false,
+                "status": "delivered",
+                "source_id": "wamid.HBgMNTU3OTk5Njg0MjAwFQIAERgSRDMzMTQ3RkY4ODE0NDM1MjIzAA==",
+                "content_type": "text",
+                "content_attributes": {},
+                "sender_type": "AgentBot",
+                "sender_id": 7,
+                "external_source_ids": {},
+                "additional_attributes": {},
+                "processed_message_content": "O seu protocolo de atendimento é o nº 412.",
+                "sentiment": {},
+                "conversation": {
+                  "assignee_id": 15,
+                  "unread_count": 0,
+                  "last_activity_at": 1778593576,
+                  "contact_inbox": {
+                    "source_id": "557999684200"
+                  }
+                },
+                "sender": {
+                  "id": 7,
+                  "name": "Bot WMSaude",
+                  "avatar_url": "",
+                  "type": "agent_bot"
+                }
+              }
+            ],
+            "labels": [],
+            "meta": {
+              "sender": {
+                "additional_attributes": {
+                  "avatar_url_hash": "c31746cd63d208f9480ffb43a6bb446ea537f0ed4bb88fa7d25a82241235c120",
+                  "last_avatar_sync_at": "2026-05-12T13:44:26Z"
+                },
+                "custom_attributes": {},
+                "email": "teste@teste.com",
+                "id": 5335,
+                "identifier": null,
+                "name": "Invenção",
+                "phone_number": "+557999684200",
+                "thumbnail": "",
+                "blocked": false,
+                "type": "contact"
+              },
+              "assignee": {
+                "id": 15,
+                "name": "Felipe Jovino",
+                "available_name": "Felipe Jovino",
+                "avatar_url": "",
+                "type": "user",
+                "availability_status": null,
+                "thumbnail": ""
+              },
+              "assignee_type": "User",
+              "team": {
+                "id": 6,
+                "name": "service desk"
+              },
+              "hmac_verified": false
+            },
+            "status": "open",
+            "custom_attributes": {
+              "ocupacao": "teste",
+              "protocolo": "412",
+              "localidade": "teste",
+              "link_chamado": "https://glpi.wmsaude.com.br/front/ticket.form.php?id=412",
+              "step_triagem": "em_atendimento",
+              "estabelecimento": "teste"
+            },
+            "snoozed_until": null,
+            "unread_count": 0,
+            "first_reply_created_at": null,
+            "priority": null,
+            "waiting_since": 1778593419,
+            "agent_last_seen_at": 1778593577,
+            "contact_last_seen_at": 0,
+            "last_activity_at": 1778593576,
+            "timestamp": 1778593576,
+            "created_at": 1778593419,
+            "updated_at": 1778593600.263503,
+            "event": "conversation_updated",
+            "changed_attributes": [
+              {
+                "assignee_id": {
+                  "previous_value": null,
+                  "current_value": 15
+                }
+              },
+              {
+                "updated_at": {
+                  "previous_value": "2026-05-12T13:46:18.962Z",
+                  "current_value": "2026-05-12T13:46:40.263Z"
+                }
+              }
+            ]
+          },
+          "webhookUrl": "http://localhost:5678/webhook/fluxo-associacao",
+          "executionMode": "production"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "b64c3950-ba0b-4ab3-af85-f1a767d24ac0",
+  "meta": {
+    "instanceId": "20d61d4346ce6060f90882f582ec82333f0d0ef83add04f61cda543f312ca8da"
+  },
+  "id": "Xiv_YUuhjf9aeC4x5G8iS",
+  "tags": [
+    {
+      "updatedAt": "2026-03-12T18:10:41.178Z",
+      "createdAt": "2026-03-12T18:10:41.178Z",
+      "id": "F3k4hPbgjXLPrNCz",
+      "name": "Triagem-GLPI"
+    }
+  ]
+}
