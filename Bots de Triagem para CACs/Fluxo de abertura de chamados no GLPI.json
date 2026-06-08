@@ -240,7 +240,7 @@
             {
               "id": "61ff073e-82e8-43ac-b082-bdb963d9b40e",
               "leftValue": "={{ $json.body.conversation.contact_inbox.inbox_id }}",
-              "rightValue": 10,
+              "rightValue": 11,
               "operator": {
                 "type": "number",
                 "operation": "equals"
@@ -376,11 +376,12 @@
                 },
                 "conditions": [
                   {
-                    "leftValue": "={{ $('init').item.json.body.conversation.messages[0].sender.name }}",
-                    "rightValue": "[0-9!@#$%^&*(),.?\":{}|<>]",
+                    "leftValue": "={{ /[0-9!@#$%^&*(),.?\":{}|<>\\p{Extended_Pictographic}]/u.test($('init').item.json.body.conversation.messages[0].sender.name) }}",
+                    "rightValue": "/[0-9!@#$%^&*(),.?\":{}|<>\\p{Extended_Pictographic}]/u",
                     "operator": {
-                      "type": "string",
-                      "operation": "regex"
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
                     },
                     "id": "75c508c5-8cb8-459b-87cc-78458d567cec"
                   }
@@ -525,7 +526,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "{\n  \"content\": \"Informe o seu e-mail para utilizarmos em seu cadastro.\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}\n",
+        "jsonBody": "{\n  \"content\": \"Por favor, informe seu e-mail pessoal ou corporativo para continuarmos o atendimento.\\n\\nExemplo: usuario@email.com\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}\n",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -3203,7 +3204,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "{\n  \"content\": \"O e-mail informado parece estar em um formato inválido. Por favor, digite um endereço de e-mail válido contendo o '@' e o domínio (exemplo: usuario@email.com) para darmos continuidade à abertura do seu chamado.\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}\n",
+        "jsonBody": "{\n  \"content\": \"O e-mail digitado parece estar incorreto. Por favor, informe um e-mail pessoal ou corporativo válido para seguirmos com o atendimento.\\n\\nExemplo: usuario@email.com\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}\n",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -3266,7 +3267,7 @@
             "accept": "application/json",
             "user-agent": "rest-client/2.1.0 (linux x86_64) ruby/3.4.4p34",
             "content-type": "application/json",
-            "content-length": "2382",
+            "content-length": "2955",
             "accept-encoding": "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
             "host": "136.248.125.55:5678"
           },
@@ -3278,62 +3279,69 @@
               "name": "WM Saúde"
             },
             "additional_attributes": {},
-            "content_attributes": {},
+            "content_attributes": {
+              "in_reply_to": null
+            },
             "content_type": "text",
-            "content": "Oi",
+            "content": "1",
             "conversation": {
               "additional_attributes": {},
               "can_reply": true,
-              "channel": "Channel::Whatsapp",
+              "channel": "Channel::Api",
               "contact_inbox": {
-                "id": 1104,
-                "contact_id": 5231,
-                "inbox_id": 10,
-                "source_id": "557999684200",
-                "created_at": "2026-05-11T17:38:57.639Z",
-                "updated_at": "2026-05-11T17:38:57.639Z",
+                "id": 1416,
+                "contact_id": 6168,
+                "inbox_id": 11,
+                "source_id": "d09fd172-c0a3-4f92-abd2-f46b47c3cd8d",
+                "created_at": "2026-05-14T12:35:43.724Z",
+                "updated_at": "2026-05-14T12:35:43.724Z",
                 "hmac_verified": false,
-                "pubsub_token": "rm1mUreg6woSZ4Q3KEA2BBYQ"
+                "pubsub_token": "GtqpAdzE6S7nLwdG81Z6fw9t"
               },
-              "id": 508,
-              "inbox_id": 10,
+              "id": 918,
+              "inbox_id": 11,
               "messages": [
                 {
-                  "id": 34897,
-                  "content": "Oi",
+                  "id": 52788,
+                  "content": "1",
                   "account_id": 2,
-                  "inbox_id": 10,
-                  "conversation_id": 508,
+                  "inbox_id": 11,
+                  "conversation_id": 918,
                   "message_type": 0,
-                  "created_at": 1778521304,
-                  "updated_at": "2026-05-11T17:41:44.529Z",
+                  "created_at": 1778763075,
+                  "updated_at": "2026-05-14T12:51:15.329Z",
                   "private": false,
                   "status": "sent",
-                  "source_id": "wamid.HBgMNTU3OTk5Njg0MjAwFQIAEhggQUMxODI5RTRGNkVFNzg4NDJFQUVBNEM5MEI1NTFCMzEA",
+                  "source_id": "WAID:3EB05EDFB9776B2EDDB78E",
                   "content_type": "text",
-                  "content_attributes": {},
+                  "content_attributes": {
+                    "in_reply_to": null
+                  },
                   "sender_type": "Contact",
-                  "sender_id": 5231,
+                  "sender_id": 6168,
                   "external_source_ids": {},
                   "additional_attributes": {},
-                  "processed_message_content": "Oi",
+                  "processed_message_content": "1",
                   "sentiment": {},
                   "conversation": {
                     "assignee_id": null,
                     "unread_count": 1,
-                    "last_activity_at": 1778521304,
+                    "last_activity_at": 1778763075,
                     "contact_inbox": {
-                      "source_id": "557999684200"
+                      "source_id": "d09fd172-c0a3-4f92-abd2-f46b47c3cd8d"
                     }
                   },
                   "sender": {
-                    "additional_attributes": {},
+                    "additional_attributes": {
+                      "avatar_url_hash": "d4c0bc9c01c97f70b9d210253192611f40349e90527d2716dc4b2bae4038069a",
+                      "last_avatar_sync_at": "2026-05-14T12:36:38Z"
+                    },
                     "custom_attributes": {},
-                    "email": null,
-                    "id": 5231,
-                    "identifier": null,
-                    "name": "Invenção",
-                    "phone_number": "+557999684200",
+                    "email": "renilapasantos@yahoo.com.br",
+                    "id": 6168,
+                    "identifier": "557799834061@s.whatsapp.net",
+                    "name": "Renivaldo Lapa",
+                    "phone_number": "+557799834061",
                     "thumbnail": "",
                     "blocked": false,
                     "type": "contact"
@@ -3343,41 +3351,49 @@
               "labels": [],
               "meta": {
                 "sender": {
-                  "additional_attributes": {},
+                  "additional_attributes": {
+                    "avatar_url_hash": "d4c0bc9c01c97f70b9d210253192611f40349e90527d2716dc4b2bae4038069a",
+                    "last_avatar_sync_at": "2026-05-14T12:36:38Z"
+                  },
                   "custom_attributes": {},
-                  "email": null,
-                  "id": 5231,
-                  "identifier": null,
-                  "name": "Invenção",
-                  "phone_number": "+557999684200",
+                  "email": "renilapasantos@yahoo.com.br",
+                  "id": 6168,
+                  "identifier": "557799834061@s.whatsapp.net",
+                  "name": "Renivaldo Lapa",
+                  "phone_number": "+557799834061",
                   "thumbnail": "",
                   "blocked": false,
                   "type": "contact"
                 },
                 "assignee": null,
                 "assignee_type": null,
-                "team": null,
+                "team": {
+                  "id": 6,
+                  "name": "service desk"
+                },
                 "hmac_verified": false
               },
               "status": "open",
-              "custom_attributes": {},
+              "custom_attributes": {
+                "step_triagem": "triagem"
+              },
               "snoozed_until": null,
               "unread_count": 1,
               "first_reply_created_at": null,
               "priority": null,
-              "waiting_since": 1778521304,
-              "agent_last_seen_at": 0,
+              "waiting_since": 1778762143,
+              "agent_last_seen_at": 1778763064,
               "contact_last_seen_at": 0,
-              "last_activity_at": 1778521304,
-              "timestamp": 1778521304,
-              "created_at": 1778521304,
-              "updated_at": 1778521304.5308511
+              "last_activity_at": 1778763075,
+              "timestamp": 1778763075,
+              "created_at": 1778762143,
+              "updated_at": 1778763075.3306592
             },
-            "created_at": "2026-05-11T17:41:44.529Z",
-            "id": 34897,
+            "created_at": "2026-05-14T12:51:15.329Z",
+            "id": 52788,
             "inbox": {
-              "id": 10,
-              "name": "Atendimento ao Cliente"
+              "id": 11,
+              "name": "CAC WM Saúde"
             },
             "message_type": "incoming",
             "private": false,
@@ -3386,18 +3402,21 @@
                 "id": 2,
                 "name": "WM Saúde"
               },
-              "additional_attributes": {},
+              "additional_attributes": {
+                "avatar_url_hash": "d4c0bc9c01c97f70b9d210253192611f40349e90527d2716dc4b2bae4038069a",
+                "last_avatar_sync_at": "2026-05-14T12:36:38Z"
+              },
               "avatar": "",
               "custom_attributes": {},
-              "email": null,
-              "id": 5231,
-              "identifier": null,
-              "name": "Invenção",
-              "phone_number": "+557999684200",
+              "email": "renilapasantos@yahoo.com.br",
+              "id": 6168,
+              "identifier": "557799834061@s.whatsapp.net",
+              "name": "Renivaldo Lapa",
+              "phone_number": "+557799834061",
               "thumbnail": "",
               "blocked": false
             },
-            "source_id": "wamid.HBgMNTU3OTk5Njg0MjAwFQIAEhggQUMxODI5RTRGNkVFNzg4NDJFQUVBNEM5MEI1NTFCMzEA",
+            "source_id": "WAID:3EB05EDFB9776B2EDDB78E",
             "event": "message_created"
           },
           "webhookUrl": "http://localhost:5678/webhook/fluxo-principal",
@@ -3975,7 +3994,13 @@
             "index": 0
           }
         ],
-        [],
+        [
+          {
+            "node": "Mensagem informando que não possível achar o ticket que o cliente digitou",
+            "type": "main",
+            "index": 0
+          }
+        ],
         [
           {
             "node": "Pega ticket aberto no nome do cliente (1)",
@@ -4296,7 +4321,7 @@
     "executionOrder": "v1",
     "availableInMCP": false
   },
-  "versionId": "9224562d-3830-48a3-a81a-6d3845328a5f",
+  "versionId": "fcb7033c-4af3-4e42-90e6-b4bbca22fa01",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "20d61d4346ce6060f90882f582ec82333f0d0ef83add04f61cda543f312ca8da"
