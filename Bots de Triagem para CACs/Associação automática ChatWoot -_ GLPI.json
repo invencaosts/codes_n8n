@@ -1,21 +1,21 @@
 {
-  "name": "Associação automática ChatWoot -> GLPI",
+  "name": "(Playnee) Associação automática ChatWoot -> GLPI",
   "nodes": [
     {
       "parameters": {
         "httpMethod": "POST",
-        "path": "fluxo-associacao",
+        "path": "fluxo-associacao-playnee",
         "options": {}
       },
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        -1136,
+        -1408,
         112
       ],
-      "id": "eb5f1584-06f4-45d3-b85f-90ac03fda525",
+      "id": "fca5beb2-c33b-44aa-88d8-49fce66f9a37",
       "name": "Webhook",
-      "webhookId": "1167f344-3518-4c7c-a575-b03970a8c1c8"
+      "webhookId": "422a99fb-88ad-4fd8-b885-3f850714089b"
     },
     {
       "parameters": {
@@ -30,7 +30,7 @@
             {
               "id": "c18add2b-cbb7-4c19-b79d-f0251cabfa61",
               "leftValue": "={{ $json.body.contact_inbox.inbox_id }}",
-              "rightValue": 11,
+              "rightValue": 83,
               "operator": {
                 "type": "number",
                 "operation": "equals"
@@ -57,7 +57,7 @@
         -496,
         16
       ],
-      "id": "9c7a94a9-ba0e-4f65-8bbb-4ad68b0bf35a",
+      "id": "afebaeff-94d0-4f64-9178-bf7be26314e7",
       "name": "Filter"
     },
     {
@@ -82,7 +82,7 @@
         0,
         0
       ],
-      "id": "d8b3382d-d57f-419d-97cc-12cfc49407a1",
+      "id": "eca8011d-8eea-4ea3-b20a-c9d3c16c85cf",
       "name": "HTTP Request",
       "credentials": {
         "httpHeaderAuth": {
@@ -93,7 +93,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// ==========================================\n// 1. MAPA DE AGENTES (ID Chatwoot -> ID GLPI)\n// ==========================================\nconst mapaAgentes = {\n  // --- EQUIPA ANTIGA ---\n  \"3\": 10,  // MILENA DUTRA\n  \"4\": 8,   // MATHEUS TAVARES\n  \"5\": 9,   // JENIFFER VICTORIA\n  \"7\": 11,  // DAYANNA CLAUDINO\n  \"8\": 12,  // LUIZ FERNANDO\n  \"10\": 14, // ÍTALO WAGNER\n  \"11\": 15, // CRISTIANE CARVALHO\n  \"12\": 16, // MONIQUE KELLY\n  \"13\": 17, // GERSON JUNIOR\n  \"14\": 18, // RAFAEL CRUZ\n  \"15\": 20, // FELIPE JOVINO\n  \"16\": 19, // GUILHERME DA INVENÇÃO\n  \"17\": 21, // ADAILSON ROCHA\n  \"18\": 22, // EDIMILSON BASTOS\n  \"19\": 23, // DANIEL LOPES\n  \"20\": 24, // DANILO ROCHA\n  \"21\": 25, // JONATAS NATÃ \n  \"22\": 26, // JADEILSON ROCHA \n\n  // --- NOVA EQUIPA (Preenchidos pela ordem de exportação do CSV) ---\n  \n  // O utilizador WM Saúde é o primeiro do CSV. O GLPI costuma usar o ID 2 para o super-admin.\n  \"2\": 2,   // WM SAÚDE \n\n  \"25\": 27, // VITOR OLIVEIRA\n  \"26\": 28, // ISABELLA CHAVES\n  \"27\": 29, // DEBORAH MACHADO\n  \"28\": 30, // GRAZIELLY MARINHO\n  \"29\": 31, // ELERY MAYARA\n  \"30\": 33, // THAIS LADEIA\n  \"31\": 32, // DANIELA SOUZA\n  \"32\": 34, // MARIA LUISA (Sem e-mail no GLPI, mas vai associar pelo ID!)\n  \"33\": 35, // ANA FLAVIA\n  \"34\": 36, // ANA CAMILA\n  \"35\": 37, // JANAÍNA LUZ\n  \"36\": 38, // LUIS DANIEL\n  \"37\": 39, // SUCESSO DO CLIENTE - GROWBIT\n  \"38\": 40, // GUSTAVO ALBERTO\n\n  // A Rafaela não estava no CSV, por isso deixei com 0 para o fluxo não encravar.\n  // Quando a criar no GLPI, será provavelmente o ID 41.\n  \"39\": 0, // RAFAELA\n  \"40\": 42, // RENATA\n  \"41\": 43 // NAIARA BARISTA\n};\n\n// ==========================================\n// 2. PROCESSAR O AGENTE DO WEBHOOK\n// ==========================================\nlet agente_id_glpi = 0;\nlet nome_agente = \"Não atribuído\";\n\nconst idChatwoot = $node[\"Webhook\"].json.body.meta?.assignee?.id || \n                   $node[\"Webhook\"].json.body.data?.assignee?.id;\n\nif (idChatwoot && mapaAgentes[idChatwoot.toString()]) {\n    agente_id_glpi = mapaAgentes[idChatwoot.toString()];\n    nome_agente = $node[\"Webhook\"].json.body.meta?.assignee?.name || \"Detectado\";\n}\n\n// ==========================================\n// 3. PROCESSAR A EQUIPE (GRUPO)\n// ==========================================\nlet glpi_group_id = 0;\nconst teamNameChatwoot = $node[\"Webhook\"].json.body.meta?.team?.name || \n                         $node[\"Webhook\"].json.body.team?.name;\n\nif (teamNameChatwoot) {\n    const normalizar = (t) => t.trim().toLowerCase().normalize(\"NFD\").replace(/[\\u0300-\\u036f]/g, \"\");\n    const nomeNormalizadoChatwoot = normalizar(teamNameChatwoot);\n\n    const gruposGlpi = $input.all();\n    const grupoEncontrado = gruposGlpi.find(i => \n        i.json.name && normalizar(i.json.name) === nomeNormalizadoChatwoot\n    );\n    \n    if (grupoEncontrado) glpi_group_id = grupoEncontrado.json.id;\n}\n\n// ==========================================\n// 4. RETORNO FINAL\n// ==========================================\nreturn {\n    agente_id_glpi, \n    glpi_group_id,\n    id_chatwoot_detectado: idChatwoot || \"Nenhum\",\n    nome_agente_detectado: nome_agente,\n    tipo_glpi_id: 1 \n};"
+        "jsCode": "// ==========================================\n// 1. MAPA DE AGENTES (ID Chatwoot -> ID GLPI)\n// ==========================================\nconst mapaAgentes = {\n  // --- \"CHATWOOT ID\" : GLPI ID ---\n  \"3110\": 2,   // WM SAÚDE\n  \"3113\": 10,  // MILENA DUTRA\n  \"3114\": 8,   // MATHEUS TAVARES\n  \"3116\": 9,   // JENIFFER VICTORIA\n  \"3117\": 11,  // DAYANNA CLAUDINO\n  \"3119\": 12,  // LUIZ FERNANDO\n  \"2348\": 14,  // ÍTALO WAGNER\n  \"3123\": 15,  // CRISTIANE CARVALHO\n  \"3124\": 16,  // MONIQUE KELLY\n  \"3125\": 17,  // GERSON JUNIOR\n  \"3129\": 18,  // RAFAEL CRUZ\n  \"3128\": 19,  // GUILHERME DA INVENÇÃO\n  \"2494\": 20,  // FELIPE JOVINO\n  \"3131\": 21,  // ADAILSON ROCHA\n  \"3132\": 22,  // EDIMILSON BASTOS\n  \"3133\": 23,  // DANIEL LOPES\n  \"3134\": 24,  // DANILO ROCHA\n  \"3135\": 25,  // JONATAS NATÃ \n  \"3136\": 26,  // JADEILSON ROCHA \n  \"3140\": 27,  // VITOR OLIVEIRA\n  \"3143\": 28,  // ISABELLA CHAVES\n  \"3144\": 29,  // DEBORAH MACHADO\n  \"3146\": 30,  // GRAZIELLY MARINHO\n  \"3147\": 31,  // ELERY MAYARA\n  \"3148\": 33,  // THAIS LADEIA\n  \"3145\": 32,  // DANIELA SOUZA\n  \"3142\": 34,  // MARIA LUISA\n  \"3141\": 35,  // ANA FLAVIA\n  \"3139\": 36,  // ANA CAMILA\n  \"3138\": 37,  // JANAÍNA LUZ\n  \"3137\": 38,  // LUIS DANIEL\n  \"1828\": 39,  // SUCESSO DO CLIENTE - GROWBIT\n  \"3130\": 40,  // GUSTAVO ALBERTO\n  \"3127\": 42,  // RAFELA\n  \"3126\": 41,  // RENATA\n  \"3122\": 43,  // NAIARA BATISTA\n  \"3121\": 44,  // LEANDRO GONÇALVES\n  \"3120\": 47,  // DANIEL DAVID\n  \"3118\": 46,  // WELLINGTON COSTA\n  \"3115\": 48,  // DAISY MEDEIROS\n  \"3150\": 50,  // GERALDO GUIMARÃES\n  \"3151\": 51,  // TAIS FERNANDES\n  \"2346\": 52   // CLAUDIO SANTOS\n};\n\n// ==========================================\n// 2. PROCESSAR O AGENTE DO WEBHOOK\n// ==========================================\nlet agente_id_glpi = 0;\nlet nome_agente = \"Não atribuído\";\n\nconst idChatwoot = $node[\"Webhook\"].json.body.meta?.assignee?.id || \n                   $node[\"Webhook\"].json.body.data?.assignee?.id;\n\nif (idChatwoot && mapaAgentes[idChatwoot.toString()]) {\n    agente_id_glpi = mapaAgentes[idChatwoot.toString()];\n    nome_agente = $node[\"Webhook\"].json.body.meta?.assignee?.name || \"Detectado\";\n}\n\n// ==========================================\n// 3. PROCESSAR A EQUIPE (GRUPO)\n// ==========================================\nlet glpi_group_id = 0;\nconst teamNameChatwoot = $node[\"Webhook\"].json.body.meta?.team?.name || \n                         $node[\"Webhook\"].json.body.team?.name;\n\nif (teamNameChatwoot) {\n    const normalizar = (t) => t.trim().toLowerCase().normalize(\"NFD\").replace(/[\\u0300-\\u036f]/g, \"\");\n    const nomeNormalizadoChatwoot = normalizar(teamNameChatwoot);\n\n    const gruposGlpi = $input.all();\n    const grupoEncontrado = gruposGlpi.find(i => \n        i.json.name && normalizar(i.json.name) === nomeNormalizadoChatwoot\n    );\n    \n    if (grupoEncontrado) glpi_group_id = grupoEncontrado.json.id;\n}\n\n// ==========================================\n// 4. RETORNO FINAL\n// ==========================================\nreturn {\n    agente_id_glpi, \n    glpi_group_id,\n    id_chatwoot_detectado: idChatwoot || \"Nenhum\",\n    nome_agente_detectado: nome_agente,\n    tipo_glpi_id: 1 \n};"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -101,7 +101,7 @@
         240,
         0
       ],
-      "id": "5cbc7f4d-8c99-42bd-a28c-ac841f216cb9",
+      "id": "6e53531f-b248-45f9-afb7-d8bb108cfe46",
       "name": "Code in JavaScript"
     },
     {
@@ -135,7 +135,7 @@
         -272,
         16
       ],
-      "id": "98704e61-51a2-40f2-926b-2e325edbd776",
+      "id": "13bde731-f09e-418d-b5b9-4dabbbcdb373",
       "name": "If",
       "executeOnce": true
     },
@@ -165,7 +165,7 @@
         448,
         0
       ],
-      "id": "be21680b-ded8-45d4-8b2c-b935d75f745e",
+      "id": "2f6552f6-1993-4b83-b3e1-61e1dcac55f7",
       "name": "HTTP Request1",
       "credentials": {
         "httpHeaderAuth": {
@@ -201,16 +201,16 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        -864,
+        -1136,
         112
       ],
-      "id": "f9865378-1166-4fce-839c-5995f900bf02",
+      "id": "c5a2be61-b4be-41db-a574-024821ed31c3",
       "name": "If1"
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{ $json.body.messages[0].account_id }}/conversations/{{ $json.body.messages[0].conversation_id }}/custom_attributes",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{ $json.body.messages[0].account_id }}/conversations/{{ $json.body.messages[0].conversation_id }}/custom_attributes",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -233,12 +233,12 @@
         -496,
         224
       ],
-      "id": "bbbb448a-287c-4047-9500-493e6ed074cb",
+      "id": "40bacf0f-bc15-41dd-93ca-3a6d80bbb4cf",
       "name": "HTTP Request2",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "VcO9g4Orh1qQUPrU",
-          "name": "Token Acesso ADM ChatWoot"
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
     }
@@ -248,12 +248,15 @@
       {
         "json": {
           "headers": {
-            "accept": "application/json",
-            "user-agent": "rest-client/2.1.0 (linux x86_64) ruby/3.4.4p34",
-            "content-type": "application/json",
-            "content-length": "2402",
             "accept-encoding": "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
-            "host": "136.248.125.55:5678"
+            "accept": "application/json",
+            "user-agent": "Ruby",
+            "host": "136.248.125.55:5678",
+            "content-type": "application/json",
+            "x-chatwoot-delivery": "735e3ff9-14fb-416c-8389-9a406333fb1a",
+            "x-chatwoot-timestamp": "1781012207",
+            "x-chatwoot-signature": "sha256=57a26b8e64f42bb86adf2f42ebb728324745b00ee45f5f903f304eff4739b958",
+            "content-length": "2419"
           },
           "params": {},
           "query": {},
@@ -262,51 +265,54 @@
             "can_reply": true,
             "channel": "Channel::Whatsapp",
             "contact_inbox": {
-              "id": 1210,
-              "contact_id": 5335,
-              "inbox_id": 10,
+              "id": 20915,
+              "contact_id": 5582,
+              "inbox_id": 83,
               "source_id": "557999684200",
-              "created_at": "2026-05-12T13:43:39.834Z",
-              "updated_at": "2026-05-12T13:43:39.834Z",
+              "created_at": "2026-06-08T19:50:05.314Z",
+              "updated_at": "2026-06-08T19:50:05.314Z",
               "hmac_verified": false,
-              "pubsub_token": "7YuZC4nY896nLFtcVcQFFyXx"
+              "pubsub_token": "7F9RXkxgBaJKDizD1RTsm6w5"
             },
-            "id": 628,
-            "inbox_id": 10,
+            "id": 56,
+            "inbox_id": 83,
             "messages": [
               {
-                "id": 39865,
-                "content": "O seu protocolo de atendimento é o nº 412.",
-                "account_id": 2,
-                "inbox_id": 10,
-                "conversation_id": 628,
+                "id": 206744,
+                "content": "O seu protocolo de atendimento é o nº 2038.",
+                "account_id": 314,
+                "inbox_id": 83,
+                "conversation_id": 56,
                 "message_type": 1,
-                "created_at": 1778593576,
-                "updated_at": "2026-05-12T13:46:18.961Z",
+                "created_at": 1781011553,
+                "updated_at": "2026-06-09T13:25:56.795Z",
                 "private": false,
                 "status": "delivered",
-                "source_id": "wamid.HBgMNTU3OTk5Njg0MjAwFQIAERgSRDMzMTQ3RkY4ODE0NDM1MjIzAA==",
+                "source_id": "wamid.HBgMNTU3OTk5Njg0MjAwFQIAERgSNzE0NTNEOTMxQ0I5OTkxMTJEAA==",
                 "content_type": "text",
                 "content_attributes": {},
-                "sender_type": "AgentBot",
-                "sender_id": 7,
+                "sender_type": "User",
+                "sender_id": 3110,
                 "external_source_ids": {},
                 "additional_attributes": {},
-                "processed_message_content": "O seu protocolo de atendimento é o nº 412.",
+                "processed_message_content": "O seu protocolo de atendimento é o nº 2038.",
                 "sentiment": {},
                 "conversation": {
-                  "assignee_id": 15,
+                  "assignee_id": null,
                   "unread_count": 0,
-                  "last_activity_at": 1778593576,
+                  "last_activity_at": 1781011693,
                   "contact_inbox": {
                     "source_id": "557999684200"
                   }
                 },
                 "sender": {
-                  "id": 7,
-                  "name": "Bot WMSaude",
+                  "id": 3110,
+                  "name": "WM Saúde TI",
+                  "available_name": "WM Saúde",
                   "avatar_url": "",
-                  "type": "agent_bot"
+                  "type": "user",
+                  "availability_status": null,
+                  "thumbnail": ""
                 }
               }
             ],
@@ -314,12 +320,12 @@
             "meta": {
               "sender": {
                 "additional_attributes": {
-                  "avatar_url_hash": "c31746cd63d208f9480ffb43a6bb446ea537f0ed4bb88fa7d25a82241235c120",
-                  "last_avatar_sync_at": "2026-05-12T13:44:26Z"
+                  "avatar_url_hash": "a2df0c97edc8f10b07ddb68e40f06ae90365968a71c89759dc44f1d7449f272d",
+                  "last_avatar_sync_at": "2026-06-08T20:01:26Z"
                 },
                 "custom_attributes": {},
-                "email": "teste@teste.com",
-                "id": 5335,
+                "email": "teste@gmaio.com",
+                "id": 5582,
                 "identifier": null,
                 "name": "Invenção",
                 "phone_number": "+557999684200",
@@ -327,18 +333,10 @@
                 "blocked": false,
                 "type": "contact"
               },
-              "assignee": {
-                "id": 15,
-                "name": "Felipe Jovino",
-                "available_name": "Felipe Jovino",
-                "avatar_url": "",
-                "type": "user",
-                "availability_status": null,
-                "thumbnail": ""
-              },
-              "assignee_type": "User",
+              "assignee": null,
+              "assignee_type": null,
               "team": {
-                "id": 6,
+                "id": 1097,
                 "name": "service desk"
               },
               "hmac_verified": false
@@ -346,40 +344,46 @@
             "status": "open",
             "custom_attributes": {
               "ocupacao": "teste",
-              "protocolo": "412",
+              "protocolo": "2038",
               "localidade": "teste",
-              "link_chamado": "https://glpi.wmsaude.com.br/front/ticket.form.php?id=412",
+              "link_chamado": "https://glpi.wmsaude.com.br/front/ticket.form.php?id=2038",
               "step_triagem": "em_atendimento",
               "estabelecimento": "teste"
             },
             "snoozed_until": null,
             "unread_count": 0,
-            "first_reply_created_at": null,
+            "first_reply_created_at": "2026-06-09T13:25:44.451Z",
             "priority": null,
-            "waiting_since": 1778593419,
-            "agent_last_seen_at": 1778593577,
+            "waiting_since": 0,
+            "agent_last_seen_at": 1781011693,
             "contact_last_seen_at": 0,
-            "last_activity_at": 1778593576,
-            "timestamp": 1778593576,
-            "created_at": 1778593419,
-            "updated_at": 1778593600.263503,
+            "last_activity_at": 1781011693,
+            "timestamp": 1781011693,
+            "created_at": 1781011542,
+            "updated_at": 1781012207.166222,
             "event": "conversation_updated",
             "changed_attributes": [
               {
                 "assignee_id": {
-                  "previous_value": null,
-                  "current_value": 15
+                  "previous_value": 3148,
+                  "current_value": null
                 }
               },
               {
                 "updated_at": {
-                  "previous_value": "2026-05-12T13:46:18.962Z",
-                  "current_value": "2026-05-12T13:46:40.263Z"
+                  "previous_value": "2026-06-09T13:28:13.499Z",
+                  "current_value": "2026-06-09T13:36:47.166Z"
+                }
+              },
+              {
+                "team_id": {
+                  "previous_value": null,
+                  "current_value": 1097
                 }
               }
             ]
           },
-          "webhookUrl": "http://localhost:5678/webhook/fluxo-associacao",
+          "webhookUrl": "http://localhost:5678/webhook/fluxo-associacao-playnee",
           "executionMode": "production"
         },
         "pairedItem": {
@@ -468,17 +472,17 @@
     "executionOrder": "v1",
     "availableInMCP": false
   },
-  "versionId": "8255351d-81c4-4336-b79e-b5ff25764891",
+  "versionId": "5bb9a971-f266-428b-859d-6bb4ef00d612",
   "meta": {
     "instanceId": "20d61d4346ce6060f90882f582ec82333f0d0ef83add04f61cda543f312ca8da"
   },
-  "id": "Xiv_YUuhjf9aeC4x5G8iS",
+  "id": "BAGxlGtyf1mzq1xt",
   "tags": [
     {
-      "updatedAt": "2026-03-12T18:10:41.178Z",
-      "createdAt": "2026-03-12T18:10:41.178Z",
-      "id": "F3k4hPbgjXLPrNCz",
-      "name": "Triagem-GLPI"
+      "updatedAt": "2026-06-08T18:47:18.375Z",
+      "createdAt": "2026-06-08T18:47:18.375Z",
+      "id": "YNF8FydUYhJWVs9e",
+      "name": "Playnee"
     }
   ]
 }

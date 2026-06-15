@@ -1,5 +1,5 @@
 {
-  "name": "Controle de chamados em aberto",
+  "name": "(Playnee) Controle de chamados em aberto",
   "nodes": [
     {
       "parameters": {
@@ -17,7 +17,7 @@
         -944,
         64
       ],
-      "id": "69689fdc-f9a4-4b32-9666-a2030cb72c32",
+      "id": "6f3bb152-13c3-4fd4-a68a-e1f12108791c",
       "name": "Schedule Trigger"
     },
     {
@@ -38,7 +38,7 @@
         -720,
         64
       ],
-      "id": "5fb8c726-cd02-4d5b-9aab-0e27cd95fcb8",
+      "id": "01bfb9ff-6975-4f2f-8d17-af5070449298",
       "name": "Get row(s)"
     },
     {
@@ -80,7 +80,7 @@
         -496,
         64
       ],
-      "id": "88ba9812-2543-41f0-b702-3e52f702e0bd",
+      "id": "2a7c4b5c-e70c-4653-88d0-8c284a6a06cb",
       "name": "Busca tickets no GLPI",
       "executeOnce": false,
       "credentials": {
@@ -116,7 +116,7 @@
         208,
         0
       ],
-      "id": "7d361d9a-bba8-43b8-9c57-8f69c0602fbb",
+      "id": "54a699a1-805d-409c-92e9-deb0398f564d",
       "name": "Delete row(s)"
     },
     {
@@ -158,13 +158,13 @@
         -288,
         64
       ],
-      "id": "8c4b4291-27ad-4054-a15e-d9117648ad97",
+      "id": "2f7ef420-4944-4708-864f-748a734147e6",
       "name": "If"
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://136.248.125.55:3000/api/v1/accounts/2/conversations/{{$('Get row(s)').item.json.convesation_id }}/messages",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/314/conversations/{{$('Get row(s)').item.json.convesation_id }}/messages",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -187,12 +187,12 @@
         0,
         0
       ],
-      "id": "50962025-b7ad-46ee-bcc1-389449bcd9da",
+      "id": "6dce03a2-0ebc-44c9-99db-dae8053f8d7f",
       "name": "Envia mensagem informando que o ticket foi fechado / solucionado",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "aLAgkGobWooRkbRp",
-          "name": "Token de Sessao GLPI"
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
     }
@@ -255,22 +255,22 @@
       ]
     }
   },
-  "active": true,
+  "active": false,
   "settings": {
     "executionOrder": "v1",
     "availableInMCP": false
   },
-  "versionId": "63674d77-8f5e-44a9-ad24-7d1e6cc2b5cf",
+  "versionId": "4e78816d-aa12-4726-8501-23d45946cccc",
   "meta": {
     "instanceId": "20d61d4346ce6060f90882f582ec82333f0d0ef83add04f61cda543f312ca8da"
   },
-  "id": "9wH1KL1_xqQHkpMl4hXHQ",
+  "id": "bexcvmvYA1mXmleR",
   "tags": [
     {
-      "updatedAt": "2026-03-12T18:10:41.178Z",
-      "createdAt": "2026-03-12T18:10:41.178Z",
-      "id": "F3k4hPbgjXLPrNCz",
-      "name": "Triagem-GLPI"
+      "updatedAt": "2026-06-08T18:47:18.375Z",
+      "createdAt": "2026-06-08T18:47:18.375Z",
+      "id": "YNF8FydUYhJWVs9e",
+      "name": "Playnee"
     }
   ]
 }

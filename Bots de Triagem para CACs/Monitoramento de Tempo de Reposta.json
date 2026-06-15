@@ -1,5 +1,5 @@
 {
-  "name": "Monitoramento de Tempo de Reposta",
+  "name": "(Playnee) Monitoramento de Tempo de Reposta",
   "nodes": [
     {
       "parameters": {
@@ -12,7 +12,7 @@
         0,
         0
       ],
-      "id": "7870cd8f-68be-425e-b4ee-9f993c63d4bb",
+      "id": "19671c35-14d7-4158-a6e5-7342cd531bb2",
       "name": "Redis Trigger",
       "credentials": {
         "redis": {
@@ -31,7 +31,7 @@
         528,
         0
       ],
-      "id": "bab81137-c112-455e-9b2d-e16fae56e331",
+      "id": "8457bea1-b241-4682-82d4-02d4959e94bc",
       "name": "Code in JavaScript"
     },
     {
@@ -64,13 +64,13 @@
         208,
         0
       ],
-      "id": "7831663a-8350-49d2-bf6e-6e1cd8eda269",
+      "id": "f416f665-9170-4761-9c8c-9ca55ed07fc9",
       "name": "If"
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://136.248.125.55:3000/api/v1/accounts/2/conversations/{{ $('Code in JavaScript').item.json.conversationId }}/labels",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/314/conversations/{{ $('Code in JavaScript').item.json.conversationId }}/labels",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -90,12 +90,12 @@
         800,
         0
       ],
-      "id": "b585dd36-e828-4dd6-8b7f-7bdef577da58",
+      "id": "c4d49604-4bed-414d-89b2-d5a079ec438a",
       "name": "Adiciona Etiqueta",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "VcO9g4Orh1qQUPrU",
-          "name": "Token Acesso ADM ChatWoot"
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
     }
@@ -141,18 +141,18 @@
     "executionOrder": "v1",
     "availableInMCP": false
   },
-  "versionId": "235ee6fb-a427-4f5d-8891-cbd34505a50f",
+  "versionId": "a205b4f0-aae1-4318-aad6-e547ad4e129a",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "20d61d4346ce6060f90882f582ec82333f0d0ef83add04f61cda543f312ca8da"
   },
-  "id": "GW93mm3PjeBVAaQz1Kmx2",
+  "id": "apH0Q9srdhdyjl05",
   "tags": [
     {
-      "updatedAt": "2026-03-12T18:10:41.178Z",
-      "createdAt": "2026-03-12T18:10:41.178Z",
-      "id": "F3k4hPbgjXLPrNCz",
-      "name": "Triagem-GLPI"
+      "updatedAt": "2026-06-08T18:47:18.375Z",
+      "createdAt": "2026-06-08T18:47:18.375Z",
+      "id": "YNF8FydUYhJWVs9e",
+      "name": "Playnee"
     }
   ]
 }

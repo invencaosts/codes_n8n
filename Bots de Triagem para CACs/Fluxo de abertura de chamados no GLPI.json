@@ -1,21 +1,21 @@
 {
-  "name": "Fluxo de abertura de chamados no GLPI",
+  "name": "(Playnee) Fluxo de abertura de chamados no GLPI",
   "nodes": [
     {
       "parameters": {
         "httpMethod": "POST",
-        "path": "fluxo-principal",
+        "path": "fluxo-principal-playnee",
         "options": {}
       },
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        -8672,
-        3648
+        -8992,
+        3632
       ],
-      "id": "9037f4d7-9845-4ad7-8ac3-30038084fc1c",
+      "id": "c571280c-052c-4fb5-9e0f-e9c131acf9f2",
       "name": "init",
-      "webhookId": "29e15898-b465-4843-a1c7-98e1b9064ad3"
+      "webhookId": "4d84ee15-4fbb-4330-800b-e676429176c3"
     },
     {
       "parameters": {
@@ -25,10 +25,10 @@
       "type": "n8n-nodes-base.redis",
       "typeVersion": 1,
       "position": [
-        -8240,
+        -8176,
         3648
       ],
-      "id": "e86d6cd1-3e80-45fe-9433-91619bdc9346",
+      "id": "2e0abde1-e478-490b-8167-da9aff5c4cc3",
       "name": "Cancela Timeout",
       "credentials": {
         "redis": {
@@ -52,7 +52,7 @@
                 "conditions": [
                   {
                     "leftValue": "={{ $('init').item.json.body.conversation.labels }}",
-                    "rightValue": "validar_dados",
+                    "rightValue": "=validar_dados",
                     "operator": {
                       "type": "array",
                       "operation": "contains",
@@ -145,13 +145,13 @@
         -7936,
         3616
       ],
-      "id": "ece87a36-e89b-4b6c-9c2f-fbb9b75a0802",
+      "id": "b02dbd41-c19a-46f7-bfb9-88b44c772bae",
       "name": "Identifica onde o usuário está"
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -172,21 +172,22 @@
       "typeVersion": 4.3,
       "position": [
         -5968,
-        2048
+        1872
       ],
-      "id": "72ebed62-acc5-47b7-ad61-29d6784db194",
+      "id": "41207238-6642-47f2-af69-ef8a5ecc82ac",
       "name": "Pede nome ao cliente",
+      "executeOnce": true,
       "credentials": {
         "httpHeaderAuth": {
-          "id": "pEJ4DhM9dl1y70fn",
-          "name": "Token de Acesso ChatWoot"
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -207,14 +208,14 @@
       "typeVersion": 4.3,
       "position": [
         -5744,
-        2048
+        1872
       ],
-      "id": "1aff2e1d-ba8d-41ce-af0c-91f6a46551b2",
+      "id": "c61fd588-77e2-4b84-a820-97cf516e0da1",
       "name": "Adiciona o passo: nome_pendente",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "pEJ4DhM9dl1y70fn",
-          "name": "Token de Acesso ChatWoot"
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
     },
@@ -240,7 +241,7 @@
             {
               "id": "61ff073e-82e8-43ac-b082-bdb963d9b40e",
               "leftValue": "={{ $json.body.conversation.contact_inbox.inbox_id }}",
-              "rightValue": 11,
+              "rightValue": 83,
               "operator": {
                 "type": "number",
                 "operation": "equals"
@@ -254,6 +255,15 @@
                 "type": "string",
                 "operation": "notEquals"
               }
+            },
+            {
+              "id": "3ffeea7e-28d2-4a8d-9b48-4bd698a64597",
+              "leftValue": "={{ $json.body.event }}",
+              "rightValue": "message_created",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
             }
           ],
           "combinator": "and"
@@ -263,16 +273,16 @@
       "type": "n8n-nodes-base.filter",
       "typeVersion": 2.3,
       "position": [
-        -8448,
+        -8416,
         3648
       ],
-      "id": "985f0b92-c479-42e9-8a29-7e4406e6f118",
+      "id": "fc34a908-3c73-47fa-a5a9-f2727a45c0dd",
       "name": "Verifica se é mensagem do cliente"
     },
     {
       "parameters": {
         "method": "PUT",
-        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/contacts/{{ $('init').item.json.body.conversation.contact_inbox.contact_id }}",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/contacts/{{ $('init').item.json.body.conversation.contact_inbox.contact_id }}",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -293,21 +303,21 @@
       "typeVersion": 4.3,
       "position": [
         -5872,
-        1744
+        1568
       ],
-      "id": "5168d572-d347-4560-90ba-1a2176352271",
+      "id": "b8ac7918-a748-46ac-ae39-4644575dcab2",
       "name": "Salva nome do cliente no contato",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "VcO9g4Orh1qQUPrU",
-          "name": "Token Acesso ADM ChatWoot"
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -328,14 +338,14 @@
       "typeVersion": 4.3,
       "position": [
         -5600,
-        1744
+        1568
       ],
-      "id": "73e0d18d-0f44-4c04-8b0c-2d07967a191e",
+      "id": "e3277951-c058-4fd2-a996-11d285d1faeb",
       "name": "Tira o passo: nome_pendente",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "pEJ4DhM9dl1y70fn",
-          "name": "Token de Acesso ChatWoot"
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
     },
@@ -376,7 +386,7 @@
                 },
                 "conditions": [
                   {
-                    "leftValue": "={{ /[0-9!@#$%^&*(),.?\":{}|<>\\p{Extended_Pictographic}]/u.test($('init').item.json.body.conversation.messages[0].sender.name) }}",
+                    "leftValue": "={{ /[0-9!@#$%^&*(),.?\":{}|<>\\p{Extended_Pictographic}]/u.test($('init').item.json.body.conversation.meta.sender.name) }}",
                     "rightValue": "/[0-9!@#$%^&*(),.?\":{}|<>\\p{Extended_Pictographic}]/u",
                     "operator": {
                       "type": "boolean",
@@ -400,7 +410,7 @@
                 "conditions": [
                   {
                     "id": "80d61297-5a90-44c1-930a-2fb5355ae4a1",
-                    "leftValue": "={{ $('init').item.json.body.conversation.messages[0].sender.name }}",
+                    "leftValue": "={{ $('init').item.json.body.conversation.meta.sender.toString() }}",
                     "rightValue": "[0-9!@#$%^&*(),.?\":{}|<>]",
                     "operator": {
                       "type": "string",
@@ -419,9 +429,9 @@
       "typeVersion": 3.4,
       "position": [
         -6240,
-        2160
+        1984
       ],
-      "id": "7e6d5e93-ad49-4d3d-ab5a-eebd82f51d85",
+      "id": "bc7d3e5f-f624-4780-816a-950242b0a4d6",
       "name": "Verifica se tem nome"
     },
     {
@@ -484,7 +494,7 @@
                 },
                 "conditions": [
                   {
-                    "leftValue": "={{ $('init').item.json.body.conversation.messages[0].sender.email }}",
+                    "leftValue": "={{ $('init').item.json.body.conversation.meta.sender.email }}",
                     "rightValue": "={{ null }}",
                     "operator": {
                       "type": "boolean",
@@ -504,15 +514,15 @@
       "typeVersion": 3.4,
       "position": [
         -5008,
-        2192
+        2016
       ],
-      "id": "d10b649f-a722-4e5e-ab43-95165f40e089",
+      "id": "1780f077-d855-4b2c-a9ce-dfc22629cb7d",
       "name": "Verifica se tem email"
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -533,21 +543,22 @@
       "typeVersion": 4.3,
       "position": [
         -4688,
-        2240
+        2064
       ],
-      "id": "7ebf323a-cb73-43da-9bf6-3b51598fee9c",
+      "id": "9c5e2408-5e37-4c90-8690-543b76da2468",
       "name": "Pede email ao cliente",
+      "executeOnce": true,
       "credentials": {
         "httpHeaderAuth": {
-          "id": "pEJ4DhM9dl1y70fn",
-          "name": "Token de Acesso ChatWoot"
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -568,21 +579,21 @@
       "typeVersion": 4.3,
       "position": [
         -4464,
-        2240
+        2064
       ],
-      "id": "a9bce1c5-c1b4-4391-9ede-610a7b710484",
+      "id": "832a5ec2-1bca-4b1f-9b8f-01f77f8c6ed8",
       "name": "Adiciona o passo: email_pendente",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "pEJ4DhM9dl1y70fn",
-          "name": "Token de Acesso ChatWoot"
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
     },
     {
       "parameters": {
         "method": "PUT",
-        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/contacts/{{ $('init').item.json.body.conversation.contact_inbox.contact_id }}",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/contacts/{{ $('init').item.json.body.conversation.contact_inbox.contact_id }}",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -603,21 +614,21 @@
       "typeVersion": 4.3,
       "position": [
         -4400,
-        1888
+        1712
       ],
-      "id": "30804d3c-ed1f-4406-aaf3-cd0220e245c7",
+      "id": "9777163a-f8fe-4c85-83a9-afd17d52feaf",
       "name": "Salva email do cliente no contato",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "VcO9g4Orh1qQUPrU",
-          "name": "Token Acesso ADM ChatWoot"
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -638,21 +649,21 @@
       "typeVersion": 4.3,
       "position": [
         -4176,
-        1888
+        1712
       ],
-      "id": "de7952ea-c193-47fe-8f96-3a7a46c75b0c",
+      "id": "0cde4c67-98b9-4c0e-b4e4-d6a5bf49e66a",
       "name": "Tira o passo: email_pendente",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "pEJ4DhM9dl1y70fn",
-          "name": "Token de Acesso ChatWoot"
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -673,21 +684,21 @@
       "typeVersion": 4.3,
       "position": [
         -3472,
-        2336
+        2160
       ],
-      "id": "9186e43e-3f4a-413f-a140-63bcccd01140",
+      "id": "d9d5b16f-2103-4219-b52d-4952cbf28544",
       "name": "Pede ocupação ao cliente",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "pEJ4DhM9dl1y70fn",
-          "name": "Token de Acesso ChatWoot"
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -708,14 +719,14 @@
       "typeVersion": 4.3,
       "position": [
         -3248,
-        2336
+        2160
       ],
-      "id": "db4906aa-334a-4f7c-b845-d80130658314",
+      "id": "a510c989-dc74-4d63-93ef-4b994e7107a9",
       "name": "Adiciona o passo: ocupacao_pendente",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "pEJ4DhM9dl1y70fn",
-          "name": "Token de Acesso ChatWoot"
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
     },
@@ -797,9 +808,9 @@
       "typeVersion": 1.1,
       "position": [
         -3472,
-        2176
+        2000
       ],
-      "id": "2a88a2bd-9d12-478a-a148-87ed6fa28f49",
+      "id": "33cd76c5-93c9-42ea-b54d-83097c8f91cf",
       "name": "Insere ocupacao"
     },
     {
@@ -884,9 +895,9 @@
       "typeVersion": 3.4,
       "position": [
         -3872,
-        2144
+        1968
       ],
-      "id": "e57df96f-9e77-477f-ba6a-86f9d1ce661b",
+      "id": "2e2a002b-5b7f-4609-a004-149dfdd29c12",
       "name": "Verifica se tem ocupacao"
     },
     {
@@ -948,15 +959,15 @@
       "typeVersion": 3.4,
       "position": [
         -2672,
-        2112
+        1936
       ],
-      "id": "fc36136c-81c3-4a60-a6aa-cf1fb10a7449",
+      "id": "f99e108a-7e05-4884-8201-95cf403ffcc8",
       "name": "Verifica se tem uf_munic"
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -977,21 +988,21 @@
       "typeVersion": 4.3,
       "position": [
         -2240,
-        2432
+        2256
       ],
-      "id": "c9b97cb7-da1b-46c1-81dc-a26fbfc321a6",
+      "id": "1df81e36-8a44-488d-b31a-cf48b7ae485d",
       "name": "Pede o uf_munic ao cliente",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "pEJ4DhM9dl1y70fn",
-          "name": "Token de Acesso ChatWoot"
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -1012,14 +1023,14 @@
       "typeVersion": 4.3,
       "position": [
         -2016,
-        2432
+        2256
       ],
-      "id": "1b21cab5-eb7f-49c6-afc9-0a7c4f2ccacd",
+      "id": "a4d2072b-346b-47ca-be5a-80f9acdde656",
       "name": "Adiciona o passo: uf_munic_pendente",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "pEJ4DhM9dl1y70fn",
-          "name": "Token de Acesso ChatWoot"
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
     },
@@ -1112,15 +1123,15 @@
       "typeVersion": 1.1,
       "position": [
         -2240,
-        2272
+        2096
       ],
-      "id": "0cfea6c5-3259-4f3b-9855-b1df436bd252",
+      "id": "9ce5f7ed-b75e-4016-b586-5118d6943141",
       "name": "Insere uf_munic"
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -1141,21 +1152,21 @@
       "typeVersion": 4.3,
       "position": [
         -3248,
-        2176
+        2000
       ],
-      "id": "de3b7908-bd19-4b89-9b4b-6374dce55675",
+      "id": "cea6add7-82f5-45e6-97f1-3438c25fdeaa",
       "name": "Adiciona o controle do prox passo: uf_munic",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "pEJ4DhM9dl1y70fn",
-          "name": "Token de Acesso ChatWoot"
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -1176,14 +1187,14 @@
       "typeVersion": 4.3,
       "position": [
         -2016,
-        2272
+        2096
       ],
-      "id": "9c9e5c0b-0e5e-495e-96a5-6fc64bbf96fc",
+      "id": "ed514a7b-c609-4f62-abda-e83a14b7e719",
       "name": "Adiciona o controle do prox passo: estabelecimento",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "pEJ4DhM9dl1y70fn",
-          "name": "Token de Acesso ChatWoot"
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
     },
@@ -1246,15 +1257,15 @@
       "typeVersion": 3.4,
       "position": [
         -1376,
-        2096
+        1920
       ],
-      "id": "6e9eeb17-21fe-436b-b5ee-c3402f8bd0fc",
+      "id": "dc518173-0ffb-4baa-8283-2ac5a8d3301b",
       "name": "Verifica se tem estabelecimento"
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -1275,14 +1286,14 @@
       "typeVersion": 4.3,
       "position": [
         -736,
-        1984
+        1808
       ],
-      "id": "7e205141-6301-4192-8a06-192cdfb735c5",
+      "id": "f45057db-4fb8-45e5-81ab-cfd6d435a0c4",
       "name": "Adiciona o controle do prox passo: estabelecimento1",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "pEJ4DhM9dl1y70fn",
-          "name": "Token de Acesso ChatWoot"
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
     },
@@ -1375,15 +1386,15 @@
       "typeVersion": 1.1,
       "position": [
         -960,
-        1984
+        1808
       ],
-      "id": "53ec395c-9754-483e-b21f-3b1b94683748",
+      "id": "d146fe2f-b7a2-4726-b825-c4934198a59e",
       "name": "Insere estabelecimento"
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -1404,21 +1415,21 @@
       "typeVersion": 4.3,
       "position": [
         -960,
-        2144
+        1968
       ],
-      "id": "14b52fe9-03de-440a-afff-5ad569d9efc3",
+      "id": "b1b22dc8-4137-4bcf-858f-258364be76d9",
       "name": "Pede o estabelecimento ao cliente",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "pEJ4DhM9dl1y70fn",
-          "name": "Token de Acesso ChatWoot"
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -1439,21 +1450,21 @@
       "typeVersion": 4.3,
       "position": [
         -736,
-        2144
+        1968
       ],
-      "id": "47200f7f-4aec-44d9-8974-8ee38271c152",
+      "id": "a1ebc0ab-72e4-493f-aaea-d1e7642dc813",
       "name": "Adiciona o passo: estabelecimento_pendente",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "pEJ4DhM9dl1y70fn",
-          "name": "Token de Acesso ChatWoot"
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -1474,21 +1485,21 @@
       "typeVersion": 4.3,
       "position": [
         -416,
-        1840
+        1664
       ],
-      "id": "46511d13-20f4-4bc8-a178-329e94435c5e",
+      "id": "d13775ae-7310-4254-89e2-4b35e3b99bc7",
       "name": "Adiciona o passo: triagem",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "pEJ4DhM9dl1y70fn",
-          "name": "Token de Acesso ChatWoot"
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://136.248.125.55:3000/api/v1/accounts/2/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/labels",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/labels",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
@@ -1500,21 +1511,21 @@
       "typeVersion": 4.3,
       "position": [
         -6512,
-        2176
+        2000
       ],
-      "id": "47f774bd-5b61-477a-b86d-322d64c17ffe",
+      "id": "66698a74-2a09-4bdb-8615-1e764a4addfa",
       "name": "Adiciona etiqueta: falta_dados",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "VcO9g4Orh1qQUPrU",
-          "name": "Token Acesso ADM ChatWoot"
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://136.248.125.55:3000/api/v1/accounts/2/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/labels",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/labels",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
@@ -1526,21 +1537,21 @@
       "typeVersion": 4.3,
       "position": [
         -192,
-        1840
+        1664
       ],
-      "id": "36c91241-ac21-463c-8cd3-aa486c7ed65e",
+      "id": "54fbf826-9d1e-4308-8df5-da15a2a05310",
       "name": "Retira as etiquetas para dar continuidade a triagem",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "VcO9g4Orh1qQUPrU",
-          "name": "Token Acesso ADM ChatWoot"
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://136.248.125.55:3000/api/v1/accounts/2/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/labels",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/labels",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
@@ -1552,21 +1563,21 @@
       "typeVersion": 4.3,
       "position": [
         -6512,
-        2352
+        2176
       ],
-      "id": "617a01a1-c376-46ca-87b4-98bf5aaa2bf6",
+      "id": "1c2fdf18-f056-4c60-b5f5-3bf47733794a",
       "name": "Retira as etiquetas para dar continuidade a triagem (1)",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "VcO9g4Orh1qQUPrU",
-          "name": "Token Acesso ADM ChatWoot"
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -1587,21 +1598,21 @@
       "typeVersion": 4.3,
       "position": [
         -6240,
-        2352
+        2176
       ],
-      "id": "130acc03-4454-4e0b-9029-7160f5189b26",
+      "id": "6188a900-5725-44d8-9b0d-f737e2d40b0e",
       "name": "Adiciona o passo: triagem (1)",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "pEJ4DhM9dl1y70fn",
-          "name": "Token de Acesso ChatWoot"
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -1622,22 +1633,22 @@
       "typeVersion": 4.3,
       "position": [
         288,
-        1840
+        1664
       ],
-      "id": "e585eba4-0874-45e4-ab12-8fd9ff0267f9",
+      "id": "9948f44f-ca3e-4655-973a-952b503df198",
       "name": "Menu de triagem básica",
       "executeOnce": false,
       "credentials": {
         "httpHeaderAuth": {
-          "id": "pEJ4DhM9dl1y70fn",
-          "name": "Token de Acesso ChatWoot"
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -1658,15 +1669,15 @@
       "typeVersion": 4.3,
       "position": [
         -5984,
-        2352
+        2176
       ],
-      "id": "25e376cc-b2bc-4db8-953a-d08b7f217cb4",
+      "id": "de0cb310-f57e-4d3d-b70c-e1f15f4d42ef",
       "name": "Menu de triagem básica (1)",
       "executeOnce": false,
       "credentials": {
         "httpHeaderAuth": {
-          "id": "pEJ4DhM9dl1y70fn",
-          "name": "Token de Acesso ChatWoot"
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
     },
@@ -1751,16 +1762,16 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.4,
       "position": [
-        -7056,
-        2992
+        -7072,
+        3168
       ],
-      "id": "31cb0cab-7a98-47d6-9459-34f196d015d0",
+      "id": "b1aa8b39-7b0f-4fb6-a592-44f9ece866a8",
       "name": "Verifica qual a opção digitada pelo cliente"
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -1780,15 +1791,15 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -6672,
-        3376
+        -6688,
+        3552
       ],
-      "id": "880ab16a-c82f-4edb-bf36-d7e3c142577f",
+      "id": "56e8840e-f7ee-401e-a7b3-0bf05268f883",
       "name": "Mensagem avisando que não entendeu a opção digitada",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "pEJ4DhM9dl1y70fn",
-          "name": "Token de Acesso ChatWoot"
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
     },
@@ -1814,10 +1825,10 @@
       "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1.1,
       "position": [
-        -6672,
-        2880
+        -6688,
+        3056
       ],
-      "id": "47c0b56e-73c9-412b-ab4f-9c4c0561e7e4",
+      "id": "ab551343-2021-4b65-9137-3c70149c39d2",
       "name": "Pega ticket aberto no nome do cliente",
       "alwaysOutputData": true
     },
@@ -1844,9 +1855,9 @@
       "typeVersion": 1.1,
       "position": [
         -7024,
-        2192
+        2016
       ],
-      "id": "f8816101-8849-4a6b-a782-e4a75581c08b",
+      "id": "f51cdfc0-e8b2-4321-af6e-765f273eda54",
       "name": "Pega dados pessoais do cliente",
       "alwaysOutputData": true
     },
@@ -1878,10 +1889,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        -6400,
-        2880
+        -6416,
+        3056
       ],
-      "id": "4466c513-5a80-479e-a468-b1a3264dde28",
+      "id": "fbb2bad0-f777-4713-9238-978844aa6fa0",
       "name": "Verifica se existe dados de ticket para esse cliente"
     },
     {
@@ -1925,15 +1936,15 @@
       "typeVersion": 2.3,
       "position": [
         -6800,
-        2192
+        2016
       ],
-      "id": "779818cf-65d9-422e-a155-31164ac08485",
+      "id": "e317997e-95f2-47ae-9b1f-518b97acd3e7",
       "name": "Verifica se existe dados pessoais do cliente"
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -1953,22 +1964,22 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -6096,
-        2976
+        -6112,
+        3152
       ],
-      "id": "e24dcfa5-4ce0-4ab9-b050-9de0cbbb7869",
+      "id": "91841871-2e2f-48d1-8489-fe9264f0134b",
       "name": "Mensagem avisando que não há ticket em aberto no nome do cliente",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "pEJ4DhM9dl1y70fn",
-          "name": "Token de Acesso ChatWoot"
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -1988,23 +1999,23 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -6096,
-        2816
+        -6112,
+        2992
       ],
-      "id": "423c33aa-39ab-4f40-9ede-1f5aadbe6c91",
+      "id": "f0399b2a-ed76-4166-b8dc-063bf7d75d20",
       "name": "Mensagem informando todos os chamados aberto no nome do cliente",
       "executeOnce": true,
       "credentials": {
         "httpHeaderAuth": {
-          "id": "pEJ4DhM9dl1y70fn",
-          "name": "Token de Acesso ChatWoot"
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -2024,22 +2035,22 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -5792,
-        2816
+        -5808,
+        2992
       ],
-      "id": "6562e045-51f7-4939-8e1d-264c17792bd0",
+      "id": "78fd59cb-81f5-48ec-a083-ea8013d19108",
       "name": "Adiciona o passo: infos_chamados_aberto",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "pEJ4DhM9dl1y70fn",
-          "name": "Token de Acesso ChatWoot"
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -2059,22 +2070,22 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -6096,
-        3216
+        -6112,
+        3392
       ],
-      "id": "c1e47725-f87b-45fe-bc5f-996da03fdd96",
+      "id": "eff2f0c8-fa1f-4e31-8ce7-76762a96104e",
       "name": "Mensagem avisando que o atendimento foi finalizado",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "pEJ4DhM9dl1y70fn",
-          "name": "Token de Acesso ChatWoot"
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://136.248.125.55:3000/api/v1/accounts/2/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/assignments",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/assignments",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -2088,28 +2099,28 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"team_id\": 6\n}",
+        "jsonBody": "={\n  \"team_id\": 1097\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -6672,
-        2656
+        -6688,
+        2704
       ],
-      "id": "80fdf002-c105-429f-856d-ca58a01879de",
+      "id": "3145ced0-cc41-42db-84fc-025c16e409f7",
       "name": "Adiciona ao time Suporte N1",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "pEJ4DhM9dl1y70fn",
-          "name": "Token de Acesso ChatWoot"
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -2129,22 +2140,22 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -6400,
-        2656
+        -6112,
+        2384
       ],
-      "id": "94fd494b-935a-4e5a-89ca-e72b0589ff9e",
+      "id": "07319fff-19dc-45cc-845d-2584865256e7",
       "name": "Mensagem solicitando informações",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "pEJ4DhM9dl1y70fn",
-          "name": "Token de Acesso ChatWoot"
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://136.248.125.55:3000/api/v1/accounts/2/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/labels",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/labels",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
@@ -2155,15 +2166,15 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -6400,
-        3216
+        -6416,
+        3392
       ],
-      "id": "84ca1b87-6334-4ff6-a25b-b8ccd137e7e5",
+      "id": "c6381557-7136-43a7-b827-55f58926162d",
       "name": "Adiciona etiqueta: valida_dados",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "VcO9g4Orh1qQUPrU",
-          "name": "Token Acesso ADM ChatWoot"
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
     },
@@ -2247,13 +2258,13 @@
         -7472,
         3936
       ],
-      "id": "f6b9e3fb-3e9e-4896-ab4c-17368bd49ec1",
+      "id": "e3a6308a-bf75-489c-bca5-416a863a6693",
       "name": "Verifica se número digitado pelo cliente é válido"
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -2276,20 +2287,20 @@
         -7104,
         3888
       ],
-      "id": "f76ce527-1376-4367-85a7-8aee0c9e27f0",
+      "id": "37ee0d22-b69b-466c-b547-45164de703cf",
       "name": "Mensagem enviando que está finalizando o atendimento",
       "executeOnce": false,
       "credentials": {
         "httpHeaderAuth": {
-          "id": "pEJ4DhM9dl1y70fn",
-          "name": "Token de Acesso ChatWoot"
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -2312,19 +2323,19 @@
         -6768,
         3888
       ],
-      "id": "b400267b-3404-4774-b6c5-5a16beeb1e3b",
+      "id": "38df77fd-89ee-4114-b669-e890ba44faa9",
       "name": "Tira os passos para não impedir futuro atendimento (1)",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "pEJ4DhM9dl1y70fn",
-          "name": "Token de Acesso ChatWoot"
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -2344,22 +2355,22 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -6672,
-        3216
+        -6688,
+        3392
       ],
-      "id": "7f0c6426-f686-4568-a7fd-24733b508a90",
+      "id": "734007bd-70f0-4fca-b191-5608a88a7a79",
       "name": "Tira os passos para não impedir futuro atendimento",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "pEJ4DhM9dl1y70fn",
-          "name": "Token de Acesso ChatWoot"
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://136.248.125.55:3000/api/v1/accounts/2/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/labels",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/labels",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
@@ -2373,12 +2384,12 @@
         -6480,
         3888
       ],
-      "id": "b8d827cb-13c9-442d-bb33-1cbc428343a9",
+      "id": "66253529-d854-437d-b010-7204b0d2849c",
       "name": "Adiciona etiqueta: valida_dados (1)",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "VcO9g4Orh1qQUPrU",
-          "name": "Token Acesso ADM ChatWoot"
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
     },
@@ -2413,13 +2424,13 @@
         -6768,
         4224
       ],
-      "id": "25f1c778-4a9c-4f7b-8044-7c7af5b71456",
+      "id": "261b8c6d-f5e1-4117-b39f-3a94f286c945",
       "name": "Verifica se o ticket digitado pelo cliente existe"
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -2442,13 +2453,13 @@
         -6480,
         4368
       ],
-      "id": "971639fc-7f11-4415-8c3b-ab56ed1ec030",
+      "id": "a8041783-3022-499c-ad5a-977d2594e983",
       "name": "Mensagem informando que não possível achar o ticket que o cliente digitou",
       "executeOnce": true,
       "credentials": {
         "httpHeaderAuth": {
-          "id": "pEJ4DhM9dl1y70fn",
-          "name": "Token de Acesso ChatWoot"
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
     },
@@ -2474,7 +2485,7 @@
         -6480,
         4208
       ],
-      "id": "dfcbac1f-caf1-4226-926b-dcc0e153fc05",
+      "id": "068de15b-0616-4a9c-92c7-e6c116230b75",
       "name": "Buscar dados do cliente no GLPI",
       "executeOnce": false,
       "credentials": {
@@ -2487,7 +2498,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://136.248.125.55:3000/api/v1/accounts/2/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/assignments",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/assignments",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -2510,19 +2521,19 @@
         -6192,
         4208
       ],
-      "id": "37af5406-bc5f-4958-bf5e-26cfd51c19ff",
+      "id": "c0c52a60-51fa-4400-8653-a74760da6439",
       "name": "Adiciona ao time Suporte N1 (1)",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "pEJ4DhM9dl1y70fn",
-          "name": "Token de Acesso ChatWoot"
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -2545,20 +2556,20 @@
         -5904,
         4208
       ],
-      "id": "61c2054d-ab04-497e-a9e7-b84ffbdb4733",
+      "id": "768c52f1-fd20-47c6-9369-8f69d841fc5b",
       "name": "Mensagem informando que o cliente foi encaminhado para o setor responsável",
       "executeOnce": true,
       "credentials": {
         "httpHeaderAuth": {
-          "id": "pEJ4DhM9dl1y70fn",
-          "name": "Token de Acesso ChatWoot"
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -2581,19 +2592,19 @@
         -5600,
         4208
       ],
-      "id": "c47b39ce-0ce8-4a51-ba1a-c3e9ecdf5800",
+      "id": "0fe74015-6a60-4aa4-a257-5307e943a238",
       "name": "Adiciona protocolo e chamado aos atributos da conversa e coloca o passo em_atendimento (1)",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "pEJ4DhM9dl1y70fn",
-          "name": "Token de Acesso ChatWoot"
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -2616,13 +2627,13 @@
         -6192,
         4368
       ],
-      "id": "dbdbc8f9-7b92-4162-a867-48cdd10f9775",
+      "id": "451fc99b-5595-4784-a8f9-66aabce50306",
       "name": "Mensagem informando todos os chamados aberto no nome do cliente (1)",
       "executeOnce": true,
       "credentials": {
         "httpHeaderAuth": {
-          "id": "pEJ4DhM9dl1y70fn",
-          "name": "Token de Acesso ChatWoot"
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
     },
@@ -2651,7 +2662,7 @@
         -7104,
         4224
       ],
-      "id": "8734996e-617e-4b6d-94d3-56808ce232bd",
+      "id": "82f4d06a-ff7d-4e67-97b4-cc34f2a7365f",
       "name": "Pega ticket aberto no nome do cliente (1)",
       "alwaysOutputData": true
     },
@@ -2667,9 +2678,9 @@
       "typeVersion": 1,
       "position": [
         -5536,
-        2048
+        1872
       ],
-      "id": "7edae187-0d67-4062-9455-9d795dc68eae",
+      "id": "9aaae0f6-b615-48df-a50c-edee19f9b0eb",
       "name": "Cria regra de timeout",
       "credentials": {
         "redis": {
@@ -2690,9 +2701,9 @@
       "typeVersion": 1,
       "position": [
         -5744,
-        2352
+        2176
       ],
-      "id": "d6417882-206c-4737-9ebb-b645bc1379ce",
+      "id": "fae90c04-7c3f-4e2b-b9f0-530393d79542",
       "name": "Cria regra de timeout (1)",
       "credentials": {
         "redis": {
@@ -2713,9 +2724,9 @@
       "typeVersion": 1,
       "position": [
         -4240,
-        2240
+        2064
       ],
-      "id": "d13ef40d-412b-46ae-bdc9-1e9ac8257733",
+      "id": "786f7b06-e9c0-4e88-ad89-65ab9ca15988",
       "name": "Cria regra de timeout (2)",
       "credentials": {
         "redis": {
@@ -2736,9 +2747,9 @@
       "typeVersion": 1,
       "position": [
         -2992,
-        2336
+        2160
       ],
-      "id": "7b0cf1fa-1b6a-4dcc-9afe-c7a81f467b29",
+      "id": "46bb8fe8-df37-47bc-b08c-23a20e030ffa",
       "name": "Cria regra de timeout (3)",
       "credentials": {
         "redis": {
@@ -2759,9 +2770,9 @@
       "typeVersion": 1,
       "position": [
         -1792,
-        2432
+        2256
       ],
-      "id": "a8734aab-24aa-4e0e-9c0a-bb1ae3e92988",
+      "id": "d370758b-5f58-4689-9dbb-de30e3b11e4c",
       "name": "Cria regra de timeout (4)",
       "credentials": {
         "redis": {
@@ -2782,9 +2793,9 @@
       "typeVersion": 1,
       "position": [
         -496,
-        2144
+        1968
       ],
-      "id": "f77fb836-c741-4150-bef1-db8f6894f3e1",
+      "id": "5b725c3e-2c8c-4612-96e3-0fc4c5a10147",
       "name": "Cria regra de timeout (5)",
       "credentials": {
         "redis": {
@@ -2805,9 +2816,9 @@
       "typeVersion": 1,
       "position": [
         544,
-        1840
+        1664
       ],
-      "id": "c527b9d2-4609-4a1d-9f85-f9e175bbb103",
+      "id": "0c1ffc02-1521-4023-a652-8563100f56b4",
       "name": "Cria regra de timeout (6)",
       "credentials": {
         "redis": {
@@ -2827,10 +2838,10 @@
       "type": "n8n-nodes-base.redis",
       "typeVersion": 1,
       "position": [
-        -5552,
-        2816
+        -5568,
+        2992
       ],
-      "id": "85aee1e7-1a49-4fa5-b648-8db2b03b6ee0",
+      "id": "1003ffc1-d88d-4b36-891f-46982fe5e522",
       "name": "Cria regra de timeout (8)",
       "credentials": {
         "redis": {
@@ -2850,10 +2861,10 @@
       "type": "n8n-nodes-base.redis",
       "typeVersion": 1,
       "position": [
-        -6400,
-        3376
+        -6416,
+        3552
       ],
-      "id": "1ec06bb4-545b-46b8-a497-ea43a75984db",
+      "id": "0d53d52c-0088-4f53-944f-3695efc39890",
       "name": "Cria regra de timeout (10)",
       "credentials": {
         "redis": {
@@ -2873,10 +2884,10 @@
       "type": "n8n-nodes-base.redis",
       "typeVersion": 1,
       "position": [
-        -5792,
-        2976
+        -5808,
+        3152
       ],
-      "id": "86a94bb6-00f8-481e-8f37-9e9011d25394",
+      "id": "bb997c0a-edc2-4cc2-beae-f65525ff5c45",
       "name": "Cria regra de timeout (9)",
       "credentials": {
         "redis": {
@@ -2899,7 +2910,7 @@
         -5904,
         4368
       ],
-      "id": "9d2a7879-97a9-46a3-86f0-8b84d3eb8725",
+      "id": "20a67b04-d287-42fd-96a6-bbcbcf6aac8a",
       "name": "Cria regra de timeout (11)",
       "credentials": {
         "redis": {
@@ -2932,9 +2943,9 @@
       "typeVersion": 4.3,
       "position": [
         32,
-        1616
+        1440
       ],
-      "id": "234eb183-baeb-4a72-85cc-1e23c3d76877",
+      "id": "7363c23b-8f79-41f9-b0f8-dc7b99be6f60",
       "name": "Finaliza cadastro do cliente1",
       "credentials": {
         "httpHeaderAuth": {
@@ -2946,7 +2957,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -2966,15 +2977,15 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -4736,
-        2656
+        -4496,
+        2560
       ],
-      "id": "eb2bd995-ea43-4fc9-abb5-5fb02f8fc918",
+      "id": "1658ff7b-b0b0-479a-a9b8-73d28769f4cb",
       "name": "Adiciona protocolo e chamado aos atributos da conversa e coloca o passo em_atendimento",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "pEJ4DhM9dl1y70fn",
-          "name": "Token de Acesso ChatWoot"
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
     },
@@ -3035,16 +3046,16 @@
       "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1.1,
       "position": [
-        -4448,
-        2656
+        -4208,
+        2560
       ],
-      "id": "09c0da28-b195-444e-9c12-e358b3339a3f",
+      "id": "d7588927-5ca1-4af0-8605-e7bd5ba5d1cf",
       "name": "Insere ticket na base de dados"
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -3064,15 +3075,15 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -4992,
-        2656
+        -4752,
+        2560
       ],
-      "id": "fa83e632-e2d1-46fa-be29-9d60cb1ee348",
+      "id": "94f3b688-1252-4f95-bd5b-99a19a721d86",
       "name": "Mensagem informando o protocolo para o cliente",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "pEJ4DhM9dl1y70fn",
-          "name": "Token de Acesso ChatWoot"
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
     },
@@ -3093,16 +3104,16 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"input\": {\n    \"name\": \"Chamado via Chatwoot: {{ $('init').item.json.body.conversation.messages[0].sender.name }}\",\n    \"content\": \"<table><tr><td><b>Solicitante:</b></td><td>{{ $('init').item.json.body.conversation.messages[0].sender.name }}</td></tr><tr><td><b>E-mail:</b></td><td>{{ $('init').item.json.body.conversation.messages[0].sender.email }}</td></tr><tr><td><b>Telefone:</b></td><td> {{ $('init').item.json.body.conversation.messages[0].sender.phone_number }}</td></tr><tr><td><b>Link da conversa:</b></td><td><a href='https://suporte.wmsaude.com.br/app/accounts/2/inbox/22/conversations/{{ $('init').item.json.body.conversation.id }}' target='_blank'>Acessar no Chatwoot</a></td></tr></table>\",\n    \"_groups_id_assign\": [ 6 ],\n    \"_municpiorequerentefield\": [ {{ $json.id_municipio_glpi || 87 }} ],\n    \"externalid\": \"{{ $('init').item.json.body.conversation.id }}\"\n  }\n}",
+        "jsonBody": "={\n  \"input\": {\n    \"name\": \"Chamado via Chatwoot: {{ $('init').item.json.body.conversation.messages[0].sender.name }}\",\n    \"content\": \"<table><tr><td><b>Solicitante:</b></td><td>{{ $('init').item.json.body.conversation.messages[0].sender.name }}</td></tr><tr><td><b>E-mail:</b></td><td>{{ $('init').item.json.body.conversation.messages[0].sender.email }}</td></tr><tr><td><b>Telefone:</b></td><td> {{ $('init').item.json.body.conversation.messages[0].sender.phone_number }}</td></tr><tr><td><b>Link da conversa:</b></td><td><a href='https://conversas.upflowz.com//app/accounts/{{ $('init').item.json.body.account.id }}/inbox/{{ $('init').item.json.body.conversation.contact_inbox.inbox_id }}/conversations/{{ $('init').item.json.body.conversation.id }}' target='_blank'>Acessar no Chatwoot</a></td></tr></table>\",\n    \"_groups_id_assign\": [ 6 ],\n    \"_municpiorequerentefield\": [ {{ $json.id_municipio_glpi || 87 }} ],\n    \"externalid\": \"{{ $('init').item.json.body.conversation.id }}\"\n  }\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -5536,
-        2656
+        -5296,
+        2560
       ],
-      "id": "291b2c66-6e61-4d1b-b6db-11b0f8c93620",
+      "id": "2b027778-8a6c-413b-a5c3-fff80aa7813e",
       "name": "Cria ticket no GLPI com descrição do cliente",
       "alwaysOutputData": false,
       "credentials": {
@@ -3134,10 +3145,10 @@
       "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1.1,
       "position": [
-        -6096,
-        2656
+        -5792,
+        2560
       ],
-      "id": "f1cc3982-6b19-43dc-9e3f-772eb3b1183c",
+      "id": "5411005a-ee49-42f9-a58a-e1c7bef8995a",
       "name": "Pega dados pessoais do cliente (1)",
       "alwaysOutputData": true
     },
@@ -3148,10 +3159,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -5792,
-        2656
+        -5552,
+        2560
       ],
-      "id": "dd7591f5-1b7a-4a5b-8d8c-d602fd510001",
+      "id": "3b2a196d-df41-4d38-b690-ca28012f95bb",
       "name": "Tratando o Município"
     },
     {
@@ -3182,15 +3193,15 @@
       "typeVersion": 2.3,
       "position": [
         -4688,
-        1904
+        1728
       ],
-      "id": "c09ad5df-ef3c-4daa-8751-ba26378e55b6",
+      "id": "15144df4-930c-45ed-8333-e05bc1f73b44",
       "name": "Verifica se email é valido"
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -3211,14 +3222,14 @@
       "typeVersion": 4.3,
       "position": [
         -4400,
-        2048
+        1872
       ],
-      "id": "e248b740-a84a-4b12-9ba1-ccf6f47d6beb",
+      "id": "5daef7e0-4a46-49e0-ba0e-06ac3090131b",
       "name": "Informa que não conseguiu entender o email informado e pede que envie novamente da forma correta",
       "credentials": {
         "httpHeaderAuth": {
-          "id": "pEJ4DhM9dl1y70fn",
-          "name": "Token de Acesso ChatWoot"
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
     },
@@ -3245,16 +3256,375 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -5264,
-        2656
+        -5024,
+        2560
       ],
-      "id": "174df3e6-729c-4ffd-9284-16b7844934e2",
+      "id": "87dcd806-3ac5-4f45-a89b-d4671a38c22c",
       "name": "Informa o campo de município requerente e sua base",
       "alwaysOutputData": false,
       "credentials": {
         "httpHeaderAuth": {
           "id": "aLAgkGobWooRkbRp",
           "name": "Token de Sessao GLPI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"custom_attributes\": {\n    \"step_triagem\": \"em_atendimento\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -8416,
+        3488
+      ],
+      "id": "09edc443-9992-480e-af1c-8dfde36a5446",
+      "name": "Adiciona passo em_atendimento para forçar atendimento humano a conversa",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "=wmsaude:{{ $('init').item.json.body.account.id }}:timeout:conv:{{ $('init').item.json.body.conversation.messages[0].conversation_id }}",
+        "value": "aguardando_resposta",
+        "expire": true,
+        "ttl": 300
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -4176,
+        1872
+      ],
+      "id": "6c02203e-0026-4251-a0ec-08b8469283ec",
+      "name": "Cria regra de timeout (13)",
+      "credentials": {
+        "redis": {
+          "id": "MynVI7yhhqqlbCcd",
+          "name": "Autenticacao Redis para GLPI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "3277eadd-7d18-4302-81e1-5d288ad15365",
+              "leftValue": "={{ $('init').item.json.body.conversation.labels }}",
+              "rightValue": "forcar_atendimento",
+              "operator": {
+                "type": "array",
+                "operation": "contains",
+                "rightType": "any"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {
+          "ignoreCase": false
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -8704,
+        3632
+      ],
+      "id": "ad80a7c6-0744-40e1-8b1c-19a89f97a266",
+      "name": "Verifica se tem etiqueta forcar_atendimento"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "=wmsaude:{{ $('init').item.json.body.account.id }}:timeout:conv:{{ $('init').item.json.body.conversation.messages[0].conversation_id }}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -7936,
+        3488
+      ],
+      "id": "4532a9dd-a2c3-4bb8-95f9-31df148c9b20",
+      "name": "Cancela Timeout (1)",
+      "credentials": {
+        "redis": {
+          "id": "MynVI7yhhqqlbCcd",
+          "name": "Autenticacao Redis para GLPI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/labels",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"labels\": [\n    \"\"\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -8176,
+        3488
+      ],
+      "id": "66aa8cfd-b5e7-481e-b0cf-847a916b2ff9",
+      "name": "Retira as etiquetas para dar continuidade ao atendimento",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "197a318e-dd82-455f-bfd9-6ce91513b733",
+                    "leftValue": "={{ [1, 2, 3, 4, 5].includes($now.setZone('America/Sao_Paulo').weekday) && (($now.setZone('America/Sao_Paulo').hour >= 8 && $now.setZone('America/Sao_Paulo').hour < 12) || ($now.setZone('America/Sao_Paulo').hour >= 14 && $now.setZone('America/Sao_Paulo').hour < 18)) }}",
+                    "rightValue": "1",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "59242af5-77fc-4bdf-b9d6-b5b187a54a84",
+                    "leftValue": "={{ [1, 2, 3, 4, 5].includes($now.setZone('America/Sao_Paulo').weekday) && ($now.setZone('America/Sao_Paulo').hour >= 12 && $now.setZone('America/Sao_Paulo').hour < 14) }}",
+                    "rightValue": "2",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "76774153-cd53-4da0-9ec6-e8720498f742",
+                    "leftValue": "={{ ![1, 2, 3, 4, 5].includes($now.setZone('America/Sao_Paulo').weekday) || $now.setZone('America/Sao_Paulo').hour < 8 || $now.setZone('America/Sao_Paulo').hour >= 18 }}",
+                    "rightValue": "3",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "none"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -6416,
+        2688
+      ],
+      "id": "d3f0f56f-a95f-47b9-b336-fac59b11d306",
+      "name": "Verifica horário comercial"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"Olá, {{ $('init').item.json.body.conversation.messages[0].sender.name }}!\\n\\nNo momento, nossa equipe está em **horário de almoço**. Mas fique tranquilo(a): sua solicitação já foi registrada!\\n\\nNosso intervalo é **das 12h às 14h**. Assim que retornarmos, às **14h**, daremos prioridade ao seu atendimento. Agradecemos a compreensão!\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -6112,
+        2560
+      ],
+      "id": "e25f823e-4109-4c9b-aa6f-585078e4c67b",
+      "name": "Mensagem informando que está no horário de almoço",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"Olá, {{ $('init').item.json.body.conversation.messages[0].sender.name }}! No momento, nossa equipe já encerrou o expediente por hoje. Nosso horário de atendimento é de **segunda a sexta-feira, das 08h às 12h e das 14h às 18h**.\\n\\nPara que possamos te dar total atenção, por gentileza, envie uma nova mensagem para nós assim que iniciarmos o próximo período de atendimento. Estaremos prontos para te ajudar! \\n\\nAgradecemos muito a sua compreensão e até breve!\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -6112,
+        2736
+      ],
+      "id": "e28c8d64-1778-42c6-a681-85f0f417971b",
+      "name": "Mensagem informando que está fora do horário de expediente",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"custom_attributes\": {\n    \"step_triagem\": \"\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -5792,
+        2736
+      ],
+      "id": "72be175f-a6e5-4bbe-9021-44688dd4a404",
+      "name": "Tira os passos para não impedir futuro atendimento (1)1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/labels",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"labels\": [\n    \"validar_dados\"\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -5552,
+        2736
+      ],
+      "id": "477fcb3c-1815-4cd0-9c7b-4fc3ee2d82c7",
+      "name": "Adiciona etiqueta: valida_dados (2)",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
     }
@@ -3264,84 +3634,83 @@
       {
         "json": {
           "headers": {
-            "accept": "application/json",
-            "user-agent": "rest-client/2.1.0 (linux x86_64) ruby/3.4.4p34",
-            "content-type": "application/json",
-            "content-length": "2955",
             "accept-encoding": "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
-            "host": "136.248.125.55:5678"
+            "accept": "application/json",
+            "user-agent": "Ruby",
+            "host": "136.248.125.55:5678",
+            "content-type": "application/json",
+            "x-chatwoot-delivery": "8489d46a-08ff-4c28-ad6c-62349f2aa02c",
+            "x-chatwoot-timestamp": "1781118299",
+            "x-chatwoot-signature": "sha256=7edf02311fafbb5d2765009aff545776a62fa9c2431e2f8703a3d5ad63bafc28",
+            "content-length": "3271"
           },
           "params": {},
           "query": {},
           "body": {
             "account": {
-              "id": 2,
-              "name": "WM Saúde"
+              "id": 314,
+              "name": "WM Saúde - Gestão e Tecnologia"
             },
             "additional_attributes": {},
-            "content_attributes": {
-              "in_reply_to": null
-            },
+            "content_attributes": {},
             "content_type": "text",
-            "content": "1",
+            "content": "09",
             "conversation": {
               "additional_attributes": {},
               "can_reply": true,
-              "channel": "Channel::Api",
+              "channel": "Channel::Whatsapp",
               "contact_inbox": {
-                "id": 1416,
-                "contact_id": 6168,
-                "inbox_id": 11,
-                "source_id": "d09fd172-c0a3-4f92-abd2-f46b47c3cd8d",
-                "created_at": "2026-05-14T12:35:43.724Z",
-                "updated_at": "2026-05-14T12:35:43.724Z",
+                "id": 40509,
+                "contact_id": 5694,
+                "inbox_id": 83,
+                "source_id": "557399981145",
+                "created_at": "2026-06-10T12:07:45.864Z",
+                "updated_at": "2026-06-10T12:07:45.864Z",
                 "hmac_verified": false,
-                "pubsub_token": "GtqpAdzE6S7nLwdG81Z6fw9t"
+                "pubsub_token": "vxUQDUCNeK1LymUCmDeExXsz"
               },
-              "id": 918,
-              "inbox_id": 11,
+              "id": 151,
+              "inbox_id": 83,
               "messages": [
                 {
-                  "id": 52788,
-                  "content": "1",
-                  "account_id": 2,
-                  "inbox_id": 11,
-                  "conversation_id": 918,
+                  "id": 212214,
+                  "content": "09",
+                  "account_id": 314,
+                  "inbox_id": 83,
+                  "conversation_id": 151,
                   "message_type": 0,
-                  "created_at": 1778763075,
-                  "updated_at": "2026-05-14T12:51:15.329Z",
+                  "created_at": 1781118299,
+                  "updated_at": "2026-06-10T19:04:59.208Z",
                   "private": false,
                   "status": "sent",
-                  "source_id": "WAID:3EB05EDFB9776B2EDDB78E",
+                  "source_id": "wamid.HBgMNTU3Mzk5OTgxMTQ1FQIAEhgUM0FGQzA3RjgwOERFODE4RTA2QTAA",
                   "content_type": "text",
-                  "content_attributes": {
-                    "in_reply_to": null
-                  },
+                  "content_attributes": {},
                   "sender_type": "Contact",
-                  "sender_id": 6168,
+                  "sender_id": 5694,
                   "external_source_ids": {},
                   "additional_attributes": {},
-                  "processed_message_content": "1",
+                  "processed_message_content": "09",
                   "sentiment": {},
                   "conversation": {
-                    "assignee_id": null,
+                    "assignee_id": 3141,
                     "unread_count": 1,
-                    "last_activity_at": 1778763075,
+                    "last_activity_at": 1781118299,
                     "contact_inbox": {
-                      "source_id": "d09fd172-c0a3-4f92-abd2-f46b47c3cd8d"
+                      "source_id": "557399981145"
                     }
                   },
                   "sender": {
                     "additional_attributes": {
-                      "avatar_url_hash": "d4c0bc9c01c97f70b9d210253192611f40349e90527d2716dc4b2bae4038069a",
-                      "last_avatar_sync_at": "2026-05-14T12:36:38Z"
+                      "avatar_url_hash": "d7c6bc0b12dcf88436c9e7e31eb4f4902af7a64051baf9072665f4ebfe488b0a",
+                      "last_avatar_sync_at": "2026-06-10T18:56:28Z"
                     },
                     "custom_attributes": {},
-                    "email": "renilapasantos@yahoo.com.br",
-                    "id": 6168,
-                    "identifier": "557799834061@s.whatsapp.net",
-                    "name": "Renivaldo Lapa",
-                    "phone_number": "+557799834061",
+                    "email": "deborasilvadossantos1@gmail.com",
+                    "id": 5694,
+                    "identifier": null,
+                    "name": "Débora",
+                    "phone_number": "+557399981145",
                     "thumbnail": "",
                     "blocked": false,
                     "type": "contact"
@@ -3352,74 +3721,87 @@
               "meta": {
                 "sender": {
                   "additional_attributes": {
-                    "avatar_url_hash": "d4c0bc9c01c97f70b9d210253192611f40349e90527d2716dc4b2bae4038069a",
-                    "last_avatar_sync_at": "2026-05-14T12:36:38Z"
+                    "avatar_url_hash": "d7c6bc0b12dcf88436c9e7e31eb4f4902af7a64051baf9072665f4ebfe488b0a",
+                    "last_avatar_sync_at": "2026-06-10T18:56:28Z"
                   },
                   "custom_attributes": {},
-                  "email": "renilapasantos@yahoo.com.br",
-                  "id": 6168,
-                  "identifier": "557799834061@s.whatsapp.net",
-                  "name": "Renivaldo Lapa",
-                  "phone_number": "+557799834061",
+                  "email": "deborasilvadossantos1@gmail.com",
+                  "id": 5694,
+                  "identifier": null,
+                  "name": "Débora",
+                  "phone_number": "+557399981145",
                   "thumbnail": "",
                   "blocked": false,
                   "type": "contact"
                 },
-                "assignee": null,
-                "assignee_type": null,
+                "assignee": {
+                  "id": 3141,
+                  "name": "Ana Flavia",
+                  "available_name": "Ana Flavia",
+                  "avatar_url": "",
+                  "type": "user",
+                  "availability_status": null,
+                  "thumbnail": ""
+                },
+                "assignee_type": "User",
                 "team": {
-                  "id": 6,
-                  "name": "service desk"
+                  "id": 1103,
+                  "name": "suporte acs"
                 },
                 "hmac_verified": false
               },
               "status": "open",
               "custom_attributes": {
-                "step_triagem": "triagem"
+                "ocupacao": "ACS",
+                "protocolo": "2201",
+                "localidade": "Itororó-Ba",
+                "link_chamado": "https://glpi.wmsaude.com.br/front/ticket.form.php?id=2201",
+                "step_triagem": "em_atendimento",
+                "estabelecimento": "PSF Dr.Alcebiades Cunha"
               },
               "snoozed_until": null,
               "unread_count": 1,
-              "first_reply_created_at": null,
+              "first_reply_created_at": "2026-06-10T12:07:47.168Z",
               "priority": null,
-              "waiting_since": 1778762143,
-              "agent_last_seen_at": 1778763064,
+              "waiting_since": 1781118299,
+              "agent_last_seen_at": 1781118262,
               "contact_last_seen_at": 0,
-              "last_activity_at": 1778763075,
-              "timestamp": 1778763075,
-              "created_at": 1778762143,
-              "updated_at": 1778763075.3306592
+              "last_activity_at": 1781118299,
+              "timestamp": 1781118299,
+              "created_at": 1781093265,
+              "updated_at": 1781118299.2314901
             },
-            "created_at": "2026-05-14T12:51:15.329Z",
-            "id": 52788,
+            "created_at": "2026-06-10T19:04:59.208Z",
+            "id": 212214,
             "inbox": {
-              "id": 11,
-              "name": "CAC WM Saúde"
+              "id": 83,
+              "name": "WM Saúde - WhatsApp"
             },
             "message_type": "incoming",
             "private": false,
             "sender": {
               "account": {
-                "id": 2,
-                "name": "WM Saúde"
+                "id": 314,
+                "name": "WM Saúde - Gestão e Tecnologia"
               },
               "additional_attributes": {
-                "avatar_url_hash": "d4c0bc9c01c97f70b9d210253192611f40349e90527d2716dc4b2bae4038069a",
-                "last_avatar_sync_at": "2026-05-14T12:36:38Z"
+                "avatar_url_hash": "d7c6bc0b12dcf88436c9e7e31eb4f4902af7a64051baf9072665f4ebfe488b0a",
+                "last_avatar_sync_at": "2026-06-10T18:56:28Z"
               },
               "avatar": "",
               "custom_attributes": {},
-              "email": "renilapasantos@yahoo.com.br",
-              "id": 6168,
-              "identifier": "557799834061@s.whatsapp.net",
-              "name": "Renivaldo Lapa",
-              "phone_number": "+557799834061",
+              "email": "deborasilvadossantos1@gmail.com",
+              "id": 5694,
+              "identifier": null,
+              "name": "Débora",
+              "phone_number": "+557399981145",
               "thumbnail": "",
               "blocked": false
             },
-            "source_id": "WAID:3EB05EDFB9776B2EDDB78E",
+            "source_id": "wamid.HBgMNTU3Mzk5OTgxMTQ1FQIAEhgUM0FGQzA3RjgwOERFODE4RTA2QTAA",
             "event": "message_created"
           },
-          "webhookUrl": "http://localhost:5678/webhook/fluxo-principal",
+          "webhookUrl": "http://localhost:5678/webhook/fluxo-principal-playnee",
           "executionMode": "production"
         },
         "pairedItem": {
@@ -3433,7 +3815,7 @@
       "main": [
         [
           {
-            "node": "Verifica se é mensagem do cliente",
+            "node": "Verifica se tem etiqueta forcar_atendimento",
             "type": "main",
             "index": 0
           }
@@ -3956,7 +4338,7 @@
       "main": [
         [
           {
-            "node": "Mensagem solicitando informações",
+            "node": "Verifica horário comercial",
             "type": "main",
             "index": 0
           }
@@ -4314,6 +4696,115 @@
           }
         ]
       ]
+    },
+    "Informa que não conseguiu entender o email informado e pede que envie novamente da forma correta": {
+      "main": [
+        [
+          {
+            "node": "Cria regra de timeout (13)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifica se tem etiqueta forcar_atendimento": {
+      "main": [
+        [
+          {
+            "node": "Adiciona passo em_atendimento para forçar atendimento humano a conversa",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Verifica se é mensagem do cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adiciona passo em_atendimento para forçar atendimento humano a conversa": {
+      "main": [
+        [
+          {
+            "node": "Retira as etiquetas para dar continuidade ao atendimento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retira as etiquetas para dar continuidade ao atendimento": {
+      "main": [
+        [
+          {
+            "node": "Cancela Timeout (1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifica horário comercial": {
+      "main": [
+        [
+          {
+            "node": "Mensagem solicitando informações",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mensagem informando que está no horário de almoço",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mensagem informando que está fora do horário de expediente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mensagem informando que está no horário de almoço": {
+      "main": [
+        [
+          {
+            "node": "Pega dados pessoais do cliente (1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mensagem informando que está fora do horário de expediente": {
+      "main": [
+        [
+          {
+            "node": "Tira os passos para não impedir futuro atendimento (1)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tira os passos para não impedir futuro atendimento (1)1": {
+      "main": [
+        [
+          {
+            "node": "Adiciona etiqueta: valida_dados (2)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
@@ -4321,18 +4812,18 @@
     "executionOrder": "v1",
     "availableInMCP": false
   },
-  "versionId": "fcb7033c-4af3-4e42-90e6-b4bbca22fa01",
+  "versionId": "5ab5ad3d-244d-4861-8bc9-fa32d6b79f58",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "20d61d4346ce6060f90882f582ec82333f0d0ef83add04f61cda543f312ca8da"
   },
-  "id": "fJ8H-BKlmeHPxZ4ueDiWi",
+  "id": "cdYCNJfYPDEVtQDs",
   "tags": [
     {
-      "updatedAt": "2026-03-12T18:10:41.178Z",
-      "createdAt": "2026-03-12T18:10:41.178Z",
-      "id": "F3k4hPbgjXLPrNCz",
-      "name": "Triagem-GLPI"
+      "updatedAt": "2026-06-08T18:47:18.375Z",
+      "createdAt": "2026-06-08T18:47:18.375Z",
+      "id": "YNF8FydUYhJWVs9e",
+      "name": "Playnee"
     }
   ]
 }
