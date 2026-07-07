@@ -3050,44 +3050,6 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpHeaderAuth",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Content-Type",
-              "value": "application/json"
-            }
-          ]
-        },
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "{\n  \"content\": \"Seu cadastro foi finalizado. Vamos agora dar continuidade ao seu atendimento.\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}\n",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.3,
-      "position": [
-        -16,
-        1440
-      ],
-      "id": "7363c23b-8f79-41f9-b0f8-dc7b99be6f60",
-      "name": "Finaliza cadastro do cliente1",
-      "retryOnFail": true,
-      "maxTries": 3,
-      "waitBetweenTries": 2000,
-      "credentials": {
-        "httpHeaderAuth": {
-          "id": "pEJ4DhM9dl1y70fn",
-          "name": "Token de Acesso ChatWoot"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "method": "POST",
         "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
@@ -3102,7 +3064,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"custom_attributes\": {\n    \"protocolo\": \"{{ $('Cria ticket no GLPI com descrição do cliente').item.json.id }}\",\n    \"link_chamado\": \"https://glpi.wmsaude.com.br/front/ticket.form.php?id={{ $('Cria ticket no GLPI com descrição do cliente').item.json.id }}\",\n    \"step_triagem\": \"em_atendimento\",\n    \"ocupacao\": \"{{ $('Pega dados pessoais do cliente (1)').item.json.ocupacao }}\",\n    \"localidade\": \"{{ $('Pega dados pessoais do cliente (1)').item.json.uf_municipio }}\",\n    \"estabelecimento\": \"{{ $('Pega dados pessoais do cliente (1)').item.json.estabelecimento }}\"\n  }\n}",
+        "jsonBody": "={\n  \"custom_attributes\": {\n    \"protocolo\": \"{{ $('Cria ticket no GLPI com descrição do cliente').item.json.id }}\",\n    \"link_chamado\": \"https://glpi.wmsaude.com.br/front/ticket.form.php?id={{ $('Cria ticket no GLPI com descrição do cliente').item.json.id }}\",\n    \"step_triagem\": \"em_atendimento\"\n  }\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -3393,7 +3355,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"input\": {\n    \"items_id\": {{ $json.id }},\n    \"itemtype\": \"Ticket\",\n    \"plugin_fields_municpiorequerentefielddropdowns_id\": {{ $('Tratando o Município').item.json.id_municipio_glpi || 88 }},\n    \"unidadedoclientefield\": \"{{ $('Pega dados pessoais do cliente (1)').item.json.estabelecimento }}\"\n  }\n}",
+        "jsonBody": "={\n  \"input\": {\n    \"items_id\": {{ $json.id }},\n    \"itemtype\": \"Ticket\",\n    \"plugin_fields_municpiorequerentefielddropdowns_id\": {{ $('Tratando o Município').item.json.id_municipio_glpi || 88 }},\n    \"unidadedoclientefield\": \"{{ ($('Pega dados pessoais do cliente (1)').item.json.estabelecimento || '').replace(/\\\\/g,'\\\\\\\\').replace(/\"/g,'\\\\\"').replace(/\\r?\\n/g,'\\\\n') }}\"\n  }\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -3933,7 +3895,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"input\": {\n    \"items_id\": {{ $json.id }},\n    \"itemtype\": \"Ticket\",\n    \"plugin_fields_municpiorequerentefielddropdowns_id\": {{ $('Pega dados pessoais do cliente (2)').item.json.id_municipio_glpi || 88 }},\n    \"unidadedoclientefield\": \"{{ $('Pega dados pessoais do cliente (2)').item.json.estabelecimento }}\"\n  }\n}",
+        "jsonBody": "={\n  \"input\": {\n    \"items_id\": {{ $json.id }},\n    \"itemtype\": \"Ticket\",\n    \"plugin_fields_municpiorequerentefielddropdowns_id\": {{ $('Pega dados pessoais do cliente (2)').item.json.id_municipio_glpi || 88 }},\n    \"unidadedoclientefield\": \"{{ ($('Pega dados pessoais do cliente (2)').item.json.estabelecimento || '').replace(/\\\\/g,'\\\\\\\\').replace(/\"/g,'\\\\\"').replace(/\\r?\\n/g,'\\\\n') }}\"\n  }\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -4052,7 +4014,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"custom_attributes\": {\n    \"protocolo\": \"{{ $('Cria ticket no GLPI com descrição do cliente (1)').item.json.id }}\",\n    \"link_chamado\": \"https://glpi.wmsaude.com.br/front/ticket.form.php?id={{ $('Cria ticket no GLPI com descrição do cliente (1)').item.json.id }}\",\n    \"step_triagem\": \"em_atendimento\",\n    \"ocupacao\": \"{{ $('Pega dados pessoais do cliente (2)').item.json.ocupacao }}\",\n    \"localidade\": \"{{ $('Pega dados pessoais do cliente (2)').item.json.uf_municipio }}\",\n    \"estabelecimento\": \"{{ $('Pega dados pessoais do cliente (2)').item.json.estabelecimento }}\"\n  }\n}",
+        "jsonBody": "={\n  \"custom_attributes\": {\n    \"protocolo\": \"{{ $('Cria ticket no GLPI com descrição do cliente (1)').item.json.id }}\",\n    \"link_chamado\": \"https://glpi.wmsaude.com.br/front/ticket.form.php?id={{ $('Cria ticket no GLPI com descrição do cliente (1)').item.json.id }}\",\n    \"step_triagem\": \"em_atendimento\"\n  }\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -4131,7 +4093,7 @@
       "typeVersion": 1.1,
       "position": [
         -8208,
-        2368
+        2192
       ],
       "id": "3eeaac8c-80ce-4512-a65d-0e0695221723",
       "name": "Insere ticket na base de dados (1)"
@@ -4202,6 +4164,251 @@
           "name": "Token de Acesso Chatwoot (Playnee)"
         }
       }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account?.id || 314 }}/conversations/{{ ($('init').item.json.body.conversation?.messages?.[0]?.conversation_id || $('init').item.json.body.id) }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"Chamado GLPI criado automaticamente. Protocolo nº {{ $('Cria ticket no GLPI com descrição do cliente (1)').item.json.id }}, já disponível no GLPI: https://glpi.wmsaude.com.br/front/ticket.form.php?id={{ $('Cria ticket no GLPI com descrição do cliente (1)').item.json.id }}\",\n  \"message_type\": \"outgoing\",\n  \"private\": true,\n  \"content_type\": \"text\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -8208,
+        2368
+      ],
+      "id": "8727280e-96c0-4dff-854d-88cf6ab0b32e",
+      "name": "Nota privada: protocolo criado automaticamente",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/contacts/{{ $('init').item.json.body.conversation.contact_inbox.contact_id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"custom_attributes\": {\n    \"ocupacao\": \"{{ $('init').item.json.body.content }}\"\n  }\n}",
+        "options": {}
+      },
+      "id": "ff4c153c-e9c3-4881-98e7-490a6c34e7bb",
+      "name": "Salva ocupação no contato",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -3520,
+        1872
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/contacts/{{ $('init').item.json.body.conversation.contact_inbox.contact_id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"custom_attributes\": {\n    \"localidade\": \"{{ $('init').item.json.body.content }}\"\n  }\n}",
+        "options": {}
+      },
+      "id": "0343f87e-8a53-41b7-a1c9-d4ab15b66f94",
+      "name": "Salva localidade no contato",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -2288,
+        1968
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/contacts/{{ $('init').item.json.body.conversation.contact_inbox.contact_id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"custom_attributes\": {\n    \"estabelecimento\": \"{{ $('init').item.json.body.content }}\"\n  }\n}",
+        "options": {}
+      },
+      "id": "e959ed08-7c58-4a8d-a2da-46ca2f962312",
+      "name": "Salva estabelecimento no contato",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1008,
+        1680
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/contacts/{{ $('init').item.json.body.conversation.contact_inbox.contact_id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"custom_attributes\": {\n    \"ultimo_protocolo\": \"{{ $('Cria ticket no GLPI com descrição do cliente').item.json.id }}\",\n    \"ultimo_chamado\": \"https://glpi.wmsaude.com.br/front/ticket.form.php?id={{ $('Cria ticket no GLPI com descrição do cliente').item.json.id }}\",\n    \"ocupacao\": \"{{ $('Pega dados pessoais do cliente (1)').item.json.ocupacao }}\",\n    \"localidade\": \"{{ $('Pega dados pessoais do cliente (1)').item.json.uf_municipio }}\",\n    \"estabelecimento\": \"{{ $('Pega dados pessoais do cliente (1)').item.json.estabelecimento }}\"\n  }\n}",
+        "options": {}
+      },
+      "id": "d7851c6f-a206-4ed4-bc07-c8b4b568f1b4",
+      "name": "Salva último chamado no contato",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -4192,
+        2432
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/contacts/{{ $('init').item.json.body.conversation.contact_inbox.contact_id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"custom_attributes\": {\n    \"ultimo_protocolo\": \"{{ $('init').item.json.body.content }}\",\n    \"ultimo_chamado\": \"https://glpi.wmsaude.com.br/front/ticket.form.php?id={{ $('init').item.json.body.content }}\"\n  }\n}",
+        "options": {}
+      },
+      "id": "d1e23693-992e-42ba-9826-4914b553db85",
+      "name": "Salva último chamado no contato (1)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -5184,
+        4368
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{($('init').item.json.body.account?.id || 314) }}/contacts/{{ ($('init').item.json.body.conversation?.contact_inbox?.contact_id || $('init').item.json.body.contact_inbox?.contact_id) }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"custom_attributes\": {\n    \"ultimo_protocolo\": \"{{ $('Cria ticket no GLPI com descrição do cliente (1)').item.json.id }}\",\n    \"ultimo_chamado\": \"https://glpi.wmsaude.com.br/front/ticket.form.php?id={{ $('Cria ticket no GLPI com descrição do cliente (1)').item.json.id }}\",\n    \"ocupacao\": \"{{ $('Pega dados pessoais do cliente (2)').item.json.ocupacao }}\",\n    \"localidade\": \"{{ $('Pega dados pessoais do cliente (2)').item.json.uf_municipio }}\",\n    \"estabelecimento\": \"{{ $('Pega dados pessoais do cliente (2)').item.json.estabelecimento }}\"\n  }\n}",
+        "options": {}
+      },
+      "id": "c213ad36-424d-4df2-ad07-f9a271d3bf60",
+      "name": "Salva último chamado no contato (1)1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -8448,
+        2496
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
     }
   ],
   "pinData": {
@@ -4214,128 +4421,156 @@
             "user-agent": "Ruby",
             "host": "136.248.125.55:5678",
             "content-type": "application/json",
-            "x-chatwoot-delivery": "46089d07-a557-45d5-95d5-b0f2dd47bd73",
-            "x-chatwoot-timestamp": "1783431458",
-            "x-chatwoot-signature": "sha256=9a6b8b89e40635c1cd2ef90df5afa974b92330d46bcaecd9b65bd883f1bfe2eb",
-            "content-length": "2869"
+            "x-chatwoot-delivery": "df7ec3e4-195d-4821-9d37-dbe8d0343b5c",
+            "x-chatwoot-timestamp": "1783442730",
+            "x-chatwoot-signature": "sha256=b94fd515d59f34d2720a887aae9a34d0ecbca4bc2b192d7b713604637fdf2daa",
+            "content-length": "2934"
           },
           "params": {},
           "query": {},
           "body": {
-            "account": {
-              "id": 314,
-              "name": "WM Saúde - Gestão e Tecnologia"
-            },
             "additional_attributes": {},
-            "content_attributes": {},
-            "content_type": "text",
-            "content": "fdsfsdfsdfs",
-            "conversation": {
-              "additional_attributes": {},
-              "can_reply": true,
-              "channel": "Channel::Whatsapp",
-              "contact_inbox": {
-                "id": 1347452,
-                "contact_id": 11417,
-                "inbox_id": 83,
-                "source_id": "557999684200",
-                "created_at": "2026-07-07T13:37:38.480Z",
-                "updated_at": "2026-07-07T13:37:38.480Z",
-                "hmac_verified": false,
-                "pubsub_token": "aawbavjV1rtRq9CDaspCAvR6"
-              },
-              "id": 1667,
-              "inbox_id": 83,
-              "messages": [
-                {
-                  "id": 290031,
-                  "content": "Seja bem-vindo à Central de Atendimento ao Cliente WM Saúde. Para prosseguirmos com o seu atendimento, pedimos que responda por escrito às perguntas enviadas pelo nosso assistente virtual. Essas informações são muito importantes para que possamos dar continuidade à sua solicitação da melhor forma possível.\r\n\r\n\nAgradecemos pela colaboração.",
-                  "account_id": 314,
-                  "inbox_id": 83,
-                  "conversation_id": 1667,
-                  "message_type": 3,
-                  "created_at": 1783431458,
-                  "updated_at": "2026-07-07T13:37:38.634Z",
-                  "private": false,
-                  "status": "sent",
-                  "source_id": null,
-                  "content_type": "text",
-                  "content_attributes": {},
-                  "sender_type": null,
-                  "sender_id": null,
-                  "external_source_ids": {},
-                  "additional_attributes": {},
-                  "processed_message_content": "Seja bem-vindo à Central de Atendimento ao Cliente WM Saúde. Para prosseguirmos com o seu atendimento, pedimos que responda por escrito às perguntas enviadas pelo nosso assistente virtual. Essas informações são muito importantes para que possamos dar continuidade à sua solicitação da melhor forma possível.\r\n\r\n\nAgradecemos pela colaboração.",
-                  "sentiment": {},
-                  "conversation": {
-                    "assignee_id": null,
-                    "unread_count": 1,
-                    "last_activity_at": 1783431458,
-                    "contact_inbox": {
-                      "source_id": "557999684200"
-                    }
+            "can_reply": true,
+            "channel": "Channel::Whatsapp",
+            "contact_inbox": {
+              "id": 1292960,
+              "contact_id": 11316,
+              "inbox_id": 96,
+              "source_id": "557798548333",
+              "created_at": "2026-07-06T17:19:44.800Z",
+              "updated_at": "2026-07-06T17:19:44.800Z",
+              "hmac_verified": false,
+              "pubsub_token": "yZA63WAwPnP3WbTJK3AF4UoW"
+            },
+            "id": 1573,
+            "inbox_id": 96,
+            "messages": [
+              {
+                "id": 287938,
+                "content": "Não tivemos retorno da última mensagem. Poderia confirmar se ainda precisa de auxílio?\n\nFicamos à disposição e teremos prazer em ajudar.\n\n\n",
+                "account_id": 314,
+                "inbox_id": 96,
+                "conversation_id": 1573,
+                "message_type": 1,
+                "created_at": 1783424789,
+                "updated_at": "2026-07-07T11:46:34.789Z",
+                "private": false,
+                "status": "delivered",
+                "source_id": "wamid.HBgMNTU3Nzk4NTQ4MzMzFQIAERgUQ0UyNUEzQUQzRkNBNzdBRjgyNDQA",
+                "content_type": "text",
+                "content_attributes": {},
+                "sender_type": "User",
+                "sender_id": 3116,
+                "external_source_ids": {},
+                "additional_attributes": {},
+                "processed_message_content": "Não tivemos retorno da última mensagem. Poderia confirmar se ainda precisa de auxílio?\n\nFicamos à disposição e teremos prazer em ajudar.\n\n\n",
+                "sentiment": {},
+                "conversation": {
+                  "assignee_id": 3116,
+                  "unread_count": 0,
+                  "last_activity_at": 1783442730,
+                  "contact_inbox": {
+                    "source_id": "557798548333"
                   }
-                }
-              ],
-              "labels": [],
-              "meta": {
-                "sender": {
-                  "additional_attributes": {},
-                  "custom_attributes": {},
-                  "email": null,
-                  "id": 11417,
-                  "identifier": null,
-                  "name": "Invenção",
-                  "phone_number": "+557999684200",
-                  "thumbnail": "",
-                  "blocked": false,
-                  "type": "contact"
                 },
-                "assignee": null,
-                "assignee_type": null,
-                "team": null,
-                "hmac_verified": false
+                "sender": {
+                  "id": 3116,
+                  "name": "Jeniffer Victoria",
+                  "available_name": "Jeniffer Victoria",
+                  "avatar_url": "",
+                  "type": "user",
+                  "availability_status": null,
+                  "thumbnail": ""
+                }
+              }
+            ],
+            "labels": [
+              "abrir_chamado_glpi"
+            ],
+            "meta": {
+              "sender": {
+                "additional_attributes": {
+                  "city": "Tabocas do Brejo Velho",
+                  "country": "Brazil",
+                  "description": "",
+                  "company_name": "",
+                  "country_code": "BR",
+                  "avatar_url_hash": "221addcf1b14dfae20fd42bfaf49615cf264278e29d00dd56e04652294d057cc",
+                  "social_profiles": {
+                    "github": "",
+                    "tiktok": "",
+                    "twitter": "",
+                    "facebook": "",
+                    "linkedin": "",
+                    "telegram": "",
+                    "instagram": ""
+                  },
+                  "last_avatar_sync_at": "2026-07-06T17:20:57Z"
+                },
+                "custom_attributes": {},
+                "email": "fau1999@yahoo.com.br",
+                "id": 11316,
+                "identifier": null,
+                "name": "Maria de Fátima dos Reis",
+                "phone_number": "+557798548333",
+                "thumbnail": "",
+                "blocked": false,
+                "type": "contact"
               },
-              "status": "open",
-              "custom_attributes": {},
-              "snoozed_until": null,
-              "unread_count": 1,
-              "first_reply_created_at": null,
-              "priority": null,
-              "waiting_since": 1783431458,
-              "agent_last_seen_at": 0,
-              "contact_last_seen_at": 0,
-              "last_activity_at": 1783431458,
-              "timestamp": 1783431458,
-              "created_at": 1783431458,
-              "updated_at": 1783431458.547688
-            },
-            "created_at": "2026-07-07T13:37:38.523Z",
-            "id": 290030,
-            "inbox": {
-              "id": 83,
-              "name": "WM Saúde - Número 1"
-            },
-            "message_type": "incoming",
-            "private": false,
-            "sender": {
-              "account": {
-                "id": 314,
-                "name": "WM Saúde - Gestão e Tecnologia"
+              "assignee": {
+                "id": 3116,
+                "name": "Jeniffer Victoria",
+                "available_name": "Jeniffer Victoria",
+                "avatar_url": "",
+                "type": "user",
+                "availability_status": null,
+                "thumbnail": ""
               },
-              "additional_attributes": {},
-              "avatar": "",
-              "custom_attributes": {},
-              "email": null,
-              "id": 11417,
-              "identifier": null,
-              "name": "Invenção",
-              "phone_number": "+557999684200",
-              "thumbnail": "",
-              "blocked": false
+              "assignee_type": "User",
+              "team": {
+                "id": 1097,
+                "name": "service desk"
+              },
+              "hmac_verified": false
             },
-            "source_id": "wamid.HBgMNTU3OTk5Njg0MjAwFQIAEhgWM0VCMDYxNDQ4MzdCODE3OUZCMjdGRQA=",
-            "event": "message_created"
+            "status": "open",
+            "custom_attributes": {
+              "step_triagem": "em_atendimento"
+            },
+            "snoozed_until": null,
+            "unread_count": 0,
+            "first_reply_created_at": "2026-07-06T17:19:46.418Z",
+            "priority": null,
+            "waiting_since": 0,
+            "agent_last_seen_at": 1783442557,
+            "contact_last_seen_at": 0,
+            "last_activity_at": 1783442730,
+            "timestamp": 1783442730,
+            "created_at": 1783358384,
+            "updated_at": 1783442730.783799,
+            "event": "conversation_updated",
+            "changed_attributes": [
+              {
+                "updated_at": {
+                  "previous_value": "2026-07-07T16:42:38.261Z",
+                  "current_value": "2026-07-07T16:45:30.751Z"
+                }
+              },
+              {
+                "cached_label_list": {
+                  "previous_value": "",
+                  "current_value": "abrir_chamado_glpi"
+                }
+              },
+              {
+                "label_list": {
+                  "previous_value": [],
+                  "current_value": [
+                    "abrir_chamado_glpi"
+                  ]
+                }
+              }
+            ]
           },
           "webhookUrl": "http://localhost:5678/webhook/fluxo-principal-playnee",
           "executionMode": "production"
@@ -4518,6 +4753,11 @@
             "node": "Adiciona o controle do prox passo: uf_munic",
             "type": "main",
             "index": 0
+          },
+          {
+            "node": "Salva ocupação no contato",
+            "type": "main",
+            "index": 0
           }
         ]
       ]
@@ -4595,6 +4835,11 @@
         [
           {
             "node": "Adiciona o controle do prox passo: estabelecimento",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Salva localidade no contato",
             "type": "main",
             "index": 0
           }
@@ -4686,6 +4931,11 @@
         [
           {
             "node": "Adiciona o controle do prox passo: estabelecimento1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Salva estabelecimento no contato",
             "type": "main",
             "index": 0
           }
@@ -5133,11 +5383,6 @@
         ]
       ]
     },
-    "Cria regra de timeout (1)": {
-      "main": [
-        []
-      ]
-    },
     "Adiciona o controle do prox passo: estabelecimento1": {
       "main": [
         [
@@ -5154,6 +5399,11 @@
         [
           {
             "node": "Insere ticket na base de dados",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Salva último chamado no contato",
             "type": "main",
             "index": 0
           }
@@ -5440,6 +5690,16 @@
             "node": "Insere ticket na base de dados (1)",
             "type": "main",
             "index": 0
+          },
+          {
+            "node": "Nota privada: protocolo criado automaticamente",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Salva último chamado no contato (1)1",
+            "type": "main",
+            "index": 0
           }
         ]
       ]
@@ -5465,6 +5725,17 @@
           }
         ]
       ]
+    },
+    "Adiciona protocolo e chamado aos atributos da conversa e coloca o passo em_atendimento (1)": {
+      "main": [
+        [
+          {
+            "node": "Salva último chamado no contato (1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
@@ -5473,7 +5744,7 @@
     "availableInMCP": false,
     "callerPolicy": "workflowsFromSameOwner"
   },
-  "versionId": "f482c650-afeb-47af-9f64-dcc7ecf92392",
+  "versionId": "ed3adcf2-c9bb-4c53-bbea-52d9b1a30d95",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "20d61d4346ce6060f90882f582ec82333f0d0ef83add04f61cda543f312ca8da"
