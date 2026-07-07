@@ -1,0 +1,5490 @@
+{
+  "name": "(Playnee) Fluxo de abertura de chamados no GLPI",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "fluxo-principal-playnee",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -9520,
+        3216
+      ],
+      "id": "c571280c-052c-4fb5-9e0f-e9c131acf9f2",
+      "name": "init",
+      "webhookId": "4d84ee15-4fbb-4330-800b-e676429176c3"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "=wmsaude:{{ $('init').item.json.body.account.id }}:timeout:conv:{{ $('init').item.json.body.conversation.messages[0].conversation_id }}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -8704,
+        3248
+      ],
+      "id": "2e0abde1-e478-490b-8167-da9aff5c4cc3",
+      "name": "Cancela Timeout",
+      "credentials": {
+        "redis": {
+          "id": "MynVI7yhhqqlbCcd",
+          "name": "Autenticacao Redis para GLPI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('init').item.json.body.conversation.labels }}",
+                    "rightValue": "=validar_dados",
+                    "operator": {
+                      "type": "array",
+                      "operation": "contains",
+                      "rightType": "any"
+                    },
+                    "id": "dba26ff8-d80d-46d2-8d37-7cac00c68cec"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "d506008a-2db3-461d-8021-16641a9f27d8",
+                    "leftValue": "={{ $('init').item.json.body.conversation.custom_attributes.step_triagem }}",
+                    "rightValue": "triagem",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "f43b32f0-db1c-424a-b375-7256e8e97cdf",
+                    "leftValue": "={{ $('init').item.json.body.conversation.custom_attributes.step_triagem }}",
+                    "rightValue": "descricao",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "5af38684-80c3-41af-8449-c9de9d22fa4f",
+                    "leftValue": "={{ $('init').item.json.body.conversation.custom_attributes.step_triagem }}",
+                    "rightValue": "infos_chamados_abertos",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": 0
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -8464,
+        3216
+      ],
+      "id": "b02dbd41-c19a-46f7-bfb9-88b44c772bae",
+      "name": "Identifica onde o usuário está"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"content\": \"Informe o seu **NOME**, por favor!\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -6016,
+        1872
+      ],
+      "id": "41207238-6642-47f2-af69-ef8a5ecc82ac",
+      "name": "Pede nome ao cliente",
+      "executeOnce": true,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"custom_attributes\": {\n    \"step_triagem\": \"nome_pendente\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -5792,
+        1872
+      ],
+      "id": "c61fd588-77e2-4b84-a820-97cf516e0da1",
+      "name": "Adiciona o passo: nome_pendente",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1c56a91f-835f-4199-9ea8-a35bf05d75c9",
+              "leftValue": "={{ $json.body.message_type }}",
+              "rightValue": "incoming",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "61ff073e-82e8-43ac-b082-bdb963d9b40e",
+              "leftValue": "={{ [83, 96].includes($json.body.conversation.contact_inbox.inbox_id) }}",
+              "rightValue": "={{ 83 || 96 }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "6973a35a-c4ab-4182-9123-b6cc6dd2babb",
+              "leftValue": "={{ $json.body.conversation.custom_attributes.step_triagem }}",
+              "rightValue": "em_atendimento",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            },
+            {
+              "id": "3ffeea7e-28d2-4a8d-9b48-4bd698a64597",
+              "leftValue": "={{ $json.body.event }}",
+              "rightValue": "message_created",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        -8944,
+        3248
+      ],
+      "id": "fc34a908-3c73-47fa-a5a9-f2727a45c0dd",
+      "name": "Verifica se é mensagem do cliente"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/contacts/{{ $('init').item.json.body.conversation.contact_inbox.contact_id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"name\": \"{{ $('init').item.json.body.content }}\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -5920,
+        1568
+      ],
+      "id": "b8ac7918-a748-46ac-ae39-4644575dcab2",
+      "name": "Salva nome do cliente no contato",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"custom_attributes\": {\n    \"step_triagem\": \"\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -5648,
+        1568
+      ],
+      "id": "e3277951-c058-4fd2-a996-11d285d1faeb",
+      "name": "Tira o passo: nome_pendente",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "7cc3032f-4256-4d74-bfb8-e69f2d3c765d",
+                    "leftValue": "={{ $('init').item.json.body.conversation.custom_attributes.step_triagem }}",
+                    "rightValue": "nome_pendente",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ /[0-9!@#$%^&*(),.?\":{}|<>\\p{Extended_Pictographic}]/u.test($('init').item.json.body.conversation.meta.sender.name) }}",
+                    "rightValue": "/[0-9!@#$%^&*(),.?\":{}|<>\\p{Extended_Pictographic}]/u",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    },
+                    "id": "75c508c5-8cb8-459b-87cc-78458d567cec"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "80d61297-5a90-44c1-930a-2fb5355ae4a1",
+                    "leftValue": "={{ /[0-9!@#$%^&*(),.?\":{}|<>\\p{Extended_Pictographic}]/u.test($('init').item.json.body.conversation.meta.sender.name) }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "false",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -6288,
+        1984
+      ],
+      "id": "bc7d3e5f-f624-4780-816a-950242b0a4d6",
+      "name": "Verifica se tem nome"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "197a318e-dd82-455f-bfd9-6ce91513b733",
+                    "leftValue": "={{ $('init').item.json.body.conversation.messages[0].sender.email }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "59242af5-77fc-4bdf-b9d6-b5b187a54a84",
+                    "leftValue": "={{ $('init').item.json.body.conversation.custom_attributes.step_triagem }}",
+                    "rightValue": "email_pendente",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('init').item.json.body.conversation.meta.sender.email }}",
+                    "rightValue": "={{ null }}",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "equals"
+                    },
+                    "id": "75c508c5-8cb8-459b-87cc-78458d567cec"
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -5056,
+        2016
+      ],
+      "id": "1780f077-d855-4b2c-a9ce-dfc22629cb7d",
+      "name": "Verifica se tem email"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"content\": \"Por favor, informe seu e-mail pessoal ou corporativo para continuarmos o atendimento.\\n\\nExemplo: usuario@email.com\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -4736,
+        2064
+      ],
+      "id": "9c5e2408-5e37-4c90-8690-543b76da2468",
+      "name": "Pede email ao cliente",
+      "executeOnce": true,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"custom_attributes\": {\n    \"step_triagem\": \"email_pendente\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -4512,
+        2064
+      ],
+      "id": "832a5ec2-1bca-4b1f-9b8f-01f77f8c6ed8",
+      "name": "Adiciona o passo: email_pendente",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/contacts/{{ $('init').item.json.body.conversation.contact_inbox.contact_id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"email\": \"{{ $('init').item.json.body.content }}\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -4448,
+        1712
+      ],
+      "id": "9777163a-f8fe-4c85-83a9-afd17d52feaf",
+      "name": "Salva email do cliente no contato",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"custom_attributes\": {\n    \"step_triagem\": \"\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -4224,
+        1712
+      ],
+      "id": "0cde4c67-98b9-4c0e-b4e4-d6a5bf49e66a",
+      "name": "Tira o passo: email_pendente",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"content\": \"Qual a sua ocupação? (Recepcionista, Técnica(o) de Enfermagem, Enfermeira(o), ACS ...)\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -3520,
+        2160
+      ],
+      "id": "d9d5b16f-2103-4219-b52d-4952cbf28544",
+      "name": "Pede ocupação ao cliente",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"custom_attributes\": {\n    \"step_triagem\": \"ocupacao_pendente\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -3296,
+        2160
+      ],
+      "id": "a510c989-dc74-4d63-93ef-4b994e7107a9",
+      "name": "Adiciona o passo: ocupacao_pendente",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "HYIlOkvHPxfU3luu",
+          "mode": "list",
+          "cachedResultName": "dados_clientes",
+          "cachedResultUrl": "/projects/3GncOxuzck8dOet9/datatables/HYIlOkvHPxfU3luu"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ocupacao": "={{ $('init').item.json.body.content }}",
+            "contact_id": "={{ $('init').item.json.body.conversation.contact_inbox.contact_id }}",
+            "conversation_id": "={{ $('init').item.json.body.conversation.messages[0].conversation_id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "ocupacao",
+              "displayName": "ocupacao",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "uf_municipio",
+              "displayName": "uf_municipio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "estabelecimento",
+              "displayName": "estabelecimento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "contact_id",
+              "displayName": "contact_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "conversation_id",
+              "displayName": "conversation_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -3520,
+        2000
+      ],
+      "id": "33cd76c5-93c9-42ea-b54d-83097c8f91cf",
+      "name": "Insere ocupacao"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "197a318e-dd82-455f-bfd9-6ce91513b733",
+                    "leftValue": "={{ $('init').item.json.body.conversation.custom_attributes.controle_triagem }}",
+                    "rightValue": "uf_munic",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "94f31122-dd81-41e8-b967-a517c191272d",
+                    "leftValue": "={{ $('init').item.json.body.conversation.custom_attributes.controle_triagem }}",
+                    "rightValue": "estabelecimento",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "59242af5-77fc-4bdf-b9d6-b5b187a54a84",
+                    "leftValue": "={{ $('init').item.json.body.conversation.custom_attributes.step_triagem }}",
+                    "rightValue": "ocupacao_pendente",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -3920,
+        1968
+      ],
+      "id": "2e2a002b-5b7f-4609-a004-149dfdd29c12",
+      "name": "Verifica se tem ocupacao"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "197a318e-dd82-455f-bfd9-6ce91513b733",
+                    "leftValue": "={{ $('init').item.json.body.conversation.custom_attributes.controle_triagem }}",
+                    "rightValue": "estabelecimento",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "59242af5-77fc-4bdf-b9d6-b5b187a54a84",
+                    "leftValue": "={{ $('init').item.json.body.conversation.custom_attributes.step_triagem }}",
+                    "rightValue": "uf_munic_pendente",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -2720,
+        1936
+      ],
+      "id": "f99e108a-7e05-4884-8201-95cf403ffcc8",
+      "name": "Verifica se tem uf_munic"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"content\": \"Informe o muncípio e UF (Salvador - BA) para o qual deseja atendimento.\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -2288,
+        2256
+      ],
+      "id": "1df81e36-8a44-488d-b31a-cf48b7ae485d",
+      "name": "Pede o uf_munic ao cliente",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"custom_attributes\": {\n    \"step_triagem\": \"uf_munic_pendente\",\n    \"controle_triagem\": \"uf_munic\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -2064,
+        2256
+      ],
+      "id": "a4d2072b-346b-47ca-be5a-80f9acdde656",
+      "name": "Adiciona o passo: uf_munic_pendente",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "value": "HYIlOkvHPxfU3luu",
+          "mode": "list",
+          "cachedResultName": "dados_clientes",
+          "cachedResultUrl": "/projects/3GncOxuzck8dOet9/datatables/HYIlOkvHPxfU3luu"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "contact_id",
+              "keyValue": "={{ $('init').item.json.body.conversation.contact_inbox.contact_id }}"
+            },
+            {
+              "keyName": "conversation_id",
+              "keyValue": "={{ $('init').item.json.body.conversation.messages[0].conversation_id }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "uf_municipio": "={{ $('init').item.json.body.content }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "ocupacao",
+              "displayName": "ocupacao",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "uf_municipio",
+              "displayName": "uf_municipio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "estabelecimento",
+              "displayName": "estabelecimento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "contact_id",
+              "displayName": "contact_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "conversation_id",
+              "displayName": "conversation_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -2288,
+        2096
+      ],
+      "id": "9ce5f7ed-b75e-4016-b586-5118d6943141",
+      "name": "Insere uf_munic"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"custom_attributes\": {\n    \"controle_triagem\": \"uf_munic\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -3296,
+        2000
+      ],
+      "id": "cea6add7-82f5-45e6-97f1-3438c25fdeaa",
+      "name": "Adiciona o controle do prox passo: uf_munic",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"custom_attributes\": {\n    \"step_triagem\": \"estabelecimento\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -2064,
+        2096
+      ],
+      "id": "ed514a7b-c609-4f62-abda-e83a14b7e719",
+      "name": "Adiciona o controle do prox passo: estabelecimento",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "197a318e-dd82-455f-bfd9-6ce91513b733",
+                    "leftValue": "={{ $('init').item.json.body.conversation.custom_attributes.controle_triagem }}",
+                    "rightValue": "final",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "59242af5-77fc-4bdf-b9d6-b5b187a54a84",
+                    "leftValue": "={{ $('init').item.json.body.conversation.custom_attributes.step_triagem }}",
+                    "rightValue": "estabelecimento_pendente",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -1424,
+        1920
+      ],
+      "id": "dc518173-0ffb-4baa-8283-2ac5a8d3301b",
+      "name": "Verifica se tem estabelecimento"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"custom_attributes\": {\n    \"step_triagem\": \"final\",\n    \"controle_triagem\": \"final\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -784,
+        1808
+      ],
+      "id": "f45057db-4fb8-45e5-81ab-cfd6d435a0c4",
+      "name": "Adiciona o controle do prox passo: estabelecimento1",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "value": "HYIlOkvHPxfU3luu",
+          "mode": "list",
+          "cachedResultName": "dados_clientes",
+          "cachedResultUrl": "/projects/3GncOxuzck8dOet9/datatables/HYIlOkvHPxfU3luu"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "contact_id",
+              "keyValue": "={{ $('init').item.json.body.conversation.contact_inbox.contact_id }}"
+            },
+            {
+              "keyName": "conversation_id",
+              "keyValue": "={{ $('init').item.json.body.conversation.messages[0].conversation_id }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "estabelecimento": "={{ $('init').item.json.body.content }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "ocupacao",
+              "displayName": "ocupacao",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "uf_municipio",
+              "displayName": "uf_municipio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "estabelecimento",
+              "displayName": "estabelecimento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "contact_id",
+              "displayName": "contact_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "conversation_id",
+              "displayName": "conversation_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -1008,
+        1808
+      ],
+      "id": "d146fe2f-b7a2-4726-b825-c4934198a59e",
+      "name": "Insere estabelecimento"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"content\": \"Qual o nome do estabelecimento para o qual deseja atendimento (PSF - Santa Clara)?\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1008,
+        1968
+      ],
+      "id": "b1b22dc8-4137-4bcf-858f-258364be76d9",
+      "name": "Pede o estabelecimento ao cliente",
+      "executeOnce": true,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"custom_attributes\": {\n    \"step_triagem\": \"estabelecimento_pendente\",\n    \"controle_triagem\": \"estabelecimento\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -784,
+        1968
+      ],
+      "id": "a1ebc0ab-72e4-493f-aaea-d1e7642dc813",
+      "name": "Adiciona o passo: estabelecimento_pendente",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"custom_attributes\": {\n    \"step_triagem\": \"triagem\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -464,
+        1664
+      ],
+      "id": "d13775ae-7310-4254-89e2-4b35e3b99bc7",
+      "name": "Adiciona o passo: triagem",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/labels",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"labels\": [\n    \"falta_dados\",\n    \"validar_dados\"\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -6560,
+        2000
+      ],
+      "id": "66698a74-2a09-4bdb-8615-1e764a4addfa",
+      "name": "Adiciona etiqueta: falta_dados",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/labels",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"labels\": [\n    \"\"\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -240,
+        1664
+      ],
+      "id": "54fbf826-9d1e-4308-8df5-da15a2a05310",
+      "name": "Retira as etiquetas para dar continuidade a triagem",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/labels",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"labels\": [\n    \"\"\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -6560,
+        2176
+      ],
+      "id": "1c2fdf18-f056-4c60-b5f5-3bf47733794a",
+      "name": "Retira as etiquetas para dar continuidade a triagem (1)",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"custom_attributes\": {\n    \"step_triagem\": \"triagem\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -6288,
+        2176
+      ],
+      "id": "6188a900-5725-44d8-9b0d-f737e2d40b0e",
+      "name": "Adiciona o passo: triagem (1)",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"Olá {{ $('init').item.json.body.conversation.messages[0].sender.name }}, obrigado por entrar em contato com a **WM Saúde**.\\n\\nEscolha uma das seguintes opções de acordo com a sua necessidade:\\n\\n1 - 💻 Dúvidas ou suporte técnico\\n2 - 🧾 Informações sobre protocolos abertos em seu nome.\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        240,
+        1664
+      ],
+      "id": "9948f44f-ca3e-4655-973a-952b503df198",
+      "name": "Menu de triagem básica",
+      "executeOnce": true,
+      "alwaysOutputData": false,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"Olá {{ $('init').item.json.body.conversation.messages[0].sender.name }}, obrigado por entrar em contato com a **WM Saúde**.\\n\\nEscolha uma das seguintes opções de acordo a sua necessidade:\\n\\n1 - 💻 Dúvidas ou suporte técnico\\n2 - 🧾 Informações sobre protocolos abertos em meu nome.\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -6032,
+        2176
+      ],
+      "id": "de0cb310-f57e-4d3d-b70c-e1f15f4d42ef",
+      "name": "Menu de triagem básica (1)",
+      "executeOnce": false,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "197a318e-dd82-455f-bfd9-6ce91513b733",
+                    "leftValue": "={{ $('init').item.json.body.content.toLowerCase().normalize(\"NFD\").replace(/[\\u0300-\\u036f]/g, \"\").trim() }}",
+                    "rightValue": "^(?:opcao\\s+)?\\(?1\\)?$",
+                    "operator": {
+                      "type": "string",
+                      "operation": "regex"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "59242af5-77fc-4bdf-b9d6-b5b187a54a84",
+                    "leftValue": "={{ $('init').item.json.body.content.toLowerCase().normalize(\"NFD\").replace(/[\\u0300-\\u036f]/g, \"\").trim() }}",
+                    "rightValue": "^(?:opcao\\s+)?\\(?2\\)?$",
+                    "operator": {
+                      "type": "string",
+                      "operation": "regex"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "76774153-cd53-4da0-9ec6-e8720498f742",
+                    "leftValue": "={{ $('init').item.json.body.content.toLowerCase().normalize(\"NFD\").replace(/[\\u0300-\\u036f]/g, \"\").trim() }}",
+                    "rightValue": "^(?:opcao\\s+)?\\(?3\\)?$",
+                    "operator": {
+                      "type": "string",
+                      "operation": "regex"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -7072,
+        3168
+      ],
+      "id": "b1aa8b39-7b0f-4fb6-a592-44f9ece866a8",
+      "name": "Verifica qual a opção digitada pelo cliente"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"content\": \"Não conseguir entender a opção digitada, digite a opção novamente.\\n\\n1 - 💻 Dúvidas ou suporte técnico\\n2 - 🧾 Informações sobre protocolos abertos em seu nome.\\n3 - ❌ Finalizar atendimento.\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -6688,
+        3552
+      ],
+      "id": "56e8840e-f7ee-401e-a7b3-0bf05268f883",
+      "name": "Mensagem avisando que não entendeu a opção digitada",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "kUhZV8Nf7J3JhUu3",
+          "mode": "list",
+          "cachedResultName": "historico_tickets",
+          "cachedResultUrl": "/projects/3GncOxuzck8dOet9/datatables/kUhZV8Nf7J3JhUu3"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "contact_id",
+              "keyValue": "={{ $('init').item.json.body.conversation.contact_inbox.contact_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -6688,
+        3056
+      ],
+      "id": "ab551343-2021-4b65-9137-3c70149c39d2",
+      "name": "Pega ticket aberto no nome do cliente",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "HYIlOkvHPxfU3luu",
+          "mode": "list",
+          "cachedResultName": "dados_clientes",
+          "cachedResultUrl": "/projects/3GncOxuzck8dOet9/datatables/HYIlOkvHPxfU3luu"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "contact_id",
+              "keyValue": "={{ $('init').item.json.body.conversation.contact_inbox.contact_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -7056,
+        2016
+      ],
+      "id": "f51cdfc0-e8b2-4321-af6e-765f273eda54",
+      "name": "Pega dados pessoais do cliente",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "24075351-ff98-4351-aacd-b907400b12ff",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "number",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -6416,
+        3056
+      ],
+      "id": "fbb2bad0-f777-4713-9238-978844aa6fa0",
+      "name": "Verifica se existe dados de ticket para esse cliente"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "b8eb4eef-149d-4aae-b136-3da3b1864060",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "empty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "3277eadd-7d18-4302-81e1-5d288ad15365",
+              "leftValue": "={{ $('init').item.json.body.conversation.labels }}",
+              "rightValue": "falta_dados",
+              "operator": {
+                "type": "array",
+                "operation": "contains",
+                "rightType": "any"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {
+          "ignoreCase": false
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -6848,
+        2016
+      ],
+      "id": "e317997e-95f2-47ae-9b1f-518b97acd3e7",
+      "name": "Verifica se existe dados pessoais do cliente"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"content\": \"Não identifiquei nenhum chamado aberto vinculado ao seu nome. Sem problemas!\\n\\nComo posso te ajudar hoje? Digite a opção desejada\\n\\n1 - 💻 Dúvidas ou suporte técnico\\n3 - ❌ Finalizar atendimento.\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -6112,
+        3152
+      ],
+      "id": "91841871-2e2f-48d1-8489-fe9264f0134b",
+      "name": "Mensagem avisando que não há ticket em aberto no nome do cliente",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"Localizei os seguintes chamados em aberto no seu nome:\\n\\n📝 Protocolos:\\n{{ $('Pega ticket aberto no nome do cliente').all().map(item => '• ' + item.json.ticket_id).join('\\\\n') }}\\n\\nVocê gostaria de tratar sobre algum deles? Se sim, digite apenas o número do protocolo.\\n\\nCaso queira abrir um assunto novo, digite 0.\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -6112,
+        2992
+      ],
+      "id": "f0399b2a-ed76-4166-b8dc-063bf7d75d20",
+      "name": "Mensagem informando todos os chamados aberto no nome do cliente",
+      "executeOnce": true,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"custom_attributes\": {\n    \"step_triagem\": \"infos_chamados_abertos\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -5808,
+        2992
+      ],
+      "id": "78fd59cb-81f5-48ec-a083-ea8013d19108",
+      "name": "Adiciona o passo: infos_chamados_aberto",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"content\": \"Seu atendimento foi finalizado. Se ainda estiver precisando de algo envie uma mensagem para iniciarmos seu atendimento.\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -6112,
+        3392
+      ],
+      "id": "eff2f0c8-fa1f-4e31-8ce7-76762a96104e",
+      "name": "Mensagem avisando que o atendimento foi finalizado",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/assignments",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"team_id\": 1097\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -6688,
+        2704
+      ],
+      "id": "3145ced0-cc41-42db-84fc-025c16e409f7",
+      "name": "Adiciona ao time Suporte N1",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"Olá, {{ $('init').item.json.body.conversation.messages[0].sender.name }}. Direcionei sua solicitação para o nosso time de especialistas.\\n\\nSe desejar acelerar o seu atendimento, descreva o problema para o qual precisa de apoio.\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -5808,
+        2384
+      ],
+      "id": "07319fff-19dc-45cc-845d-2584865256e7",
+      "name": "Mensagem solicitando informações",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/labels",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"labels\": [\n    \"validar_dados\"\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -6416,
+        3392
+      ],
+      "id": "c6381557-7136-43a7-b827-55f58926162d",
+      "name": "Adiciona etiqueta: valida_dados",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('init').item.json.body.conversation.messages[0].processed_message_content }}",
+                    "rightValue": "0",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "e96c646e-4ef9-4571-aade-bd72b9a2ce3f"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "c413effb-1cfb-414f-8ef3-3012891db186",
+                    "leftValue": "={{ $('init').item.json.body.conversation.messages[0].processed_message_content }}",
+                    "rightValue": "[^0-9]",
+                    "operator": {
+                      "type": "string",
+                      "operation": "regex"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "55c0c90e-0422-4317-a3fd-a5e73ed31119",
+                    "leftValue": "={{ $('init').item.json.body.conversation.messages[0].processed_message_content }}",
+                    "rightValue": "[^a-zA-ZÀ-ÿ\\W_]",
+                    "operator": {
+                      "type": "string",
+                      "operation": "regex"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -7056,
+        3952
+      ],
+      "id": "e3a6308a-bf75-489c-bca5-416a863a6693",
+      "name": "Verifica se número digitado pelo cliente é válido"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"Seu atendimento foi encerrado com sucesso. ✅ Caso precise de algo mais, basta enviar uma nova mensagem e estarei pronto para ajudar novamente. Tenha um excelente dia!\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -6688,
+        3904
+      ],
+      "id": "37ee0d22-b69b-466c-b547-45164de703cf",
+      "name": "Mensagem enviando que está finalizando o atendimento",
+      "executeOnce": false,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"custom_attributes\": {\n    \"step_triagem\": \"\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -6352,
+        3904
+      ],
+      "id": "38df77fd-89ee-4114-b669-e890ba44faa9",
+      "name": "Tira os passos para não impedir futuro atendimento (1)",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"custom_attributes\": {\n    \"step_triagem\": \"\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -6688,
+        3392
+      ],
+      "id": "734007bd-70f0-4fca-b191-5608a88a7a79",
+      "name": "Tira os passos para não impedir futuro atendimento",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/labels",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"labels\": [\n    \"validar_dados\"\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -6064,
+        3904
+      ],
+      "id": "66253529-d854-437d-b010-7204b0d2849c",
+      "name": "Adiciona etiqueta: valida_dados (1)",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "21dbf00c-8788-4b70-a5cb-bedea9dd75e9",
+              "leftValue": "={{ $json.ticket_id }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -6352,
+        4240
+      ],
+      "id": "261b8c6d-f5e1-4117-b39f-3a94f286c945",
+      "name": "Verifica se o ticket digitado pelo cliente existe"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"Não conseguir achar o ticket informado, irei te mostrar novamente os chamados.\\n\\nLembrando que informe apenas o número do protocolo, sem mais nada na mensagem.\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -6064,
+        4384
+      ],
+      "id": "a8041783-3022-499c-ad5a-977d2594e983",
+      "name": "Mensagem informando que não possível achar o ticket que o cliente digitou",
+      "executeOnce": true,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://glpi.wmsaude.com.br/api.php/v1/Ticket/{{ $json.ticket_id }}/",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "App-Token",
+              "value": "JNEF4dhTLaty1BHSqxdEYHV2jhu1god37IHFHqOL"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -6064,
+        4224
+      ],
+      "id": "068de15b-0616-4a9c-92c7-e6c116230b75",
+      "name": "Buscar dados do cliente no GLPI",
+      "executeOnce": false,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "aLAgkGobWooRkbRp",
+          "name": "Token de Sessao GLPI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/assignments",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"team_id\": 6\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -5776,
+        4224
+      ],
+      "id": "c0c52a60-51fa-4400-8653-a74760da6439",
+      "name": "Adiciona ao time Suporte N1 (1)",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"Perfeito! Já direcionei sua solicitação para o nosso setor técnico. 🛠️\\n\\nEnquanto um analista se prepara para te atender, você pode adiantar detalhes, enviar fotos ou prints do problema aqui mesmo. Isso ajuda muito na agilidade da solução!\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -5488,
+        4224
+      ],
+      "id": "768c52f1-fd20-47c6-9369-8f69d841fc5b",
+      "name": "Mensagem informando que o cliente foi encaminhado para o setor responsável",
+      "executeOnce": true,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"custom_attributes\": {\n    \"protocolo\": \"{{ $('init').item.json.body.content }}\",\n    \"link_chamado\": \"https://glpi.wmsaude.com.br/front/ticket.form.php?id={{ $('init').item.json.body.content }}\",\n    \"step_triagem\": \"em_atendimento\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -5184,
+        4224
+      ],
+      "id": "0fe74015-6a60-4aa4-a257-5307e943a238",
+      "name": "Adiciona protocolo e chamado aos atributos da conversa e coloca o passo em_atendimento (1)",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"Localizei os seguintes chamados em aberto no seu nome:\\n\\n📝 Protocolos:{{ $(\"Pega ticket aberto no nome do cliente\").all().map(item => '• ' + item.json.ticket_id).join('\\n') }}\\n\\nVocê gostaria de tratar sobre algum deles? Se sim, digite apenas o número do protocolo.\\n\\nCaso queira abrir um assunto novo, digite 0.\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -5776,
+        4384
+      ],
+      "id": "451fc99b-5595-4784-a8f9-66aabce50306",
+      "name": "Mensagem informando todos os chamados aberto no nome do cliente (1)",
+      "executeOnce": true,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "kUhZV8Nf7J3JhUu3",
+          "mode": "list",
+          "cachedResultName": "historico_tickets",
+          "cachedResultUrl": "/projects/3GncOxuzck8dOet9/datatables/kUhZV8Nf7J3JhUu3"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "contact_id",
+              "keyValue": "={{ $('init').item.json.body.conversation.contact_inbox.contact_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -6688,
+        4240
+      ],
+      "id": "82f4d06a-ff7d-4e67-97b4-cc34f2a7365f",
+      "name": "Pega ticket aberto no nome do cliente (1)",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "=wmsaude:{{ $('init').item.json.body.account.id }}:timeout:conv:{{ $('init').item.json.body.conversation.messages[0].conversation_id }}",
+        "value": "aguardando_resposta",
+        "expire": true,
+        "ttl": 300
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -5584,
+        1872
+      ],
+      "id": "9aaae0f6-b615-48df-a50c-edee19f9b0eb",
+      "name": "Cria regra de timeout",
+      "credentials": {
+        "redis": {
+          "id": "MynVI7yhhqqlbCcd",
+          "name": "Autenticacao Redis para GLPI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "=wmsaude:{{ $('init').item.json.body.account.id }}:timeout:conv:{{ $('init').item.json.body.conversation.messages[0].conversation_id }}",
+        "value": "aguardando_resposta",
+        "expire": true,
+        "ttl": 300
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -5792,
+        2176
+      ],
+      "id": "fae90c04-7c3f-4e2b-b9f0-530393d79542",
+      "name": "Cria regra de timeout (1)",
+      "credentials": {
+        "redis": {
+          "id": "MynVI7yhhqqlbCcd",
+          "name": "Autenticacao Redis para GLPI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "=wmsaude:{{ $('init').item.json.body.account.id }}:timeout:conv:{{ $('init').item.json.body.conversation.messages[0].conversation_id }}",
+        "value": "aguardando_resposta",
+        "expire": true,
+        "ttl": 300
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -4288,
+        2064
+      ],
+      "id": "786f7b06-e9c0-4e88-ad89-65ab9ca15988",
+      "name": "Cria regra de timeout (2)",
+      "credentials": {
+        "redis": {
+          "id": "MynVI7yhhqqlbCcd",
+          "name": "Autenticacao Redis para GLPI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "=wmsaude:{{ $('init').item.json.body.account.id }}:timeout:conv:{{ $('init').item.json.body.conversation.messages[0].conversation_id }}",
+        "value": "aguardando_resposta",
+        "expire": true,
+        "ttl": 300
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -3040,
+        2160
+      ],
+      "id": "46bb8fe8-df37-47bc-b08c-23a20e030ffa",
+      "name": "Cria regra de timeout (3)",
+      "credentials": {
+        "redis": {
+          "id": "MynVI7yhhqqlbCcd",
+          "name": "Autenticacao Redis para GLPI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "=wmsaude:{{ $('init').item.json.body.account.id }}:timeout:conv:{{ $('init').item.json.body.conversation.messages[0].conversation_id }}",
+        "value": "aguardando_resposta",
+        "expire": true,
+        "ttl": 300
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -1840,
+        2256
+      ],
+      "id": "d370758b-5f58-4689-9dbb-de30e3b11e4c",
+      "name": "Cria regra de timeout (4)",
+      "credentials": {
+        "redis": {
+          "id": "MynVI7yhhqqlbCcd",
+          "name": "Autenticacao Redis para GLPI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "=wmsaude:{{ $('init').item.json.body.account.id }}:timeout:conv:{{ $('init').item.json.body.conversation.messages[0].conversation_id }}",
+        "value": "aguardando_resposta",
+        "expire": true,
+        "ttl": 300
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -544,
+        1968
+      ],
+      "id": "5b725c3e-2c8c-4612-96e3-0fc4c5a10147",
+      "name": "Cria regra de timeout (5)",
+      "credentials": {
+        "redis": {
+          "id": "MynVI7yhhqqlbCcd",
+          "name": "Autenticacao Redis para GLPI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "=wmsaude:{{ $('init').item.json.body.account.id }}:timeout:conv:{{ $('init').item.json.body.conversation.messages[0].conversation_id }}",
+        "value": "aguardando_resposta",
+        "expire": true,
+        "ttl": 300
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        496,
+        1664
+      ],
+      "id": "0c1ffc02-1521-4023-a652-8563100f56b4",
+      "name": "Cria regra de timeout (6)",
+      "credentials": {
+        "redis": {
+          "id": "MynVI7yhhqqlbCcd",
+          "name": "Autenticacao Redis para GLPI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "=wmsaude:{{ $('init').item.json.body.account.id }}:timeout:conv:{{ $('init').item.json.body.conversation.messages[0].conversation_id }}",
+        "value": "aguardando_resposta",
+        "expire": true,
+        "ttl": 300
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -5568,
+        2992
+      ],
+      "id": "1003ffc1-d88d-4b36-891f-46982fe5e522",
+      "name": "Cria regra de timeout (8)",
+      "credentials": {
+        "redis": {
+          "id": "MynVI7yhhqqlbCcd",
+          "name": "Autenticacao Redis para GLPI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "=wmsaude:{{ $('init').item.json.body.account.id }}:timeout:conv:{{ $('init').item.json.body.conversation.messages[0].conversation_id }}",
+        "value": "aguardando_resposta",
+        "expire": true,
+        "ttl": 300
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -6416,
+        3552
+      ],
+      "id": "0d53d52c-0088-4f53-944f-3695efc39890",
+      "name": "Cria regra de timeout (10)",
+      "credentials": {
+        "redis": {
+          "id": "MynVI7yhhqqlbCcd",
+          "name": "Autenticacao Redis para GLPI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "=wmsaude:{{ $('init').item.json.body.account.id }}:timeout:conv:{{ $('init').item.json.body.conversation.messages[0].conversation_id }}",
+        "value": "aguardando_resposta",
+        "expire": true,
+        "ttl": 300
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -5808,
+        3152
+      ],
+      "id": "bb997c0a-edc2-4cc2-beae-f65525ff5c45",
+      "name": "Cria regra de timeout (9)",
+      "credentials": {
+        "redis": {
+          "id": "MynVI7yhhqqlbCcd",
+          "name": "Autenticacao Redis para GLPI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "=wmsaude:{{ $('init').item.json.body.account.id }}:timeout:conv:{{ $('init').item.json.body.conversation.messages[0].conversation_id }}",
+        "value": "aguardando_resposta",
+        "expire": true,
+        "ttl": 300
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -5488,
+        4384
+      ],
+      "id": "20a67b04-d287-42fd-96a6-bbcbcf6aac8a",
+      "name": "Cria regra de timeout (11)",
+      "credentials": {
+        "redis": {
+          "id": "MynVI7yhhqqlbCcd",
+          "name": "Autenticacao Redis para GLPI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://136.248.125.55:3000/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"content\": \"Seu cadastro foi finalizado. Vamos agora dar continuidade ao seu atendimento.\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -16,
+        1440
+      ],
+      "id": "7363c23b-8f79-41f9-b0f8-dc7b99be6f60",
+      "name": "Finaliza cadastro do cliente1",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "pEJ4DhM9dl1y70fn",
+          "name": "Token de Acesso ChatWoot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"custom_attributes\": {\n    \"protocolo\": \"{{ $('Cria ticket no GLPI com descrição do cliente').item.json.id }}\",\n    \"link_chamado\": \"https://glpi.wmsaude.com.br/front/ticket.form.php?id={{ $('Cria ticket no GLPI com descrição do cliente').item.json.id }}\",\n    \"step_triagem\": \"em_atendimento\",\n    \"ocupacao\": \"{{ $('Pega dados pessoais do cliente (1)').item.json.ocupacao }}\",\n    \"localidade\": \"{{ $('Pega dados pessoais do cliente (1)').item.json.uf_municipio }}\",\n    \"estabelecimento\": \"{{ $('Pega dados pessoais do cliente (1)').item.json.estabelecimento }}\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -4192,
+        2560
+      ],
+      "id": "1658ff7b-b0b0-479a-a9b8-73d28769f4cb",
+      "name": "Adiciona protocolo e chamado aos atributos da conversa e coloca o passo em_atendimento",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "kUhZV8Nf7J3JhUu3",
+          "mode": "list",
+          "cachedResultName": "historico_tickets",
+          "cachedResultUrl": "/projects/3GncOxuzck8dOet9/datatables/kUhZV8Nf7J3JhUu3"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "contact_id": "={{ $('init').item.json.body.conversation.contact_inbox.contact_id }}",
+            "convesation_id": "={{ $('init').item.json.body.conversation.messages[0].conversation_id }}",
+            "ticket_id": "={{ $('Cria ticket no GLPI com descrição do cliente').item.json.id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "contact_id",
+              "displayName": "contact_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ticket_id",
+              "displayName": "ticket_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "convesation_id",
+              "displayName": "convesation_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -3904,
+        2560
+      ],
+      "id": "d7588927-5ca1-4af0-8605-e7bd5ba5d1cf",
+      "name": "Insere ticket na base de dados"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"O seu protocolo de atendimento é o nº {{ $('Cria ticket no GLPI com descrição do cliente').item.json.id }}.\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -4448,
+        2560
+      ],
+      "id": "94f3b688-1252-4f95-bd5b-99a19a721d86",
+      "name": "Mensagem informando o protocolo para o cliente",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://glpi.wmsaude.com.br/api.php/v1/Ticket",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "App-Token",
+              "value": "JNEF4dhTLaty1BHSqxdEYHV2jhu1god37IHFHqOL"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"input\": {\n    \"name\": \"Chamado via Chatwoot: {{ $('init').item.json.body.conversation.messages[0].sender.name.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;') }}\",\n    \"content\": \"<table><tr><td><b>Solicitante:</b></td><td>{{ $('init').item.json.body.conversation.messages[0].sender.name.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;') }}</td></tr><tr><td><b>E-mail:</b></td><td>{{ ($('init').item.json.body.conversation.messages[0].sender.email || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;') }}</td></tr><tr><td><b>Telefone:</b></td><td> {{ ($('init').item.json.body.conversation.messages[0].sender.phone_number || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;') }}</td></tr><tr><td><b>Link da conversa:</b></td><td><a href='https://conversas.upflowz.com/app/accounts/{{ $('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.id }}' target='_blank'>Acessar no Chatwoot</a></td></tr></table>\",\n    \"_groups_id_assign\": [ 6 ],\n    \"_municpiorequerentefield\": [ {{ $json.id_municipio_glpi || 87 }} ],\n    \"externalid\": \"{{ $('init').item.json.body.conversation.id }}\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -4992,
+        2560
+      ],
+      "id": "2b027778-8a6c-413b-a5c3-fff80aa7813e",
+      "name": "Cria ticket no GLPI com descrição do cliente",
+      "alwaysOutputData": false,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "aLAgkGobWooRkbRp",
+          "name": "Token de Sessao GLPI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "HYIlOkvHPxfU3luu",
+          "mode": "list",
+          "cachedResultName": "dados_clientes",
+          "cachedResultUrl": "/projects/3GncOxuzck8dOet9/datatables/HYIlOkvHPxfU3luu"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "contact_id",
+              "keyValue": "={{ $('init').item.json.body.conversation.contact_inbox.contact_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -5488,
+        2560
+      ],
+      "id": "5411005a-ee49-42f9-a58a-e1c7bef8995a",
+      "name": "Pega dados pessoais do cliente (1)",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Pega o valor correto da base de dados (agora a usar 'uf_municipio')\nconst valorOriginal = $json.uf_municipio || \"\";\n\n// 2. Dicionário de Cidades (ID 1 a 86)\nconst mapaCidades = {\n    // Estados (IDs 1 a 6)\n    \"bahia\": 1, \"piaui\": 2, \"ceara\": 3, \"minas gerais\": 4, \"maranhao\": 5, \"para\": 6,\n\n    // Cidades da Bahia\n    \"anage\": 7, \"angical\": 8, \"barra da estiva\": 9, \"barra do choca\": 10, \"brejolandia\": 11,\n    \"cacule\": 12, \"caetanos\": 13, \"canapolis\": 14, \"candiba\": 15, \"carinhanha\": 16,\n    \"cocos\": 17, \"dom basilio\": 18, \"erico cardoso\": 19, \"feira da mata\": 20, \"guanambi\": 21,\n    \"ibicui\": 22, \"ibipitanga\": 23, \"itabuna\": 24, \"itagiba\": 25, \"itagimirim\": 26,\n    \"itambe\": 27, \"itapebi\": 28, \"itororo\": 29, \"ituacu\": 30, \"iuiu\": 31, \"jaborandi\": 32,\n    \"jussiape\": 33, \"macaubas\": 34, \"malhada\": 35, \"morpara\": 36, \"nova canaa\": 37,\n    \"palmas de monte alto\": 38, \"palmeiras\": 39, \"paramirim\": 40, \"pindai\": 41, \"planalto\": 42,\n    \"riacho de santana\": 43, \"ribeirao do largo\": 44, \"rio de contas\": 45, \"rio do pires\": 46,\n    \"sao felix do coribe\": 47, \"sebastiao laranjeiras\": 48, \"serra dourada\": 49,\n    \"tabocas do brejo velho\": 50, \"tanhacu\": 51, \"tanque novo\": 52, \"tremedal\": 53,\n    \"una\": 54, \"urandi\": 55, \"vitoria da conquista\": 56,\n\n    // Cidades do Piauí\n    \"baixa grande do ribeiro\": 57, \"beneditinos\": 58, \"buriti dos montes\": 59, \"campo maior\": 60,\n    \"canto do buriti\": 61, \"castelo do piaui\": 62, \"colonia do gurgueia\": 63, \"curimata\": 64,\n    \"elesbao veloso\": 66, \"inhuma\": 67, \"isaias coelho\": 68, \"jaicos\": 69, \"juazeiro do piaui\": 70,\n    \"lagoa alegre\": 71, \"marcolandia\": 72, \"matias olimpio\": 73, \"piracuruca\": 74, \"piripiri\": 75,\n    \"santa filomena\": 76, \"sigefredo pacheco\": 77, \"valenca do piaui\": 78,\n\n    // Cidades do Ceará\n    \"brejo santo\": 79, \"itaicaba\": 80, \"senador de sa\": 82,\n\n    // Cidades de Minas Gerais\n    \"espinosa\": 83, \"pedra azul\": 84,\n\n    // Maranhão e Pará\n    \"colinas\": 85, \"ponta de pedras\": 86\n};\n\n// 3. Função para extrair apenas a cidade e normalizar o texto\nconst extrairENormalizar = (texto) => {\n    if (!texto) return \"\";\n    \n    // Passa para minúsculas e remove os acentos logo de cara\n    let textoLimpo = String(texto).toLowerCase().normalize(\"NFD\").replace(/[\\u0300-\\u036f]/g, \"\");\n\n    // Regex para encontrar siglas de estados no final da frase (com ou sem hífen ou espaços)\n    // O \\b garante que é uma palavra isolada (ex: ignora o \"ba\" no final de \"candiba\")\n    // Cobri todas as UFs para deixar a automação à prova de balas\n    textoLimpo = textoLimpo.replace(/\\s*-?\\s*\\b(ac|al|ap|am|ba|ce|df|es|go|ma|mt|ms|mg|pa|pb|pr|pe|pi|rj|rn|rs|ro|rr|sc|sp|se|to)\\b$/, \"\");\n    \n    // Remove os espaços extras que possam sobrar nas pontas\n    return textoLimpo.trim();\n};\n\nconst cidadeLimpa = extrairENormalizar(valorOriginal);\n\n// 4. Encontra o ID no mapa (se a cidade não existir na lista, retorna null)\nconst id_cidade_glpi = mapaCidades[cidadeLimpa] || null;\n\n// 5. Retorno para o nó seguinte\nreturn {\n    texto_original: valorOriginal,\n    cidade_processada: cidadeLimpa,\n    id_municipio_glpi: id_cidade_glpi\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -5248,
+        2560
+      ],
+      "id": "3b2a196d-df41-4d38-b690-ca28012f95bb",
+      "name": "Tratando o Município"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "4859de8c-d5a3-4405-94bd-6193e28ca3a6",
+              "leftValue": "={{ $('init').item.json.body.content }}",
+              "rightValue": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+              "operator": {
+                "type": "string",
+                "operation": "regex"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -4736,
+        1728
+      ],
+      "id": "15144df4-930c-45ed-8333-e05bc1f73b44",
+      "name": "Verifica se email é valido"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"content\": \"O e-mail digitado parece estar incorreto. Por favor, informe um e-mail pessoal ou corporativo válido para seguirmos com o atendimento.\\n\\nExemplo: usuario@email.com\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -4448,
+        1872
+      ],
+      "id": "5daef7e0-4a46-49e0-ba0e-06ac3090131b",
+      "name": "Informa que não conseguiu entender o email informado e pede que envie novamente da forma correta",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://glpi.wmsaude.com.br/api.php/v1/PluginFieldsTicketmunicpiorequerente",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "App-Token",
+              "value": "JNEF4dhTLaty1BHSqxdEYHV2jhu1god37IHFHqOL"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"input\": {\n    \"items_id\": {{ $json.id }},\n    \"itemtype\": \"Ticket\",\n    \"plugin_fields_municpiorequerentefielddropdowns_id\": {{ $('Tratando o Município').item.json.id_municipio_glpi || 88 }},\n    \"unidadedoclientefield\": \"{{ $('Pega dados pessoais do cliente (1)').item.json.estabelecimento }}\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -4720,
+        2560
+      ],
+      "id": "87dcd806-3ac5-4f45-a89b-d4671a38c22c",
+      "name": "Informa o campo de município requerente e sua base",
+      "alwaysOutputData": false,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "aLAgkGobWooRkbRp",
+          "name": "Token de Sessao GLPI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"custom_attributes\": {\n    \"step_triagem\": \"em_atendimento\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -8944,
+        3008
+      ],
+      "id": "09edc443-9992-480e-af1c-8dfde36a5446",
+      "name": "Adiciona passo em_atendimento para forçar atendimento humano a conversa",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "=wmsaude:{{ $('init').item.json.body.account.id }}:timeout:conv:{{ $('init').item.json.body.conversation.messages[0].conversation_id }}",
+        "value": "aguardando_resposta",
+        "expire": true,
+        "ttl": 300
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -4224,
+        1872
+      ],
+      "id": "6c02203e-0026-4251-a0ec-08b8469283ec",
+      "name": "Cria regra de timeout (13)",
+      "credentials": {
+        "redis": {
+          "id": "MynVI7yhhqqlbCcd",
+          "name": "Autenticacao Redis para GLPI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "key": "=wmsaude:{{ $('init').item.json.body.account.id }}:timeout:conv:{{ $('init').item.json.body.conversation.messages[0].conversation_id }}"
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -8464,
+        3008
+      ],
+      "id": "4532a9dd-a2c3-4bb8-95f9-31df148c9b20",
+      "name": "Cancela Timeout (1)",
+      "credentials": {
+        "redis": {
+          "id": "MynVI7yhhqqlbCcd",
+          "name": "Autenticacao Redis para GLPI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/labels",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"labels\": [\n    \"\"\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -8704,
+        3008
+      ],
+      "id": "66aa8cfd-b5e7-481e-b0cf-847a916b2ff9",
+      "name": "Retira as etiquetas para dar continuidade ao atendimento",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "197a318e-dd82-455f-bfd9-6ce91513b733",
+                    "leftValue": "={{ $json.status_expediente }}",
+                    "rightValue": "normal",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "59242af5-77fc-4bdf-b9d6-b5b187a54a84",
+                    "leftValue": "={{ $json.status_expediente }}",
+                    "rightValue": "almoco",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "76774153-cd53-4da0-9ec6-e8720498f742",
+                    "leftValue": "={{ $json.status_expediente }}",
+                    "rightValue": "fora",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "none"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -6112,
+        2688
+      ],
+      "id": "d3f0f56f-a95f-47b9-b336-fac59b11d306",
+      "name": "Verifica horário comercial"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"Olá, {{ $('init').item.json.body.conversation.messages[0].sender.name }}!\\n\\nNo momento, nossa equipe está em **horário de almoço**. Mas fique tranquilo(a): sua solicitação já foi registrada!\\n\\nNosso intervalo é **das 12h às 14h**. Assim que retornarmos, às **14h**, daremos prioridade ao seu atendimento. Agradecemos a compreensão!\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -5808,
+        2560
+      ],
+      "id": "e25f823e-4109-4c9b-aa6f-585078e4c67b",
+      "name": "Mensagem informando que está no horário de almoço",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"Olá, {{ $('init').item.json.body.conversation.messages[0].sender.name }}! No momento, nossa equipe já encerrou o expediente por hoje. Nosso horário de atendimento é de **segunda a sexta-feira, das 08h às 12h e das 14h às 18h**.\\n\\nPara que possamos te dar total atenção, por gentileza, envie uma nova mensagem para nós assim que iniciarmos o próximo período de atendimento. Estaremos prontos para te ajudar! \\n\\nAgradecemos muito a sua compreensão e até breve!\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -5808,
+        2736
+      ],
+      "id": "e28c8d64-1778-42c6-a681-85f0f417971b",
+      "name": "Mensagem informando que está fora do horário de expediente",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"custom_attributes\": {\n    \"step_triagem\": \"\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -5488,
+        2736
+      ],
+      "id": "72be175f-a6e5-4bbe-9021-44688dd4a404",
+      "name": "Tira os passos para não impedir futuro atendimento (1)1",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/labels",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"labels\": [\n    \"validar_dados\"\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -5248,
+        2736
+      ],
+      "id": "477fcb3c-1815-4cd0-9c7b-4fc3ee2d82c7",
+      "name": "Adiciona etiqueta: valida_dados (2)",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Pega o horário atual forçando o fuso horário de Brasília\nconst agora = $now.setZone('America/Sao_Paulo');\nconst diaSemana = agora.weekday; // 1 = Segunda, 5 = Sexta, 6/7 = Fim de Semana\nconst hora = agora.hour;\nconst minuto = agora.minute;\n\nlet status = \"fora\"; // Por padrão, começa como fora de expediente\n\n// 2. Valida se é dia de semana (Segunda a Sexta)\nif (diaSemana >= 1 && diaSemana <= 5) {\n    if (hora >= 8 && hora < 12) {\n        status = \"normal\";\n    } else if (hora >= 12 && hora < 14) {\n        status = \"almoco\";\n    } else if (hora >= 14 && hora < 18) {\n        status = \"normal\";\n    }\n}\n\n// 3. Retorna os dados mastigados para o fluxo e serve como diagnóstico\nreturn {\n    status_expediente: status,\n    hora_no_servidor: hora,\n    minuto_no_servidor: minuto,\n    horario_formatado: agora.toFormat('HH:mm:ss'),\n    dia_da_semana: diaSemana\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -6400,
+        2704
+      ],
+      "id": "7353999d-88a9-430f-9375-298d6c30e39c",
+      "name": "Verifica horário comercial com o timezone de São Paulo"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "6622301e-10bc-42ce-9e0f-82f129ed2f90",
+                    "leftValue": "={{ $json.body.event }}",
+                    "rightValue": "conversation_updated",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('init').item.json.body.conversation.labels }}",
+                    "rightValue": "=forcar_atendimento",
+                    "operator": {
+                      "type": "array",
+                      "operation": "contains",
+                      "rightType": "any"
+                    },
+                    "id": "dba26ff8-d80d-46d2-8d37-7cac00c68cec"
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -9232,
+        3200
+      ],
+      "id": "37b6d251-a37f-44b1-933d-e4f0505934c9",
+      "name": "Verifica subfluxo"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "3277eadd-7d18-4302-81e1-5d288ad15365",
+              "leftValue": "={{ ($('init').item.json.body.conversation?.labels || $('init').item.json.body.labels) }}",
+              "rightValue": "abrir_chamado_glpi",
+              "operator": {
+                "type": "array",
+                "operation": "contains",
+                "rightType": "any"
+              }
+            },
+            {
+              "id": "b7f1a001-idem-guard-0001",
+              "leftValue": "={{ ($('init').item.json.body.conversation?.custom_attributes?.protocolo || $('init').item.json.body.custom_attributes?.protocolo || '') }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "ignoreCase": false
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -8944,
+        2784
+      ],
+      "id": "ad80a7c6-0744-40e1-8b1c-19a89f97a266",
+      "name": "Verifica se é para criar chamado automaticamente"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://glpi.wmsaude.com.br/api.php/v1/Ticket",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "App-Token",
+              "value": "JNEF4dhTLaty1BHSqxdEYHV2jhu1god37IHFHqOL"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"input\": {\n    \"name\": \"Chamado via Chatwoot: {{ ($('init').item.json.body.conversation?.messages?.[0]?.sender?.name || $('init').item.json.body.meta?.sender?.name).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;') }}\",\n    \"content\": \"<table><tr><td><b>Solicitante:</b></td><td>{{ ($('init').item.json.body.conversation?.messages?.[0]?.sender?.name || $('init').item.json.body.meta?.sender?.name).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;') }}</td></tr><tr><td><b>E-mail:</b></td><td>{{ (($('init').item.json.body.conversation?.messages?.[0]?.sender?.email || $('init').item.json.body.meta?.sender?.email) || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;') || \"Não informado\" }}</td></tr><tr><td><b>Telefone:</b></td><td> {{ (($('init').item.json.body.conversation?.messages?.[0]?.sender?.phone_number || $('init').item.json.body.meta?.sender?.phone_number) || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;') }}</td></tr><tr><td><b>Link da conversa:</b></td><td><a href='https://conversas.upflowz.com/app/accounts/{{ ($('init').item.json.body.account?.id || 314) }}/conversations/{{ ($('init').item.json.body.conversation?.id || $('init').item.json.body.id) }}' target='_blank'>Acessar no Chatwoot</a></td></tr></table>\",\n    \"_groups_id_assign\": [ 6 ],\n    \"_municpiorequerentefield\": [ {{ $json.id_municipio_glpi || 87 }} ],\n    \"externalid\": \"{{ ($('init').item.json.body.conversation?.id || $('init').item.json.body.id) }}\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -8448,
+        2560
+      ],
+      "id": "db078067-6a24-41c0-84a4-67c5da497570",
+      "name": "Cria ticket no GLPI com descrição do cliente (1)",
+      "alwaysOutputData": false,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "aLAgkGobWooRkbRp",
+          "name": "Token de Sessao GLPI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://glpi.wmsaude.com.br/api.php/v1/PluginFieldsTicketmunicpiorequerente",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "App-Token",
+              "value": "JNEF4dhTLaty1BHSqxdEYHV2jhu1god37IHFHqOL"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"input\": {\n    \"items_id\": {{ $json.id }},\n    \"itemtype\": \"Ticket\",\n    \"plugin_fields_municpiorequerentefielddropdowns_id\": {{ $('Pega dados pessoais do cliente (2)').item.json.id_municipio_glpi || 88 }},\n    \"unidadedoclientefield\": \"{{ $('Pega dados pessoais do cliente (2)').item.json.estabelecimento }}\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -8208,
+        2560
+      ],
+      "id": "88eafdca-47a2-4a77-b845-10a853e14796",
+      "name": "Informa o campo de município requerente e sua base (2)",
+      "alwaysOutputData": false,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "aLAgkGobWooRkbRp",
+          "name": "Token de Sessao GLPI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "HYIlOkvHPxfU3luu",
+          "mode": "list",
+          "cachedResultName": "dados_clientes",
+          "cachedResultUrl": "/projects/3GncOxuzck8dOet9/datatables/HYIlOkvHPxfU3luu"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "contact_id",
+              "keyValue": "={{ ($('init').item.json.body.conversation?.contact_inbox?.contact_id || $('init').item.json.body.contact_inbox?.contact_id) }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -8208,
+        2768
+      ],
+      "id": "751c66ab-57b3-46c4-9cc4-21d056b87e6a",
+      "name": "Pega dados pessoais do cliente (2)",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Pega o valor correto da base de dados (agora a usar 'uf_municipio')\nconst valorOriginal = $json.uf_municipio || \"\";\n\n// 2. Dicionário de Cidades (ID 1 a 86)\nconst mapaCidades = {\n    // Estados (IDs 1 a 6)\n    \"bahia\": 1, \"piaui\": 2, \"ceara\": 3, \"minas gerais\": 4, \"maranhao\": 5, \"para\": 6,\n\n    // Cidades da Bahia\n    \"anage\": 7, \"angical\": 8, \"barra da estiva\": 9, \"barra do choca\": 10, \"brejolandia\": 11,\n    \"cacule\": 12, \"caetanos\": 13, \"canapolis\": 14, \"candiba\": 15, \"carinhanha\": 16,\n    \"cocos\": 17, \"dom basilio\": 18, \"erico cardoso\": 19, \"feira da mata\": 20, \"guanambi\": 21,\n    \"ibicui\": 22, \"ibipitanga\": 23, \"itabuna\": 24, \"itagiba\": 25, \"itagimirim\": 26,\n    \"itambe\": 27, \"itapebi\": 28, \"itororo\": 29, \"ituacu\": 30, \"iuiu\": 31, \"jaborandi\": 32,\n    \"jussiape\": 33, \"macaubas\": 34, \"malhada\": 35, \"morpara\": 36, \"nova canaa\": 37,\n    \"palmas de monte alto\": 38, \"palmeiras\": 39, \"paramirim\": 40, \"pindai\": 41, \"planalto\": 42,\n    \"riacho de santana\": 43, \"ribeirao do largo\": 44, \"rio de contas\": 45, \"rio do pires\": 46,\n    \"sao felix do coribe\": 47, \"sebastiao laranjeiras\": 48, \"serra dourada\": 49,\n    \"tabocas do brejo velho\": 50, \"tanhacu\": 51, \"tanque novo\": 52, \"tremedal\": 53,\n    \"una\": 54, \"urandi\": 55, \"vitoria da conquista\": 56,\n\n    // Cidades do Piauí\n    \"baixa grande do ribeiro\": 57, \"beneditinos\": 58, \"buriti dos montes\": 59, \"campo maior\": 60,\n    \"canto do buriti\": 61, \"castelo do piaui\": 62, \"colonia do gurgueia\": 63, \"curimata\": 64,\n    \"elesbao veloso\": 66, \"inhuma\": 67, \"isaias coelho\": 68, \"jaicos\": 69, \"juazeiro do piaui\": 70,\n    \"lagoa alegre\": 71, \"marcolandia\": 72, \"matias olimpio\": 73, \"piracuruca\": 74, \"piripiri\": 75,\n    \"santa filomena\": 76, \"sigefredo pacheco\": 77, \"valenca do piaui\": 78,\n\n    // Cidades do Ceará\n    \"brejo santo\": 79, \"itaicaba\": 80, \"senador de sa\": 82,\n\n    // Cidades de Minas Gerais\n    \"espinosa\": 83, \"pedra azul\": 84,\n\n    // Maranhão e Pará\n    \"colinas\": 85, \"ponta de pedras\": 86\n};\n\n// 3. Função para extrair apenas a cidade e normalizar o texto\nconst extrairENormalizar = (texto) => {\n    if (!texto) return \"\";\n    \n    // Passa para minúsculas e remove os acentos logo de cara\n    let textoLimpo = String(texto).toLowerCase().normalize(\"NFD\").replace(/[\\u0300-\\u036f]/g, \"\");\n\n    // Regex para encontrar siglas de estados no final da frase (com ou sem hífen ou espaços)\n    // O \\b garante que é uma palavra isolada (ex: ignora o \"ba\" no final de \"candiba\")\n    // Cobri todas as UFs para deixar a automação à prova de balas\n    textoLimpo = textoLimpo.replace(/\\s*-?\\s*\\b(ac|al|ap|am|ba|ce|df|es|go|ma|mt|ms|mg|pa|pb|pr|pe|pi|rj|rn|rs|ro|rr|sc|sp|se|to)\\b$/, \"\");\n    \n    // Remove os espaços extras que possam sobrar nas pontas\n    return textoLimpo.trim();\n};\n\nconst cidadeLimpa = extrairENormalizar(valorOriginal);\n\n// 4. Encontra o ID no mapa (se a cidade não existir na lista, retorna null)\nconst id_cidade_glpi = mapaCidades[cidadeLimpa] || null;\n\n// 5. Retorno para o nó seguinte\nreturn {\n    texto_original: valorOriginal,\n    cidade_processada: cidadeLimpa,\n    id_municipio_glpi: id_cidade_glpi\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -8704,
+        2560
+      ],
+      "id": "915b59ac-4b27-46d4-84eb-1ead2eabee33",
+      "name": "Tratando o Município (1)"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{($('init').item.json.body.account?.id || 314) }}/conversations/{{ ($('init').item.json.body.conversation?.messages?.[0]?.conversation_id || $('init').item.json.body.id) }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"O seu protocolo de atendimento é o nº {{ $('Cria ticket no GLPI com descrição do cliente (1)').item.json.id }}.\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -8704,
+        2368
+      ],
+      "id": "9fbe8594-979c-48e9-9e8a-04a6bdf23d81",
+      "name": "Mensagem informando o protocolo para o cliente (1)",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{($('init').item.json.body.account?.id || 314) }}/conversations/{{ ($('init').item.json.body.conversation?.messages?.[0]?.conversation_id || $('init').item.json.body.id) }}/custom_attributes",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"custom_attributes\": {\n    \"protocolo\": \"{{ $('Cria ticket no GLPI com descrição do cliente (1)').item.json.id }}\",\n    \"link_chamado\": \"https://glpi.wmsaude.com.br/front/ticket.form.php?id={{ $('Cria ticket no GLPI com descrição do cliente (1)').item.json.id }}\",\n    \"step_triagem\": \"em_atendimento\",\n    \"ocupacao\": \"{{ $('Pega dados pessoais do cliente (2)').item.json.ocupacao }}\",\n    \"localidade\": \"{{ $('Pega dados pessoais do cliente (2)').item.json.uf_municipio }}\",\n    \"estabelecimento\": \"{{ $('Pega dados pessoais do cliente (2)').item.json.estabelecimento }}\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -8448,
+        2368
+      ],
+      "id": "f90db8e2-3679-4d8d-8cef-2d05c342a189",
+      "name": "Adiciona protocolo e chamado aos atributos da conversa e coloca o passo em_atendimento (1)1",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "kUhZV8Nf7J3JhUu3",
+          "mode": "list",
+          "cachedResultName": "historico_tickets",
+          "cachedResultUrl": "/projects/3GncOxuzck8dOet9/datatables/kUhZV8Nf7J3JhUu3"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "contact_id": "={{ ($('init').item.json.body.conversation?.contact_inbox?.contact_id || $('init').item.json.body.contact_inbox?.contact_id) }}",
+            "convesation_id": "={{ ($('init').item.json.body.conversation?.messages?.[0]?.conversation_id || $('init').item.json.body.id) }}",
+            "ticket_id": "={{ $('Cria ticket no GLPI com descrição do cliente (1)').item.json.id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "contact_id",
+              "displayName": "contact_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "ticket_id",
+              "displayName": "ticket_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "convesation_id",
+              "displayName": "convesation_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -8208,
+        2368
+      ],
+      "id": "3eeaac8c-80ce-4512-a65d-0e0695221723",
+      "name": "Insere ticket na base de dados (1)"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{($('init').item.json.body.account?.id || 314) }}/conversations/{{ ($('init').item.json.body.conversation?.messages?.[0]?.conversation_id || $('init').item.json.body.id) }}/labels",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"labels\": [\n    \"\"\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -8448,
+        2768
+      ],
+      "id": "7503c8c3-2b9b-4f2c-a18a-7734d8622a0e",
+      "name": "Retira as etiquetas para dar continuidade ao atendimento (1)",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{($('init').item.json.body.account?.id || 314) }}/conversations/{{ ($('init').item.json.body.conversation?.messages?.[0]?.conversation_id || $('init').item.json.body.id) }}/custom_attributes",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"custom_attributes\": {\n    \"step_triagem\": \"em_atendimento\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -8704,
+        2768
+      ],
+      "id": "9f1ccebc-f8f6-46b4-be01-1d2f5694ea29",
+      "name": "Adiciona passo em_atendimento para forçar atendimento humano a conversa (1)",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "init": [
+      {
+        "json": {
+          "headers": {
+            "accept-encoding": "gzip;q=1.0,deflate;q=0.6,identity;q=0.3",
+            "accept": "application/json",
+            "user-agent": "Ruby",
+            "host": "136.248.125.55:5678",
+            "content-type": "application/json",
+            "x-chatwoot-delivery": "46089d07-a557-45d5-95d5-b0f2dd47bd73",
+            "x-chatwoot-timestamp": "1783431458",
+            "x-chatwoot-signature": "sha256=9a6b8b89e40635c1cd2ef90df5afa974b92330d46bcaecd9b65bd883f1bfe2eb",
+            "content-length": "2869"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "account": {
+              "id": 314,
+              "name": "WM Saúde - Gestão e Tecnologia"
+            },
+            "additional_attributes": {},
+            "content_attributes": {},
+            "content_type": "text",
+            "content": "fdsfsdfsdfs",
+            "conversation": {
+              "additional_attributes": {},
+              "can_reply": true,
+              "channel": "Channel::Whatsapp",
+              "contact_inbox": {
+                "id": 1347452,
+                "contact_id": 11417,
+                "inbox_id": 83,
+                "source_id": "557999684200",
+                "created_at": "2026-07-07T13:37:38.480Z",
+                "updated_at": "2026-07-07T13:37:38.480Z",
+                "hmac_verified": false,
+                "pubsub_token": "aawbavjV1rtRq9CDaspCAvR6"
+              },
+              "id": 1667,
+              "inbox_id": 83,
+              "messages": [
+                {
+                  "id": 290031,
+                  "content": "Seja bem-vindo à Central de Atendimento ao Cliente WM Saúde. Para prosseguirmos com o seu atendimento, pedimos que responda por escrito às perguntas enviadas pelo nosso assistente virtual. Essas informações são muito importantes para que possamos dar continuidade à sua solicitação da melhor forma possível.\r\n\r\n\nAgradecemos pela colaboração.",
+                  "account_id": 314,
+                  "inbox_id": 83,
+                  "conversation_id": 1667,
+                  "message_type": 3,
+                  "created_at": 1783431458,
+                  "updated_at": "2026-07-07T13:37:38.634Z",
+                  "private": false,
+                  "status": "sent",
+                  "source_id": null,
+                  "content_type": "text",
+                  "content_attributes": {},
+                  "sender_type": null,
+                  "sender_id": null,
+                  "external_source_ids": {},
+                  "additional_attributes": {},
+                  "processed_message_content": "Seja bem-vindo à Central de Atendimento ao Cliente WM Saúde. Para prosseguirmos com o seu atendimento, pedimos que responda por escrito às perguntas enviadas pelo nosso assistente virtual. Essas informações são muito importantes para que possamos dar continuidade à sua solicitação da melhor forma possível.\r\n\r\n\nAgradecemos pela colaboração.",
+                  "sentiment": {},
+                  "conversation": {
+                    "assignee_id": null,
+                    "unread_count": 1,
+                    "last_activity_at": 1783431458,
+                    "contact_inbox": {
+                      "source_id": "557999684200"
+                    }
+                  }
+                }
+              ],
+              "labels": [],
+              "meta": {
+                "sender": {
+                  "additional_attributes": {},
+                  "custom_attributes": {},
+                  "email": null,
+                  "id": 11417,
+                  "identifier": null,
+                  "name": "Invenção",
+                  "phone_number": "+557999684200",
+                  "thumbnail": "",
+                  "blocked": false,
+                  "type": "contact"
+                },
+                "assignee": null,
+                "assignee_type": null,
+                "team": null,
+                "hmac_verified": false
+              },
+              "status": "open",
+              "custom_attributes": {},
+              "snoozed_until": null,
+              "unread_count": 1,
+              "first_reply_created_at": null,
+              "priority": null,
+              "waiting_since": 1783431458,
+              "agent_last_seen_at": 0,
+              "contact_last_seen_at": 0,
+              "last_activity_at": 1783431458,
+              "timestamp": 1783431458,
+              "created_at": 1783431458,
+              "updated_at": 1783431458.547688
+            },
+            "created_at": "2026-07-07T13:37:38.523Z",
+            "id": 290030,
+            "inbox": {
+              "id": 83,
+              "name": "WM Saúde - Número 1"
+            },
+            "message_type": "incoming",
+            "private": false,
+            "sender": {
+              "account": {
+                "id": 314,
+                "name": "WM Saúde - Gestão e Tecnologia"
+              },
+              "additional_attributes": {},
+              "avatar": "",
+              "custom_attributes": {},
+              "email": null,
+              "id": 11417,
+              "identifier": null,
+              "name": "Invenção",
+              "phone_number": "+557999684200",
+              "thumbnail": "",
+              "blocked": false
+            },
+            "source_id": "wamid.HBgMNTU3OTk5Njg0MjAwFQIAEhgWM0VCMDYxNDQ4MzdCODE3OUZCMjdGRQA=",
+            "event": "message_created"
+          },
+          "webhookUrl": "http://localhost:5678/webhook/fluxo-principal-playnee",
+          "executionMode": "production"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "init": {
+      "main": [
+        [
+          {
+            "node": "Verifica subfluxo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cancela Timeout": {
+      "main": [
+        [
+          {
+            "node": "Identifica onde o usuário está",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Identifica onde o usuário está": {
+      "main": [
+        [
+          {
+            "node": "Pega dados pessoais do cliente",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Verifica qual a opção digitada pelo cliente",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [],
+        [
+          {
+            "node": "Verifica se número digitado pelo cliente é válido",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pede nome ao cliente": {
+      "main": [
+        [
+          {
+            "node": "Adiciona o passo: nome_pendente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifica se é mensagem do cliente": {
+      "main": [
+        [
+          {
+            "node": "Cancela Timeout",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Salva nome do cliente no contato": {
+      "main": [
+        [
+          {
+            "node": "Tira o passo: nome_pendente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifica se tem nome": {
+      "main": [
+        [
+          {
+            "node": "Salva nome do cliente no contato",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Pede nome ao cliente",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Verifica se tem email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifica se tem email": {
+      "main": [
+        [
+          {
+            "node": "Verifica se tem ocupacao",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Verifica se email é valido",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Pede email ao cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pede email ao cliente": {
+      "main": [
+        [
+          {
+            "node": "Adiciona o passo: email_pendente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Salva email do cliente no contato": {
+      "main": [
+        [
+          {
+            "node": "Tira o passo: email_pendente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pede ocupação ao cliente": {
+      "main": [
+        [
+          {
+            "node": "Adiciona o passo: ocupacao_pendente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insere ocupacao": {
+      "main": [
+        [
+          {
+            "node": "Adiciona o controle do prox passo: uf_munic",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifica se tem ocupacao": {
+      "main": [
+        [
+          {
+            "node": "Verifica se tem uf_munic",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Verifica se tem uf_munic",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Insere ocupacao",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Pede ocupação ao cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifica se tem uf_munic": {
+      "main": [
+        [
+          {
+            "node": "Verifica se tem estabelecimento",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Insere uf_munic",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Pede o uf_munic ao cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pede o uf_munic ao cliente": {
+      "main": [
+        [
+          {
+            "node": "Adiciona o passo: uf_munic_pendente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insere uf_munic": {
+      "main": [
+        [
+          {
+            "node": "Adiciona o controle do prox passo: estabelecimento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tira o passo: nome_pendente": {
+      "main": [
+        [
+          {
+            "node": "Verifica se tem email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adiciona o passo: email_pendente": {
+      "main": [
+        [
+          {
+            "node": "Cria regra de timeout (2)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adiciona o passo: ocupacao_pendente": {
+      "main": [
+        [
+          {
+            "node": "Cria regra de timeout (3)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tira o passo: email_pendente": {
+      "main": [
+        [
+          {
+            "node": "Verifica se tem ocupacao",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adiciona o controle do prox passo: uf_munic": {
+      "main": [
+        [
+          {
+            "node": "Verifica se tem uf_munic",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifica se tem estabelecimento": {
+      "main": [
+        [
+          {
+            "node": "Adiciona o passo: triagem",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Insere estabelecimento",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Pede o estabelecimento ao cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insere estabelecimento": {
+      "main": [
+        [
+          {
+            "node": "Adiciona o controle do prox passo: estabelecimento1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pede o estabelecimento ao cliente": {
+      "main": [
+        [
+          {
+            "node": "Adiciona o passo: estabelecimento_pendente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adiciona o controle do prox passo: estabelecimento": {
+      "main": [
+        [
+          {
+            "node": "Verifica se tem estabelecimento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adiciona o passo: triagem": {
+      "main": [
+        [
+          {
+            "node": "Retira as etiquetas para dar continuidade a triagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adiciona etiqueta: falta_dados": {
+      "main": [
+        [
+          {
+            "node": "Verifica se tem nome",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retira as etiquetas para dar continuidade a triagem": {
+      "main": [
+        [
+          {
+            "node": "Menu de triagem básica",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retira as etiquetas para dar continuidade a triagem (1)": {
+      "main": [
+        [
+          {
+            "node": "Adiciona o passo: triagem (1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adiciona o passo: triagem (1)": {
+      "main": [
+        [
+          {
+            "node": "Menu de triagem básica (1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifica qual a opção digitada pelo cliente": {
+      "main": [
+        [
+          {
+            "node": "Adiciona ao time Suporte N1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Pega ticket aberto no nome do cliente",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Tira os passos para não impedir futuro atendimento",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mensagem avisando que não entendeu a opção digitada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pega dados pessoais do cliente": {
+      "main": [
+        [
+          {
+            "node": "Verifica se existe dados pessoais do cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pega ticket aberto no nome do cliente": {
+      "main": [
+        [
+          {
+            "node": "Verifica se existe dados de ticket para esse cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifica se existe dados pessoais do cliente": {
+      "main": [
+        [
+          {
+            "node": "Adiciona etiqueta: falta_dados",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Retira as etiquetas para dar continuidade a triagem (1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifica se existe dados de ticket para esse cliente": {
+      "main": [
+        [
+          {
+            "node": "Mensagem informando todos os chamados aberto no nome do cliente",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mensagem avisando que não há ticket em aberto no nome do cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mensagem informando todos os chamados aberto no nome do cliente": {
+      "main": [
+        [
+          {
+            "node": "Adiciona o passo: infos_chamados_aberto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adiciona ao time Suporte N1": {
+      "main": [
+        [
+          {
+            "node": "Verifica horário comercial com o timezone de São Paulo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mensagem solicitando informações": {
+      "main": [
+        [
+          {
+            "node": "Pega dados pessoais do cliente (1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adiciona etiqueta: valida_dados": {
+      "main": [
+        [
+          {
+            "node": "Mensagem avisando que o atendimento foi finalizado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifica se número digitado pelo cliente é válido": {
+      "main": [
+        [
+          {
+            "node": "Mensagem enviando que está finalizando o atendimento",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mensagem informando que não possível achar o ticket que o cliente digitou",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Pega ticket aberto no nome do cliente (1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mensagem enviando que está finalizando o atendimento": {
+      "main": [
+        [
+          {
+            "node": "Tira os passos para não impedir futuro atendimento (1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tira os passos para não impedir futuro atendimento": {
+      "main": [
+        [
+          {
+            "node": "Adiciona etiqueta: valida_dados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tira os passos para não impedir futuro atendimento (1)": {
+      "main": [
+        [
+          {
+            "node": "Adiciona etiqueta: valida_dados (1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifica se o ticket digitado pelo cliente existe": {
+      "main": [
+        [
+          {
+            "node": "Buscar dados do cliente no GLPI",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mensagem informando que não possível achar o ticket que o cliente digitou",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar dados do cliente no GLPI": {
+      "main": [
+        [
+          {
+            "node": "Adiciona ao time Suporte N1 (1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adiciona ao time Suporte N1 (1)": {
+      "main": [
+        [
+          {
+            "node": "Mensagem informando que o cliente foi encaminhado para o setor responsável",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mensagem informando que o cliente foi encaminhado para o setor responsável": {
+      "main": [
+        [
+          {
+            "node": "Adiciona protocolo e chamado aos atributos da conversa e coloca o passo em_atendimento (1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mensagem informando que não possível achar o ticket que o cliente digitou": {
+      "main": [
+        [
+          {
+            "node": "Mensagem informando todos os chamados aberto no nome do cliente (1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pega ticket aberto no nome do cliente (1)": {
+      "main": [
+        [
+          {
+            "node": "Verifica se o ticket digitado pelo cliente existe",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adiciona o passo: nome_pendente": {
+      "main": [
+        [
+          {
+            "node": "Cria regra de timeout",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Menu de triagem básica (1)": {
+      "main": [
+        [
+          {
+            "node": "Cria regra de timeout (1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adiciona o passo: uf_munic_pendente": {
+      "main": [
+        [
+          {
+            "node": "Cria regra de timeout (4)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adiciona o passo: estabelecimento_pendente": {
+      "main": [
+        [
+          {
+            "node": "Cria regra de timeout (5)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Menu de triagem básica": {
+      "main": [
+        [
+          {
+            "node": "Cria regra de timeout (6)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adiciona o passo: infos_chamados_aberto": {
+      "main": [
+        [
+          {
+            "node": "Cria regra de timeout (8)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mensagem avisando que não há ticket em aberto no nome do cliente": {
+      "main": [
+        [
+          {
+            "node": "Cria regra de timeout (9)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mensagem avisando que não entendeu a opção digitada": {
+      "main": [
+        [
+          {
+            "node": "Cria regra de timeout (10)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mensagem informando todos os chamados aberto no nome do cliente (1)": {
+      "main": [
+        [
+          {
+            "node": "Cria regra de timeout (11)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cria regra de timeout (1)": {
+      "main": [
+        []
+      ]
+    },
+    "Adiciona o controle do prox passo: estabelecimento1": {
+      "main": [
+        [
+          {
+            "node": "Adiciona o passo: triagem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adiciona protocolo e chamado aos atributos da conversa e coloca o passo em_atendimento": {
+      "main": [
+        [
+          {
+            "node": "Insere ticket na base de dados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mensagem informando o protocolo para o cliente": {
+      "main": [
+        [
+          {
+            "node": "Adiciona protocolo e chamado aos atributos da conversa e coloca o passo em_atendimento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cria ticket no GLPI com descrição do cliente": {
+      "main": [
+        [
+          {
+            "node": "Informa o campo de município requerente e sua base",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pega dados pessoais do cliente (1)": {
+      "main": [
+        [
+          {
+            "node": "Tratando o Município",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tratando o Município": {
+      "main": [
+        [
+          {
+            "node": "Cria ticket no GLPI com descrição do cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifica se email é valido": {
+      "main": [
+        [
+          {
+            "node": "Salva email do cliente no contato",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Informa que não conseguiu entender o email informado e pede que envie novamente da forma correta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Informa o campo de município requerente e sua base": {
+      "main": [
+        [
+          {
+            "node": "Mensagem informando o protocolo para o cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Informa que não conseguiu entender o email informado e pede que envie novamente da forma correta": {
+      "main": [
+        [
+          {
+            "node": "Cria regra de timeout (13)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adiciona passo em_atendimento para forçar atendimento humano a conversa": {
+      "main": [
+        [
+          {
+            "node": "Retira as etiquetas para dar continuidade ao atendimento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retira as etiquetas para dar continuidade ao atendimento": {
+      "main": [
+        [
+          {
+            "node": "Cancela Timeout (1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifica horário comercial": {
+      "main": [
+        [
+          {
+            "node": "Mensagem solicitando informações",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mensagem informando que está no horário de almoço",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mensagem informando que está fora do horário de expediente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mensagem informando que está no horário de almoço": {
+      "main": [
+        [
+          {
+            "node": "Pega dados pessoais do cliente (1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mensagem informando que está fora do horário de expediente": {
+      "main": [
+        [
+          {
+            "node": "Tira os passos para não impedir futuro atendimento (1)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tira os passos para não impedir futuro atendimento (1)1": {
+      "main": [
+        [
+          {
+            "node": "Adiciona etiqueta: valida_dados (2)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifica horário comercial com o timezone de São Paulo": {
+      "main": [
+        [
+          {
+            "node": "Verifica horário comercial",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifica subfluxo": {
+      "main": [
+        [
+          {
+            "node": "Verifica se é para criar chamado automaticamente",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Adiciona passo em_atendimento para forçar atendimento humano a conversa",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Verifica se é mensagem do cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifica se é para criar chamado automaticamente": {
+      "main": [
+        [
+          {
+            "node": "Retira as etiquetas para dar continuidade ao atendimento (1)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Verifica se é mensagem do cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cria ticket no GLPI com descrição do cliente (1)": {
+      "main": [
+        [
+          {
+            "node": "Informa o campo de município requerente e sua base (2)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Informa o campo de município requerente e sua base (2)": {
+      "main": [
+        [
+          {
+            "node": "Mensagem informando o protocolo para o cliente (1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pega dados pessoais do cliente (2)": {
+      "main": [
+        [
+          {
+            "node": "Tratando o Município (1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tratando o Município (1)": {
+      "main": [
+        [
+          {
+            "node": "Cria ticket no GLPI com descrição do cliente (1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mensagem informando o protocolo para o cliente (1)": {
+      "main": [
+        [
+          {
+            "node": "Adiciona protocolo e chamado aos atributos da conversa e coloca o passo em_atendimento (1)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adiciona protocolo e chamado aos atributos da conversa e coloca o passo em_atendimento (1)1": {
+      "main": [
+        [
+          {
+            "node": "Insere ticket na base de dados (1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retira as etiquetas para dar continuidade ao atendimento (1)": {
+      "main": [
+        [
+          {
+            "node": "Adiciona passo em_atendimento para forçar atendimento humano a conversa (1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adiciona passo em_atendimento para forçar atendimento humano a conversa (1)": {
+      "main": [
+        [
+          {
+            "node": "Pega dados pessoais do cliente (2)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "f482c650-afeb-47af-9f64-dcc7ecf92392",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "20d61d4346ce6060f90882f582ec82333f0d0ef83add04f61cda543f312ca8da"
+  },
+  "id": "cdYCNJfYPDEVtQDs",
+  "tags": [
+    {
+      "updatedAt": "2026-06-08T18:47:18.375Z",
+      "createdAt": "2026-06-08T18:47:18.375Z",
+      "id": "YNF8FydUYhJWVs9e",
+      "name": "Playnee"
+    }
+  ]
+}
