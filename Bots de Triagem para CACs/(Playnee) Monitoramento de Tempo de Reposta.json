@@ -1,0 +1,158 @@
+{
+  "name": "(Playnee) Monitoramento de Tempo de Reposta",
+  "nodes": [
+    {
+      "parameters": {
+        "channels": "=__keyevent@0__:expired",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redisTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "19671c35-14d7-4158-a6e5-7342cd531bb2",
+      "name": "Redis Trigger",
+      "credentials": {
+        "redis": {
+          "id": "MynVI7yhhqqlbCcd",
+          "name": "Autenticacao Redis para GLPI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const key = $json.message;\n\nconst parts = key.split(':');\n\nreturn [{\n  accountId: parts[1],\n  conversationId: parts[4],\n  redisKey: key\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        528,
+        0
+      ],
+      "id": "8457bea1-b241-4682-82d4-02d4959e94bc",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c03a6d9b-7e0d-4554-bb25-3bde43c8085c",
+              "leftValue": "={{ $json.message }}",
+              "rightValue": "wmsaude:",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        208,
+        0
+      ],
+      "id": "f416f665-9170-4761-9c8c-9ca55ed07fc9",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/314/conversations/{{ $('Code in JavaScript').item.json.conversationId }}/labels",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"labels\": [\n    \"sem_resposta\"\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        800,
+        0
+      ],
+      "id": "c4d49604-4bed-414d-89b2-d5a079ec438a",
+      "name": "Adiciona Etiqueta",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Adiciona Etiqueta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Redis Trigger": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "a205b4f0-aae1-4318-aad6-e547ad4e129a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "20d61d4346ce6060f90882f582ec82333f0d0ef83add04f61cda543f312ca8da"
+  },
+  "id": "apH0Q9srdhdyjl05",
+  "tags": [
+    {
+      "updatedAt": "2026-06-08T18:47:18.375Z",
+      "createdAt": "2026-06-08T18:47:18.375Z",
+      "id": "YNF8FydUYhJWVs9e",
+      "name": "Playnee"
+    }
+  ]
+}

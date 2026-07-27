@@ -94,7 +94,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// ==========================================\n// 1. MAPA DE AGENTES (ID Chatwoot -> ID GLPI)\n// ==========================================\nconst linhasAgentes = $('Lê mapa de agentes').all();\nconst mapaAgentes = {};\nfor (const linha of linhasAgentes) {\n    const chatwootId = linha.json['(Playnee) ID Chatwoot'];\n    const glpiId = linha.json['ID GLPI'];\n    if (chatwootId && glpiId) {\n        mapaAgentes[chatwootId.toString().trim()] = Number(glpiId);\n    }\n}\n\n// ==========================================\n// 2. PROCESSAR O AGENTE DO WEBHOOK\n// ==========================================\nlet agente_id_glpi = 0;\nlet nome_agente = \"Não atribuído\";\n\nconst idChatwoot = $node[\"Webhook\"].json.body.meta?.assignee?.id || \n                   $node[\"Webhook\"].json.body.data?.assignee?.id;\n\nif (idChatwoot && mapaAgentes[idChatwoot.toString()]) {\n    agente_id_glpi = mapaAgentes[idChatwoot.toString()];\n    nome_agente = $node[\"Webhook\"].json.body.meta?.assignee?.name || \"Detectado\";\n}\n\n// ==========================================\n// 3. PROCESSAR A EQUIPE (GRUPO)\n// ==========================================\nlet glpi_group_id = 0;\nconst teamNameChatwoot = $node[\"Webhook\"].json.body.meta?.team?.name || \n                         $node[\"Webhook\"].json.body.team?.name;\n\nif (teamNameChatwoot) {\n    const normalizar = (t) => t.trim().toLowerCase().normalize(\"NFD\").replace(/[\\u0300-\\u036f]/g, \"\");\n    const nomeNormalizadoChatwoot = normalizar(teamNameChatwoot);\n\n    const gruposGlpi = $('HTTP Request').all();\n    const grupoEncontrado = gruposGlpi.find(i => \n        i.json.name && normalizar(i.json.name) === nomeNormalizadoChatwoot\n    );\n    \n    if (grupoEncontrado) glpi_group_id = grupoEncontrado.json.id;\n}\n\n// ==========================================\n// 4. RETORNO FINAL\n// ==========================================\nreturn {\n    agente_id_glpi, \n    glpi_group_id,\n    id_chatwoot_detectado: idChatwoot || \"Nenhum\",\n    nome_agente_detectado: nome_agente,\n    tipo_glpi_id: 1 \n};"
+        "jsCode": "// ==========================================\n// 1. MAPA DE AGENTES (ID Chatwoot -> ID GLPI)\n// ==========================================\nconst linhasAgentes = $('Lê mapa de agentes').all();\nconst mapaAgentes = {};\nfor (const linha of linhasAgentes) {\n    const chatwootId = linha.json['(Playnee) ID Chatwoot'];\n    const glpiId = linha.json['ID GLPI'];\n    if (chatwootId && glpiId) {\n        mapaAgentes[chatwootId.toString().trim()] = Number(glpiId);\n    }\n}\n\n// ==========================================\n// 2. PROCESSAR O AGENTE DO WEBHOOK\n// ==========================================\nlet agente_id_glpi = 0;\nlet nome_agente = \"Não atribuído\";\n\nconst idChatwoot = $node[\"Entrada\"].json.body.meta?.assignee?.id || \n                   $node[\"Entrada\"].json.body.data?.assignee?.id;\n\nif (idChatwoot && mapaAgentes[idChatwoot.toString()]) {\n    agente_id_glpi = mapaAgentes[idChatwoot.toString()];\n    nome_agente = $node[\"Entrada\"].json.body.meta?.assignee?.name || \"Detectado\";\n}\n\n// ==========================================\n// 3. PROCESSAR A EQUIPE (GRUPO)\n// ==========================================\nlet glpi_group_id = 0;\nconst teamNameChatwoot = $node[\"Entrada\"].json.body.meta?.team?.name || \n                         $node[\"Entrada\"].json.body.team?.name;\n\nif (teamNameChatwoot) {\n    const normalizar = (t) => t.trim().toLowerCase().normalize(\"NFD\").replace(/[\\u0300-\\u036f]/g, \"\");\n    const nomeNormalizadoChatwoot = normalizar(teamNameChatwoot);\n\n    const gruposGlpi = $('HTTP Request').all();\n    const grupoEncontrado = gruposGlpi.find(i => \n        i.json.name && normalizar(i.json.name) === nomeNormalizadoChatwoot\n    );\n    \n    if (grupoEncontrado) glpi_group_id = grupoEncontrado.json.id;\n}\n\n// ==========================================\n// 4. RETORNO FINAL\n// ==========================================\nreturn {\n    agente_id_glpi, \n    glpi_group_id,\n    id_chatwoot_detectado: idChatwoot || \"Nenhum\",\n    nome_agente_detectado: nome_agente,\n    tipo_glpi_id: 1 \n};"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -109,20 +109,29 @@
       "parameters": {
         "conditions": {
           "options": {
-            "caseSensitive": true,
+            "version": 3,
             "leftValue": "",
-            "typeValidation": "strict",
-            "version": 3
+            "caseSensitive": true,
+            "typeValidation": "strict"
           },
           "conditions": [
             {
               "id": "5519193e-f737-40ef-b9bc-fbb90df0c027",
-              "leftValue": "={{ $('Webhook').first().json.body.custom_attributes.protocolo }}",
-              "rightValue": "={{ $('Webhook').first().json.body.custom_attributes.protocolo }}",
+              "leftValue": "={{ $('Entrada').first().json.body.custom_attributes.protocolo }}",
+              "rightValue": "={{ $('Entrada').first().json.body.custom_attributes.protocolo }}",
               "operator": {
                 "type": "string",
                 "operation": "notEmpty",
                 "singleValue": true
+              }
+            },
+            {
+              "id": "chamado-associado-guard-0001",
+              "leftValue": "={{ $('Entrada').first().json.body.custom_attributes.chamado_associado }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
               }
             }
           ],
@@ -143,7 +152,7 @@
     {
       "parameters": {
         "method": "PUT",
-        "url": "=https://glpi.wmsaude.com.br/api.php/v1/Ticket/{{ $('Webhook').first().json.body.custom_attributes.protocolo }}",
+        "url": "=https://glpi.wmsaude.com.br/api.php/v1/Ticket/{{ $('Entrada').first().json.body.custom_attributes.protocolo }}",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -157,7 +166,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"input\": {\n    \"id\": {{ $('Webhook').first().json.body.custom_attributes.protocolo }},\n    \"_users_id_assign\": {{ $json.agente_id_glpi }},\n    \"_groups_id_assign\": {{ $json.glpi_group_id }},\n    \"type\": {{ $json.tipo_glpi_id }}\n  }\n}",
+        "jsonBody": "={\n  \"input\": {\n    \"id\": {{ $('Entrada').first().json.body.custom_attributes.protocolo }},\n    \"_users_id_assign\": {{ $json.agente_id_glpi ? JSON.stringify([$json.agente_id_glpi]) : '[]' }},\n    \"_groups_id_assign\": {{ JSON.stringify(Array.from(new Set([6, $json.glpi_group_id].filter(v => v)))) }},\n    \"type\": {{ $json.tipo_glpi_id }}\n  }\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -272,6 +281,65 @@
           "name": "Conta Invenção n8n WM Saude"
         }
       }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{ $('Entrada').first().json.body.messages[0].account_id }}/conversations/{{ $('Entrada').first().json.body.messages[0].conversation_id }}/custom_attributes",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"custom_attributes\": {\n    \"chamado_associado\": true\n  }\n}",
+        "options": {}
+      },
+      "id": "9cb5606d-465f-4a95-8b7f-e59d23d67466",
+      "name": "Marca chamado como associado",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        848,
+        0
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "fb564d77-76bc-49e5-9580-8de1d297d500",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1408,
+        320
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "024be569-5b23-4495-9d47-aca52715617b",
+      "name": "Entrada",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -1264,
+        160
+      ]
     }
   ],
   "pinData": {
@@ -426,17 +494,6 @@
     ]
   },
   "connections": {
-    "Webhook": {
-      "main": [
-        [
-          {
-            "node": "If1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Filter": {
       "main": [
         [
@@ -509,6 +566,50 @@
           }
         ]
       ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Marca chamado como associado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Entrada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Entrada",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Entrada": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
@@ -517,7 +618,7 @@
     "availableInMCP": false,
     "callerPolicy": "workflowsFromSameOwner"
   },
-  "versionId": "277d27dd-9489-4791-b7cb-81fe79ce7f9d",
+  "versionId": "e1f073a7-8e9e-44aa-a64e-b236611bb6e7",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "20d61d4346ce6060f90882f582ec82333f0d0ef83add04f61cda543f312ca8da"
