@@ -10,8 +10,8 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        -1408,
-        112
+        -1536,
+        64
       ],
       "id": "fca5beb2-c33b-44aa-88d8-49fce66f9a37",
       "name": "Webhook",
@@ -117,8 +117,8 @@
           "conditions": [
             {
               "id": "5519193e-f737-40ef-b9bc-fbb90df0c027",
-              "leftValue": "={{ $('Entrada').first().json.body.custom_attributes.protocolo }}",
-              "rightValue": "={{ $('Entrada').first().json.body.custom_attributes.protocolo }}",
+              "leftValue": "={{ $('Entrada').first().json.body.custom_attributes.protocolo || $('Entrada').first().json.body.meta?.sender?.custom_attributes?.ultimo_protocolo || $('Entrada').first().json.body.messages?.[0]?.sender?.custom_attributes?.ultimo_protocolo }}",
+              "rightValue": "={{ $('Entrada').first().json.body.custom_attributes.protocolo || $('Entrada').first().json.body.meta?.sender?.custom_attributes?.ultimo_protocolo || $('Entrada').first().json.body.messages?.[0]?.sender?.custom_attributes?.ultimo_protocolo }}",
               "operator": {
                 "type": "string",
                 "operation": "notEmpty",
@@ -127,8 +127,8 @@
             },
             {
               "id": "chamado-associado-guard-0001",
-              "leftValue": "={{ $('Entrada').first().json.body.custom_attributes.chamado_associado }}",
-              "rightValue": "true",
+              "leftValue": "={{ ($('Entrada').first().json.body.meta?.assignee?.id || $('Entrada').first().json.body.data?.assignee?.id || 'null') + ':' + ($('Entrada').first().json.body.meta?.team?.id || 'null') }}",
+              "rightValue": "={{ $('Entrada').first().json.body.custom_attributes.chamado_associado_key || '' }}",
               "operator": {
                 "type": "string",
                 "operation": "notEquals"
@@ -152,7 +152,7 @@
     {
       "parameters": {
         "method": "PUT",
-        "url": "=https://glpi.wmsaude.com.br/api.php/v1/Ticket/{{ $('Entrada').first().json.body.custom_attributes.protocolo }}",
+        "url": "=https://glpi.wmsaude.com.br/api.php/v1/Ticket/{{ $('Entrada').first().json.body.custom_attributes.protocolo || $('Entrada').first().json.body.meta?.sender?.custom_attributes?.ultimo_protocolo || $('Entrada').first().json.body.messages?.[0]?.sender?.custom_attributes?.ultimo_protocolo }}",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -166,7 +166,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"input\": {\n    \"id\": {{ $('Entrada').first().json.body.custom_attributes.protocolo }},\n    \"_users_id_assign\": {{ $json.agente_id_glpi ? JSON.stringify([$json.agente_id_glpi]) : '[]' }},\n    \"_groups_id_assign\": {{ JSON.stringify(Array.from(new Set([6, $json.glpi_group_id].filter(v => v)))) }},\n    \"type\": {{ $json.tipo_glpi_id }}\n  }\n}",
+        "jsonBody": "={\n  \"input\": {\n    \"id\": {{ $('Entrada').first().json.body.custom_attributes.protocolo || $('Entrada').first().json.body.meta?.sender?.custom_attributes?.ultimo_protocolo || $('Entrada').first().json.body.messages?.[0]?.sender?.custom_attributes?.ultimo_protocolo }},\n    \"_users_id_assign\": {{ $json.agente_id_glpi ? JSON.stringify([$json.agente_id_glpi]) : '[]' }},\n    \"_groups_id_assign\": {{ JSON.stringify(Array.from(new Set([6, $json.glpi_group_id].filter(v => v)))) }},\n    \"type\": {{ $json.tipo_glpi_id }}\n  }\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -234,7 +234,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "{\n  \"custom_attributes\": {\n    \"o_usurio_esta_passando_por_onde\": \"\"\n  }\n}",
+        "jsonBody": "={{ { custom_attributes: Object.assign({}, $json.body.custom_attributes, { o_usurio_esta_passando_por_onde: \"\" }) } }}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -275,6 +275,7 @@
       ],
       "id": "f69faedf-99cd-4ccc-a9b9-afe6caa54a37",
       "name": "Lê mapa de agentes",
+      "executeOnce": true,
       "credentials": {
         "googleApi": {
           "id": "W6W6Zi7RLPvFV82I",
@@ -299,7 +300,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "{\n  \"custom_attributes\": {\n    \"chamado_associado\": true\n  }\n}",
+        "jsonBody": "={{ { custom_attributes: Object.assign({}, $('Entrada').first().json.body.custom_attributes, { chamado_associado: true, chamado_associado_key: ($('Entrada').first().json.body.meta?.assignee?.id || $('Entrada').first().json.body.data?.assignee?.id || 'null') + ':' + ($('Entrada').first().json.body.meta?.team?.id || 'null') }) } }}",
         "options": {}
       },
       "id": "9cb5606d-465f-4a95-8b7f-e59d23d67466",
@@ -326,8 +327,8 @@
       "type": "n8n-nodes-base.executeWorkflowTrigger",
       "typeVersion": 1.2,
       "position": [
-        -1408,
-        320
+        -1536,
+        272
       ]
     },
     {
@@ -337,8 +338,8 @@
       "type": "n8n-nodes-base.noOp",
       "typeVersion": 1,
       "position": [
-        -1264,
-        160
+        -1312,
+        112
       ]
     }
   ],
@@ -352,10 +353,10 @@
             "user-agent": "Ruby",
             "host": "136.248.125.55:5678",
             "content-type": "application/json",
-            "x-chatwoot-delivery": "509062e0-7cd2-4d6a-b931-8e8b08299e57",
-            "x-chatwoot-timestamp": "1782220800",
-            "x-chatwoot-signature": "sha256=2aec9e15bd31d59482f75eb9e5553e4e6456b54e73c9f162dfb9dde3a8df9613",
-            "content-length": "2478"
+            "x-chatwoot-delivery": "db1b74bb-db06-41e8-bbf5-566912ba504b",
+            "x-chatwoot-timestamp": "1785324884",
+            "x-chatwoot-signature": "sha256=54294f917817657c7cc98aa023139c6d58349dfa7f149ca2ce37df9a8dd140ea",
+            "content-length": "2572"
           },
           "params": {},
           "query": {},
@@ -364,50 +365,50 @@
             "can_reply": true,
             "channel": "Channel::Whatsapp",
             "contact_inbox": {
-              "id": 462885,
-              "contact_id": 6243,
+              "id": 3229079,
+              "contact_id": 78884,
               "inbox_id": 83,
-              "source_id": "557799799014",
-              "created_at": "2026-06-23T11:44:25.331Z",
-              "updated_at": "2026-06-23T11:44:25.331Z",
+              "source_id": "557999684200",
+              "created_at": "2026-07-28T20:39:21.466Z",
+              "updated_at": "2026-07-28T20:39:21.466Z",
               "hmac_verified": false,
-              "pubsub_token": "X18tUvswhZmUL6jAwcEYzKRJ"
+              "pubsub_token": "4rafWVVymJ5BpSVDTxhScRqw"
             },
-            "id": 815,
+            "id": 4001,
             "inbox_id": 83,
             "messages": [
               {
-                "id": 239868,
-                "content": "Ajudo em algo mais?",
+                "id": 469653,
+                "content": "O seu protocolo de atendimento é o nº 5648.",
                 "account_id": 314,
                 "inbox_id": 83,
-                "conversation_id": 815,
+                "conversation_id": 4001,
                 "message_type": 1,
-                "created_at": 1782220800,
-                "updated_at": "2026-06-23T13:20:00.249Z",
+                "created_at": 1785324875,
+                "updated_at": "2026-07-29T11:34:37.774Z",
                 "private": false,
-                "status": "sent",
-                "source_id": null,
+                "status": "delivered",
+                "source_id": "wamid.HBgMNTU3OTk5Njg0MjAwFQIAERgUQ0U2M0RFRUQ0NDg5QzNEMjk1MjEA",
                 "content_type": "text",
                 "content_attributes": {},
                 "sender_type": "User",
-                "sender_id": 3116,
+                "sender_id": 3110,
                 "external_source_ids": {},
                 "additional_attributes": {},
-                "processed_message_content": "Ajudo em algo mais?",
+                "processed_message_content": "O seu protocolo de atendimento é o nº 5648.",
                 "sentiment": {},
                 "conversation": {
-                  "assignee_id": 3116,
+                  "assignee_id": 3110,
                   "unread_count": 0,
-                  "last_activity_at": 1782220800,
+                  "last_activity_at": 1785324875,
                   "contact_inbox": {
-                    "source_id": "557799799014"
+                    "source_id": "557999684200"
                   }
                 },
                 "sender": {
-                  "id": 3116,
-                  "name": "Jeniffer Victoria",
-                  "available_name": "Jeniffer Victoria",
+                  "id": 3110,
+                  "name": "WM Saúde TI",
+                  "available_name": "WM Saúde",
                   "avatar_url": "",
                   "type": "user",
                   "availability_status": null,
@@ -419,23 +420,35 @@
             "meta": {
               "sender": {
                 "additional_attributes": {
-                  "avatar_url_hash": "5368a68b4758684054d94c1e72f1fcb71b9c76976ea7107e63b6b5bd0ce0dcf8",
-                  "last_avatar_sync_at": "2026-06-23T11:45:55Z"
+                  "city": "",
+                  "country": "",
+                  "description": "",
+                  "company_name": "",
+                  "country_code": "",
+                  "social_profiles": {
+                    "telegram": ""
+                  }
                 },
-                "custom_attributes": {},
-                "email": "renatasmv3@hotmail.com",
-                "id": 6243,
+                "custom_attributes": {
+                  "ocupacao": "Dev",
+                  "localidade": "Aracaju SE",
+                  "ultimo_chamado": "https://glpi.wmsaude.com.br/front/ticket.form.php?id=5648",
+                  "estabelecimento": "HUSE",
+                  "ultimo_protocolo": "5648"
+                },
+                "email": null,
+                "id": 78884,
                 "identifier": null,
-                "name": "Renata Rocha",
-                "phone_number": "+557799799014",
+                "name": "Guilherme",
+                "phone_number": "+557999684200",
                 "thumbnail": "",
                 "blocked": false,
                 "type": "contact"
               },
               "assignee": {
-                "id": 3116,
-                "name": "Jeniffer Victoria",
-                "available_name": "Jeniffer Victoria",
+                "id": 3110,
+                "name": "WM Saúde TI",
+                "available_name": "WM Saúde",
                 "avatar_url": "",
                 "type": "user",
                 "availability_status": null,
@@ -450,36 +463,33 @@
             },
             "status": "open",
             "custom_attributes": {
-              "ocupacao": "Enfermeira",
-              "protocolo": "2853",
-              "localidade": "Brejolândia - BA",
-              "link_chamado": "https://glpi.wmsaude.com.br/front/ticket.form.php?id=2853",
-              "step_triagem": "em_atendimento",
-              "estabelecimento": "PSF Antonino dos Santos Alves"
+              "protocolo": "5648",
+              "link_chamado": "https://glpi.wmsaude.com.br/front/ticket.form.php?id=5648",
+              "step_triagem": "em_atendimento"
             },
             "snoozed_until": null,
             "unread_count": 0,
-            "first_reply_created_at": "2026-06-23T11:44:26.694Z",
+            "first_reply_created_at": "2026-07-29T11:34:28.495Z",
             "priority": null,
             "waiting_since": 0,
-            "agent_last_seen_at": 1782220800,
+            "agent_last_seen_at": 1785324875,
             "contact_last_seen_at": 0,
-            "last_activity_at": 1782220800,
-            "timestamp": 1782220800,
-            "created_at": 1782215065,
-            "updated_at": 1782220800.3539,
+            "last_activity_at": 1785324875,
+            "timestamp": 1785324875,
+            "created_at": 1785324866,
+            "updated_at": 1785324884.284509,
             "event": "conversation_updated",
             "changed_attributes": [
               {
-                "updated_at": {
-                  "previous_value": "2026-06-23T13:20:00.271Z",
-                  "current_value": "2026-06-23T13:20:00.353Z"
+                "assignee_id": {
+                  "previous_value": null,
+                  "current_value": 3110
                 }
               },
               {
-                "waiting_since": {
-                  "previous_value": "2026-06-23T12:27:44.530Z",
-                  "current_value": null
+                "updated_at": {
+                  "previous_value": "2026-07-29T11:34:36.106Z",
+                  "current_value": "2026-07-29T11:34:44.284Z"
                 }
               }
             ]
@@ -618,7 +628,7 @@
     "availableInMCP": false,
     "callerPolicy": "workflowsFromSameOwner"
   },
-  "versionId": "e1f073a7-8e9e-44aa-a64e-b236611bb6e7",
+  "versionId": "4d0d68c0-244a-41c1-9718-c91210df6243",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "20d61d4346ce6060f90882f582ec82333f0d0ef83add04f61cda543f312ca8da"

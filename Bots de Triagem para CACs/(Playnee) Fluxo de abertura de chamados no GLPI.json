@@ -10,7 +10,7 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        -10016,
+        -11120,
         3216
       ],
       "id": "c571280c-052c-4fb5-9e0f-e9c131acf9f2",
@@ -205,7 +205,7 @@
       "typeVersion": 4.3,
       "position": [
         -6016,
-        1872
+        1760
       ],
       "id": "41207238-6642-47f2-af69-ef8a5ecc82ac",
       "name": "Pede nome ao cliente",
@@ -244,7 +244,7 @@
       "typeVersion": 4.3,
       "position": [
         -5792,
-        1872
+        1760
       ],
       "id": "c61fd588-77e2-4b84-a820-97cf516e0da1",
       "name": "Adiciona o passo: nome_pendente",
@@ -343,7 +343,7 @@
       "typeVersion": 4.3,
       "position": [
         -5920,
-        1568
+        1456
       ],
       "id": "b8ac7918-a748-46ac-ae39-4644575dcab2",
       "name": "Salva nome do cliente no contato",
@@ -381,7 +381,7 @@
       "typeVersion": 4.3,
       "position": [
         -5648,
-        1568
+        1456
       ],
       "id": "e3277951-c058-4fd2-a996-11d285d1faeb",
       "name": "Tira o passo: nome_pendente",
@@ -476,249 +476,10 @@
       "typeVersion": 3.4,
       "position": [
         -6288,
-        1984
+        1872
       ],
       "id": "bc7d3e5f-f624-4780-816a-950242b0a4d6",
       "name": "Verifica se tem nome"
-    },
-    {
-      "parameters": {
-        "rules": {
-          "values": [
-            {
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "loose",
-                  "version": 3
-                },
-                "conditions": [
-                  {
-                    "id": "197a318e-dd82-455f-bfd9-6ce91513b733",
-                    "leftValue": "={{ (($('init').item.json.body.conversation && $('init').item.json.body.conversation.meta && $('init').item.json.body.conversation.meta.sender && $('init').item.json.body.conversation.meta.sender.email) || ($('init').item.json.body.sender && $('init').item.json.body.sender.email) || '') }}",
-                    "rightValue": "",
-                    "operator": {
-                      "type": "string",
-                      "operation": "notEmpty",
-                      "singleValue": true
-                    }
-                  }
-                ],
-                "combinator": "and"
-              }
-            },
-            {
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "loose",
-                  "version": 3
-                },
-                "conditions": [
-                  {
-                    "id": "59242af5-77fc-4bdf-b9d6-b5b187a54a84",
-                    "leftValue": "={{ $('init').item.json.body.conversation.custom_attributes.step_triagem }}",
-                    "rightValue": "email_pendente",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals",
-                      "name": "filter.operator.equals"
-                    }
-                  }
-                ],
-                "combinator": "and"
-              }
-            },
-            {
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "loose",
-                  "version": 3
-                },
-                "conditions": [
-                  {
-                    "leftValue": "={{ (($('init').item.json.body.conversation && $('init').item.json.body.conversation.meta && $('init').item.json.body.conversation.meta.sender && $('init').item.json.body.conversation.meta.sender.email) || ($('init').item.json.body.sender && $('init').item.json.body.sender.email) || '') }}",
-                    "rightValue": "",
-                    "operator": {
-                      "type": "string",
-                      "operation": "empty",
-                      "singleValue": true
-                    },
-                    "id": "75c508c5-8cb8-459b-87cc-78458d567cec"
-                  }
-                ],
-                "combinator": "and"
-              }
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.switch",
-      "typeVersion": 3.4,
-      "position": [
-        -5056,
-        2016
-      ],
-      "id": "1780f077-d855-4b2c-a9ce-dfc22629cb7d",
-      "name": "Verifica se tem email"
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpHeaderAuth",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Content-Type",
-              "value": "application/json"
-            }
-          ]
-        },
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "{\n  \"content\": \"Por favor, informe seu e-mail pessoal ou corporativo para continuarmos o atendimento.\\n\\nExemplo: usuario@email.com\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}\n",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.3,
-      "position": [
-        -4736,
-        2064
-      ],
-      "id": "9c5e2408-5e37-4c90-8690-543b76da2468",
-      "name": "Pede email ao cliente",
-      "executeOnce": true,
-      "retryOnFail": true,
-      "maxTries": 3,
-      "waitBetweenTries": 2000,
-      "credentials": {
-        "httpHeaderAuth": {
-          "id": "IV5ZFvAfaulH0LP9",
-          "name": "Token de Acesso Chatwoot (Playnee)"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpHeaderAuth",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Content-Type",
-              "value": "application/json"
-            }
-          ]
-        },
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "{\n  \"custom_attributes\": {\n    \"step_triagem\": \"email_pendente\"\n  }\n}",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.3,
-      "position": [
-        -4512,
-        2064
-      ],
-      "id": "832a5ec2-1bca-4b1f-9b8f-01f77f8c6ed8",
-      "name": "Adiciona o passo: email_pendente",
-      "retryOnFail": true,
-      "maxTries": 3,
-      "waitBetweenTries": 2000,
-      "credentials": {
-        "httpHeaderAuth": {
-          "id": "IV5ZFvAfaulH0LP9",
-          "name": "Token de Acesso Chatwoot (Playnee)"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "method": "PUT",
-        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/contacts/{{ $('init').item.json.body.conversation.contact_inbox.contact_id }}",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpHeaderAuth",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Content-Type",
-              "value": "application/json"
-            }
-          ]
-        },
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ email: $('init').item.json.body.content }) }}",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.3,
-      "position": [
-        -3808,
-        1488
-      ],
-      "id": "9777163a-f8fe-4c85-83a9-afd17d52feaf",
-      "name": "Salva email do cliente no contato",
-      "retryOnFail": true,
-      "maxTries": 3,
-      "waitBetweenTries": 2000,
-      "credentials": {
-        "httpHeaderAuth": {
-          "id": "IV5ZFvAfaulH0LP9",
-          "name": "Token de Acesso Chatwoot (Playnee)"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/custom_attributes\n",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpHeaderAuth",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Content-Type",
-              "value": "application/json"
-            }
-          ]
-        },
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "{\n  \"custom_attributes\": {\n    \"step_triagem\": \"\"\n  }\n}",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.3,
-      "position": [
-        -3488,
-        1488
-      ],
-      "id": "0cde4c67-98b9-4c0e-b4e4-d6a5bf49e66a",
-      "name": "Tira o passo: email_pendente",
-      "retryOnFail": true,
-      "maxTries": 3,
-      "waitBetweenTries": 2000,
-      "credentials": {
-        "httpHeaderAuth": {
-          "id": "IV5ZFvAfaulH0LP9",
-          "name": "Token de Acesso Chatwoot (Playnee)"
-        }
-      }
     },
     {
       "parameters": {
@@ -743,8 +504,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -3520,
-        2160
+        -4704,
+        2080
       ],
       "id": "d9d5b16f-2103-4219-b52d-4952cbf28544",
       "name": "Pede ocupação ao cliente",
@@ -781,8 +542,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -3296,
-        2160
+        -4480,
+        2080
       ],
       "id": "a510c989-dc74-4d63-93ef-4b994e7107a9",
       "name": "Adiciona o passo: ocupacao_pendente",
@@ -873,8 +634,8 @@
       "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1.1,
       "position": [
-        -3520,
-        2000
+        -4704,
+        1936
       ],
       "id": "33cd76c5-93c9-42ea-b54d-83097c8f91cf",
       "name": "Insere ocupacao"
@@ -960,8 +721,8 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.4,
       "position": [
-        -3920,
-        1968
+        -5104,
+        1888
       ],
       "id": "2e2a002b-5b7f-4609-a004-149dfdd29c12",
       "name": "Verifica se tem ocupacao"
@@ -1024,8 +785,8 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.4,
       "position": [
-        -2720,
-        1936
+        -3600,
+        1904
       ],
       "id": "f99e108a-7e05-4884-8201-95cf403ffcc8",
       "name": "Verifica se tem uf_munic"
@@ -1053,8 +814,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -2288,
-        2256
+        -3168,
+        2240
       ],
       "id": "1df81e36-8a44-488d-b31a-cf48b7ae485d",
       "name": "Pede o uf_munic ao cliente",
@@ -1091,8 +852,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -2064,
-        2256
+        -2944,
+        2240
       ],
       "id": "a4d2072b-346b-47ca-be5a-80f9acdde656",
       "name": "Adiciona o passo: uf_munic_pendente",
@@ -1194,8 +955,8 @@
       "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1.1,
       "position": [
-        -2288,
-        2096
+        -3168,
+        1920
       ],
       "id": "9ce5f7ed-b75e-4016-b586-5118d6943141",
       "name": "Insere uf_munic"
@@ -1223,8 +984,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -3296,
-        2000
+        -4480,
+        1936
       ],
       "id": "cea6add7-82f5-45e6-97f1-3438c25fdeaa",
       "name": "Adiciona o controle do prox passo: uf_munic",
@@ -1261,8 +1022,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -2064,
-        2096
+        -2944,
+        1920
       ],
       "id": "ed514a7b-c609-4f62-abda-e83a14b7e719",
       "name": "Adiciona o controle do prox passo: estabelecimento",
@@ -1334,8 +1095,8 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.4,
       "position": [
-        -1424,
-        1920
+        -2240,
+        1904
       ],
       "id": "dc518173-0ffb-4baa-8283-2ac5a8d3301b",
       "name": "Verifica se tem estabelecimento"
@@ -1363,8 +1124,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -784,
-        1808
+        -1600,
+        1792
       ],
       "id": "f45057db-4fb8-45e5-81ab-cfd6d435a0c4",
       "name": "Adiciona o controle do prox passo: estabelecimento1",
@@ -1466,8 +1227,8 @@
       "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1.1,
       "position": [
-        -1008,
-        1808
+        -1824,
+        1792
       ],
       "id": "d146fe2f-b7a2-4726-b825-c4934198a59e",
       "name": "Insere estabelecimento"
@@ -1495,8 +1256,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -1008,
-        1968
+        -1824,
+        1952
       ],
       "id": "b1b22dc8-4137-4bcf-858f-258364be76d9",
       "name": "Pede o estabelecimento ao cliente",
@@ -1534,8 +1295,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -784,
-        1968
+        -1600,
+        1952
       ],
       "id": "a1ebc0ab-72e4-493f-aaea-d1e7642dc813",
       "name": "Adiciona o passo: estabelecimento_pendente",
@@ -1572,8 +1333,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -464,
-        1664
+        -1280,
+        1648
       ],
       "id": "d13775ae-7310-4254-89e2-4b35e3b99bc7",
       "name": "Adiciona o passo: triagem",
@@ -1602,7 +1363,7 @@
       "typeVersion": 4.3,
       "position": [
         -6560,
-        2000
+        1888
       ],
       "id": "66698a74-2a09-4bdb-8615-1e764a4addfa",
       "name": "Adiciona etiqueta: falta_dados",
@@ -1630,8 +1391,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -240,
-        1664
+        -1056,
+        1648
       ],
       "id": "54fbf826-9d1e-4308-8df5-da15a2a05310",
       "name": "Retira as etiquetas para dar continuidade a triagem",
@@ -1660,7 +1421,7 @@
       "typeVersion": 4.3,
       "position": [
         -6560,
-        2176
+        2064
       ],
       "id": "1c2fdf18-f056-4c60-b5f5-3bf47733794a",
       "name": "Retira as etiquetas para dar continuidade a triagem (1)",
@@ -1698,7 +1459,7 @@
       "typeVersion": 4.3,
       "position": [
         -6288,
-        2176
+        2064
       ],
       "id": "6188a900-5725-44d8-9b0d-f737e2d40b0e",
       "name": "Adiciona o passo: triagem (1)",
@@ -1735,8 +1496,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        240,
-        1664
+        -576,
+        1648
       ],
       "id": "9948f44f-ca3e-4655-973a-952b503df198",
       "name": "Menu de triagem básica",
@@ -1769,14 +1530,14 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"content\": \"Olá {{ $('init').item.json.body.conversation.messages[0].sender.name }}, obrigado por entrar em contato com a **WM Saúde**.\\n\\nDigite o número de uma das seguintes opções de acordo a sua necessidade:\\n\\n1 - 💻 Dúvidas ou suporte técnico\\n2 - 🧾 Informações sobre protocolos abertos em meu nome.\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}",
+        "jsonBody": "={\n  \"content\": \"Olá {{ $('init').item.json.body.conversation.messages[0].sender.name }}, obrigado por entrar em contato com a **WM Saúde**.\\n\\nDigite o número de uma das seguintes opções de acordo com a sua necessidade:\\n\\n1 - 💻 Dúvidas ou suporte técnico\\n2 - 🧾 Informações sobre protocolos abertos em meu nome.\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
         -6032,
-        2176
+        2064
       ],
       "id": "de0cb310-f57e-4d3d-b70c-e1f15f4d42ef",
       "name": "Menu de triagem básica (1)",
@@ -1893,7 +1654,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "{\n  \"content\": \"Não consegui entender a opção digitada, digite a opção novamente.\\n\\n1 - 💻 Dúvidas ou suporte técnico\\n2 - 🧾 Informações sobre protocolos abertos em seu nome.\\n3 - ❌ Finalizar atendimento.\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}\n",
+        "jsonBody": "{\n  \"content\": \"Não consegui entender a opção digitada, por favor, escolha uma das opções abaixo:\\n👉 Digite somente 1, 2 ou 3.\\n\\n1 - 💻 Dúvidas ou suporte técnico\\n2 - 🧾 Informações sobre protocolos abertos em seu nome.\\n3 - ❌ Finalizar atendimento.\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}\n",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -1966,7 +1727,7 @@
       "typeVersion": 1.1,
       "position": [
         -7056,
-        2016
+        1904
       ],
       "id": "f51cdfc0-e8b2-4321-af6e-765f273eda54",
       "name": "Pega dados pessoais do cliente",
@@ -2047,7 +1808,7 @@
       "typeVersion": 2.3,
       "position": [
         -6848,
-        2016
+        1904
       ],
       "id": "e317997e-95f2-47ae-9b1f-518b97acd3e7",
       "name": "Verifica se existe dados pessoais do cliente"
@@ -2449,7 +2210,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"custom_attributes\": {\n    \"step_triagem\": \"\"\n  }\n}",
+        "jsonBody": "={{ { custom_attributes: Object.assign({}, $('init').item.json.body.conversation.custom_attributes, { step_triagem: \"\" }) } }}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -2487,7 +2248,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"custom_attributes\": {\n    \"step_triagem\": \"\"\n  }\n}",
+        "jsonBody": "={{ { custom_attributes: Object.assign({}, $('init').item.json.body.conversation.custom_attributes, { step_triagem: \"\" }) } }}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -2648,7 +2409,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/assignments",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').first().json.body.account.id }}/conversations/{{ $('init').first().json.body.conversation.messages[0].conversation_id }}/assignments",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -2662,14 +2423,14 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"team_id\": 6\n}",
+        "jsonBody": "={\n  \"team_id\": {{ $('Resolve equipe do ticket antigo').first().json.team_id }}\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -5776,
-        4224
+        -5008,
+        4080
       ],
       "id": "c0c52a60-51fa-4400-8653-a74760da6439",
       "name": "Adiciona ao time Suporte N1 (1)",
@@ -2686,7 +2447,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').first().json.body.account.id }}/conversations/{{ $('init').first().json.body.conversation.messages[0].conversation_id }}/messages",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -2706,8 +2467,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -5488,
-        4224
+        -4208,
+        4096
       ],
       "id": "768c52f1-fd20-47c6-9369-8f69d841fc5b",
       "name": "Mensagem informando que o cliente foi encaminhado para o setor responsável",
@@ -2745,8 +2506,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -5184,
-        4224
+        -4048,
+        4096
       ],
       "id": "0fe74015-6a60-4aa4-a257-5307e943a238",
       "name": "Adiciona protocolo e chamado aos atributos da conversa e coloca o passo em_atendimento (1)",
@@ -2783,7 +2544,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -5776,
+        -5840,
         4384
       ],
       "id": "451fc99b-5595-4784-a8f9-66aabce50306",
@@ -2840,7 +2601,7 @@
       "typeVersion": 1,
       "position": [
         -5584,
-        1872
+        1760
       ],
       "id": "9aaae0f6-b615-48df-a50c-edee19f9b0eb",
       "name": "Cria regra de timeout",
@@ -2863,7 +2624,7 @@
       "typeVersion": 1,
       "position": [
         -5792,
-        2176
+        2064
       ],
       "id": "fae90c04-7c3f-4e2b-b9f0-530393d79542",
       "name": "Cria regra de timeout (1)",
@@ -2885,31 +2646,8 @@
       "type": "n8n-nodes-base.redis",
       "typeVersion": 1,
       "position": [
-        -4288,
-        2064
-      ],
-      "id": "786f7b06-e9c0-4e88-ad89-65ab9ca15988",
-      "name": "Cria regra de timeout (2)",
-      "credentials": {
-        "redis": {
-          "id": "MynVI7yhhqqlbCcd",
-          "name": "Autenticacao Redis para GLPI"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "operation": "set",
-        "key": "=wmsaude:{{ $('init').item.json.body.account.id }}:timeout:conv:{{ $('init').item.json.body.conversation.messages[0].conversation_id }}",
-        "value": "aguardando_resposta",
-        "expire": true,
-        "ttl": 300
-      },
-      "type": "n8n-nodes-base.redis",
-      "typeVersion": 1,
-      "position": [
-        -3040,
-        2160
+        -4224,
+        2080
       ],
       "id": "46bb8fe8-df37-47bc-b08c-23a20e030ffa",
       "name": "Cria regra de timeout (3)",
@@ -2931,8 +2669,8 @@
       "type": "n8n-nodes-base.redis",
       "typeVersion": 1,
       "position": [
-        -1840,
-        2256
+        -2720,
+        2240
       ],
       "id": "d370758b-5f58-4689-9dbb-de30e3b11e4c",
       "name": "Cria regra de timeout (4)",
@@ -2954,8 +2692,8 @@
       "type": "n8n-nodes-base.redis",
       "typeVersion": 1,
       "position": [
-        -544,
-        1968
+        -1360,
+        1952
       ],
       "id": "5b725c3e-2c8c-4612-96e3-0fc4c5a10147",
       "name": "Cria regra de timeout (5)",
@@ -2977,8 +2715,8 @@
       "type": "n8n-nodes-base.redis",
       "typeVersion": 1,
       "position": [
-        496,
-        1664
+        -320,
+        1648
       ],
       "id": "0c1ffc02-1521-4023-a652-8563100f56b4",
       "name": "Cria regra de timeout (6)",
@@ -3069,7 +2807,7 @@
       "type": "n8n-nodes-base.redis",
       "typeVersion": 1,
       "position": [
-        -5488,
+        -5632,
         4384
       ],
       "id": "20a67b04-d287-42fd-96a6-bbcbcf6aac8a",
@@ -3104,7 +2842,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -4192,
+        -3968,
         2560
       ],
       "id": "1658ff7b-b0b0-479a-a9b8-73d28769f4cb",
@@ -3176,7 +2914,7 @@
       "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1.1,
       "position": [
-        -3904,
+        -3680,
         2560
       ],
       "id": "d7588927-5ca1-4af0-8605-e7bd5ba5d1cf",
@@ -3205,7 +2943,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -4448,
+        -4224,
         2560
       ],
       "id": "94f3b688-1252-4f95-bd5b-99a19a721d86",
@@ -3243,7 +2981,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -4992,
+        -4768,
         2560
       ],
       "id": "2b027778-8a6c-413b-a5c3-fff80aa7813e",
@@ -3290,7 +3028,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// 1. Pega o valor correto da base de dados (agora a usar 'uf_municipio')\nconst valorOriginal = $json.uf_municipio || \"\";\n\n// 2. Dicionário de Cidades (ID 1 a 86)\nconst mapaCidades = {\n    // Estados (IDs 1 a 6)\n    \"bahia\": 1, \"piaui\": 2, \"ceara\": 3, \"minas gerais\": 4, \"maranhao\": 5, \"para\": 6,\n\n    // Cidades da Bahia\n    \"anage\": 7, \"angical\": 8, \"barra da estiva\": 9, \"barra do choca\": 10, \"brejolandia\": 11,\n    \"cacule\": 12, \"caetanos\": 13, \"canapolis\": 14, \"candiba\": 15, \"carinhanha\": 16,\n    \"cocos\": 17, \"dom basilio\": 18, \"erico cardoso\": 19, \"feira da mata\": 20, \"guanambi\": 21,\n    \"ibicui\": 22, \"ibipitanga\": 23, \"itabuna\": 24, \"itagiba\": 25, \"itagimirim\": 26,\n    \"itambe\": 27, \"itapebi\": 28, \"itororo\": 29, \"ituacu\": 30, \"iuiu\": 31, \"jaborandi\": 32,\n    \"jussiape\": 33, \"macaubas\": 34, \"malhada\": 35, \"morpara\": 36, \"nova canaa\": 37,\n    \"palmas de monte alto\": 38, \"palmeiras\": 39, \"paramirim\": 40, \"pindai\": 41, \"planalto\": 42,\n    \"riacho de santana\": 43, \"ribeirao do largo\": 44, \"rio de contas\": 45, \"rio do pires\": 46,\n    \"sao felix do coribe\": 47, \"sebastiao laranjeiras\": 48, \"serra dourada\": 49,\n    \"tabocas do brejo velho\": 50, \"tanhacu\": 51, \"tanque novo\": 52, \"tremedal\": 53,\n    \"una\": 54, \"urandi\": 55, \"vitoria da conquista\": 56,\n\n    // Cidades do Piauí\n    \"baixa grande do ribeiro\": 57, \"beneditinos\": 58, \"buriti dos montes\": 59, \"campo maior\": 60,\n    \"canto do buriti\": 61, \"castelo do piaui\": 62, \"colonia do gurgueia\": 63, \"curimata\": 64,\n    \"elesbao veloso\": 66, \"inhuma\": 67, \"isaias coelho\": 68, \"jaicos\": 69, \"juazeiro do piaui\": 70,\n    \"lagoa alegre\": 71, \"marcolandia\": 72, \"matias olimpio\": 73, \"piracuruca\": 74, \"piripiri\": 75,\n    \"santa filomena\": 76, \"sigefredo pacheco\": 77, \"valenca do piaui\": 78,\n\n    // Cidades do Ceará\n    \"brejo santo\": 79, \"itaicaba\": 80, \"senador de sa\": 82,\n\n    // Cidades de Minas Gerais\n    \"espinosa\": 83, \"pedra azul\": 84,\n\n    // Maranhão e Pará\n    \"colinas\": 85, \"ponta de pedras\": 86\n};\n\n// 3. Função para extrair apenas a cidade e normalizar o texto\nconst extrairENormalizar = (texto) => {\n    if (!texto) return \"\";\n    \n    // Passa para minúsculas e remove os acentos logo de cara\n    let textoLimpo = String(texto).toLowerCase().normalize(\"NFD\").replace(/[\\u0300-\\u036f]/g, \"\");\n\n    // Regex para encontrar siglas de estados no final da frase (com ou sem hífen ou espaços)\n    // O \\b garante que é uma palavra isolada (ex: ignora o \"ba\" no final de \"candiba\")\n    // Cobri todas as UFs para deixar a automação à prova de balas\n    textoLimpo = textoLimpo.replace(/\\s*-?\\s*\\b(ac|al|ap|am|ba|ce|df|es|go|ma|mt|ms|mg|pa|pb|pr|pe|pi|rj|rn|rs|ro|rr|sc|sp|se|to)\\b$/, \"\");\n    \n    // Remove os espaços extras que possam sobrar nas pontas\n    return textoLimpo.trim();\n};\n\nconst cidadeLimpa = extrairENormalizar(valorOriginal);\n\n// 4. Encontra o ID no mapa (se a cidade não existir na lista, retorna null)\nconst id_cidade_glpi = mapaCidades[cidadeLimpa] || null;\n\n// 5. Retorno para o nó seguinte\nreturn {\n    texto_original: valorOriginal,\n    cidade_processada: cidadeLimpa,\n    id_municipio_glpi: id_cidade_glpi\n};"
+        "jsCode": "// 1. Pega o valor correto da base de dados (agora a usar 'uf_municipio')\nconst valorOriginal = $json.uf_municipio || \"\";\n\n// 2. Dicionário de Cidades (ID 1 a 86)\nconst mapaCidades = {\n    // Estados (IDs 1 a 6)\n    \"bahia\": 1, \"piaui\": 2, \"ceara\": 3, \"minas gerais\": 4, \"maranhao\": 5, \"para\": 6,\n\n    // Cidades da Bahia\n    \"anage\": 7, \"angical\": 8, \"barra da estiva\": 9, \"barra do choca\": 10, \"brejolandia\": 11,\n    \"cacule\": 12, \"caetanos\": 13, \"canapolis\": 14, \"candiba\": 15, \"carinhanha\": 16,\n    \"cocos\": 17, \"dom basilio\": 18, \"erico cardoso\": 19, \"feira da mata\": 20, \"guanambi\": 21,\n    \"ibicui\": 22, \"ibipitanga\": 23, \"itabuna\": 24, \"itagiba\": 25, \"itagimirim\": 26,\n    \"itambe\": 27, \"itapebi\": 28, \"itororo\": 29, \"ituacu\": 30, \"iuiu\": 31, \"jaborandi\": 32,\n    \"jussiape\": 33, \"macaubas\": 34, \"malhada\": 35, \"morpara\": 36, \"nova canaa\": 37,\n    \"palmas de monte alto\": 38, \"palmeiras\": 39, \"paramirim\": 40, \"pindai\": 41, \"planalto\": 42,\n    \"riacho de santana\": 43, \"ribeirao do largo\": 44, \"rio de contas\": 45, \"rio do pires\": 46,\n    \"sao felix do coribe\": 47, \"sebastiao laranjeiras\": 48, \"serra dourada\": 49,\n    \"tabocas do brejo velho\": 50, \"tanhacu\": 51, \"tanque novo\": 52, \"tremedal\": 53,\n    \"una\": 54, \"urandi\": 55, \"vitoria da conquista\": 56,\n\n    // Cidades do Piauí\n    \"baixa grande do ribeiro\": 57, \"beneditinos\": 58, \"buriti dos montes\": 59, \"campo maior\": 60,\n    \"canto do buriti\": 61, \"castelo do piaui\": 62, \"colonia do gurgueia\": 63, \"curimata\": 64,\n    \"elesbao veloso\": 66, \"inhuma\": 67, \"isaias coelho\": 68, \"jaicos\": 69, \"juazeiro do piaui\": 70,\n    \"lagoa alegre\": 71, \"marcolandia\": 72, \"matias olimpio\": 73, \"piracuruca\": 74, \"piripiri\": 75,\n    \"santa filomena\": 76, \"sigefredo pacheco\": 77, \"valenca do piaui\": 78,\n\n    // Cidades do Ceará\n    \"brejo santo\": 79, \"itaicaba\": 80, \"senador de sa\": 82,\n\n    // Cidades de Minas Gerais\n    \"espinosa\": 83, \"pedra azul\": 84,\n\n    // Maranhão e Pará\n    \"colinas\": 85, \"ponta de pedras\": 86\n};\n\n// 3. Função para extrair apenas a cidade e normalizar o texto\nconst extrairENormalizar = (textoOriginal) => {\n    if (!textoOriginal) return \"\";\n\n    // Passa para minúsculas e remove os acentos logo de cara\n    let t = String(textoOriginal).toLowerCase().normalize(\"NFD\").replace(/[̀-ͯ]/g, \"\").trim();\n\n    // Lista de UFs (sigla ou nome completo) que o script sabe reconhecer\n    const UF = \"ac|al|ap|am|ba|ce|df|es|go|ma|mt|ms|mg|pa|pb|pr|pe|pi|rj|rn|rs|ro|rr|sc|sp|se|to|bahia|piaui|ceara|minas gerais|maranhao|para\";\n\n    // Remove sufixo \"Cidade - UF\" ou \"Cidade - Estado\" no final.\n    // Exige um separador de verdade (espaço, virgula ou hífen) antes da UF, pra nao apagar\n    // o nome do estado quando o cliente digita SO o estado (ex: \"Piauí\" sozinho continua \"piaui\").\n    const semSufixo = t.replace(new RegExp(\"[\\\\s,-]+\\\\b(\" + UF + \")\\\\b$\"), \"\").trim();\n    if (semSufixo !== t && semSufixo) return semSufixo;\n\n    // Remove prefixo \"UF - Cidade\" ou \"Estado - Cidade\" no inicio (ex: \"Piauí - Piripiri\").\n    // Exige separador real depois da UF, pra nao apagar o nome do estado sozinho tambem.\n    const semPrefixo = t.replace(new RegExp(\"^\\\\b(\" + UF + \")\\\\b[\\\\s,-]+\"), \"\").trim();\n    if (semPrefixo !== t && semPrefixo) return semPrefixo;\n\n    return t;\n};\n\nconst cidadeLimpa = extrairENormalizar(valorOriginal);\n\n// 4. Encontra o ID no mapa (se a cidade não existir na lista, retorna null)\nconst id_cidade_glpi = mapaCidades[cidadeLimpa] || null;\n\n// 5. Retorno para o nó seguinte\nreturn [{\n    json: {\n        texto_original: valorOriginal,\n        cidade_processada: cidadeLimpa,\n        id_municipio_glpi: id_cidade_glpi\n    },\n    pairedItem: { item: 0 }\n}];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -3300,77 +3038,6 @@
       ],
       "id": "3b2a196d-df41-4d38-b690-ca28012f95bb",
       "name": "Tratando o Município"
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict",
-            "version": 3
-          },
-          "conditions": [
-            {
-              "id": "4859de8c-d5a3-4405-94bd-6193e28ca3a6",
-              "leftValue": "={{ $('init').item.json.body.content }}",
-              "rightValue": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
-              "operator": {
-                "type": "string",
-                "operation": "regex"
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.3,
-      "position": [
-        -4736,
-        1728
-      ],
-      "id": "15144df4-930c-45ed-8333-e05bc1f73b44",
-      "name": "Verifica se email é valido"
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpHeaderAuth",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Content-Type",
-              "value": "application/json"
-            }
-          ]
-        },
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "{\n  \"content\": \"O e-mail digitado parece estar incorreto. Por favor, informe um e-mail pessoal ou corporativo válido para seguirmos com o atendimento.\\n\\nExemplo: usuario@email.com\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}\n",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.3,
-      "position": [
-        -4448,
-        1872
-      ],
-      "id": "5daef7e0-4a46-49e0-ba0e-06ac3090131b",
-      "name": "Informa que não conseguiu entender o email informado e pede que envie novamente da forma correta",
-      "retryOnFail": true,
-      "maxTries": 3,
-      "waitBetweenTries": 2000,
-      "credentials": {
-        "httpHeaderAuth": {
-          "id": "IV5ZFvAfaulH0LP9",
-          "name": "Token de Acesso Chatwoot (Playnee)"
-        }
-      }
     },
     {
       "parameters": {
@@ -3389,13 +3056,13 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"input\": {\n    \"items_id\": {{ $json.id }},\n    \"itemtype\": \"Ticket\",\n    \"plugin_fields_municpiorequerentefielddropdowns_id\": {{ $('Tratando o Município').item.json.id_municipio_glpi || 88 }},\n    \"unidadedoclientefield\": \"{{ ($('Pega dados pessoais do cliente (1)').item.json.estabelecimento || '').replace(/\\\\/g,'\\\\\\\\').replace(/\"/g,'\\\\\"').replace(/\\r?\\n/g,'\\\\n') }}\"\n  }\n}",
+        "jsonBody": "={\n  \"input\": {\n    \"items_id\": {{ $json.id }},\n    \"itemtype\": \"Ticket\",\n    \"plugin_fields_municpiorequerentefielddropdowns_id\": {{ $('Tratando o Município').item.json.id_municipio_glpi || 88 }},\n    \"plugin_fields_unidaderequerentefielddropdowns_id\": {{ $('Tratando a Unidade').item.json.id_unidade_glpi || 530 }},\n    \"plugin_fields_unidadedoclientefield\": {{ JSON.stringify($('Tratando a Unidade').item.json.texto_original || '') }}\n  }\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -4720,
+        -4496,
         2560
       ],
       "id": "87dcd806-3ac5-4f45-a89b-d4671a38c22c",
@@ -3428,7 +3095,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"custom_attributes\": {\n    \"step_triagem\": \"em_atendimento\"\n  }\n}",
+        "jsonBody": "={{ { custom_attributes: Object.assign({}, $('init').item.json.body.conversation.custom_attributes, { step_triagem: \"em_atendimento\" }) } }}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -3446,29 +3113,6 @@
         "httpHeaderAuth": {
           "id": "IV5ZFvAfaulH0LP9",
           "name": "Token de Acesso Chatwoot (Playnee)"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "operation": "set",
-        "key": "=wmsaude:{{ $('init').item.json.body.account.id }}:timeout:conv:{{ $('init').item.json.body.conversation.messages[0].conversation_id }}",
-        "value": "aguardando_resposta",
-        "expire": true,
-        "ttl": 300
-      },
-      "type": "n8n-nodes-base.redis",
-      "typeVersion": 1,
-      "position": [
-        -4176,
-        1872
-      ],
-      "id": "6c02203e-0026-4251-a0ec-08b8469283ec",
-      "name": "Cria regra de timeout (13)",
-      "credentials": {
-        "redis": {
-          "id": "MynVI7yhhqqlbCcd",
-          "name": "Autenticacao Redis para GLPI"
         }
       }
     },
@@ -3623,7 +3267,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"content\": \"Olá, {{ $('init').item.json.body.conversation.messages[0].sender.name }}!\\n\\nNeste momento, o setor está em horário de almoço. Nosso atendimento será retomado às **14h**. Assim que retornarmos, entraremos em contato para dar continuidade à sua solicitação. Agradecemos a compreensão!\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}",
+        "jsonBody": "={{ JSON.stringify({\n  content: `Olá, ${$('init').item.json.body.conversation.messages[0].sender.name}!\\n\\nNeste momento, o setor está em horário de almoço. Nosso atendimento será retomado às **13h**. Assim que retornarmos, entraremos em contato para dar continuidade à sua solicitação. Agradecemos a compreensão!`,\n  message_type: \"outgoing\",\n  private: false,\n  content_type: \"text\"\n}) }}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -3661,7 +3305,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"content\": \"Olá, {{ $('init').item.json.body.conversation.messages[0].sender.name }}! No momento, nossa equipe já encerrou o expediente por hoje. Nosso horário de atendimento é de **segunda a sexta-feira, das 08h às 12h e das 14h às 18h**.\\n\\nPara que possamos te dar total atenção, por gentileza, envie uma nova mensagem para nós assim que iniciarmos o próximo período de atendimento. Estaremos prontos para te ajudar! \\n\\nAgradecemos muito a sua compreensão e até breve!\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}",
+        "jsonBody": "={\n  \"content\": \"Olá, {{ $('init').item.json.body.conversation.messages[0].sender.name }}! No momento, nossa equipe está fora do horário de atendimento. Nosso horário é de **segunda a sexta-feira, das 08h às 12h e das 14h às 18h**.\\n\\nPara que possamos te dar total atenção, por gentileza, envie uma nova mensagem para nós assim que iniciarmos o próximo período de atendimento. Estaremos prontos para te ajudar! \\n\\nAgradecemos muito a sua compreensão e até breve!\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -3699,7 +3343,7 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"custom_attributes\": {\n    \"step_triagem\": \"\"\n  }\n}",
+        "jsonBody": "={{ { custom_attributes: Object.assign({}, $('init').item.json.body.conversation.custom_attributes, { step_triagem: \"\" }) } }}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
@@ -3751,7 +3395,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// 1. Pega o horário atual forçando o fuso horário de Brasília\nconst agora = $now.setZone('America/Sao_Paulo');\nconst diaSemana = agora.weekday; // 1 = Segunda, 5 = Sexta, 6/7 = Fim de Semana\nconst hora = agora.hour;\nconst minuto = agora.minute;\n\nlet status = \"fora\"; // Por padrão, começa como fora de expediente\n\n// 2. Valida se é dia de semana (Segunda a Sexta)\nif (diaSemana >= 1 && diaSemana <= 5) {\n    if (hora >= 8 && hora < 12) {\n        status = \"normal\";\n    } else if (hora >= 12 && hora < 14) {\n        status = \"almoco\";\n    } else if (hora >= 14 && hora < 18) {\n        status = \"normal\";\n    }\n}\n\n// 3. Retorna os dados mastigados para o fluxo e serve como diagnóstico\nreturn {\n    status_expediente: status,\n    hora_no_servidor: hora,\n    minuto_no_servidor: minuto,\n    horario_formatado: agora.toFormat('HH:mm:ss'),\n    dia_da_semana: diaSemana\n};"
+        "jsCode": "// 1. Pega o horário atual forçando o fuso horário de Brasília\nconst agora = $now.setZone('America/Sao_Paulo');\nconst diaSemana = agora.weekday; // 1 = Segunda, 5 = Sexta, 6/7 = Fim de Semana\nconst hora = agora.hour;\nconst minuto = agora.minute;\n\nlet status = \"fora\"; // Por padrão, começa como fora de expediente\n\n// 2. Valida se é dia de semana (Segunda a Sexta)\nif (diaSemana >= 1 && diaSemana <= 5) {\n    if (hora >= 8 && hora < 12) {\n        status = \"normal\";\n    } else if (hora >= 12 && hora < 13) {\n        status = \"almoco\";\n    } else if (hora >= 13 && hora < 18) {\n        status = \"normal\";\n    }\n}\n\n// 3. Retorna os dados mastigados para o fluxo e serve como diagnóstico\nreturn {\n    status_expediente: status,\n    hora_no_servidor: hora,\n    minuto_no_servidor: minuto,\n    horario_formatado: agora.toFormat('HH:mm:ss'),\n    dia_da_semana: diaSemana\n};"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -3821,7 +3465,7 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.4,
       "position": [
-        -9728,
+        -10832,
         3200
       ],
       "id": "37b6d251-a37f-44b1-933d-e4f0505934c9",
@@ -3846,16 +3490,6 @@
                 "operation": "contains",
                 "rightType": "any"
               }
-            },
-            {
-              "id": "b7f1a001-idem-guard-0001",
-              "leftValue": "={{ ($('init').item.json.body.conversation?.custom_attributes?.protocolo || $('init').item.json.body.custom_attributes?.protocolo || '') }}",
-              "rightValue": "",
-              "operator": {
-                "type": "string",
-                "operation": "empty",
-                "singleValue": true
-              }
             }
           ],
           "combinator": "and"
@@ -3867,8 +3501,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        -9440,
-        2784
+        -10368,
+        2848
       ],
       "id": "ad80a7c6-0744-40e1-8b1c-19a89f97a266",
       "name": "Verifica se é para criar chamado automaticamente"
@@ -3890,14 +3524,14 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"input\": {\n    \"name\": \"Chamado via Chatwoot: {{ ($('init').item.json.body.conversation?.messages?.[0]?.sender?.name || $('init').item.json.body.meta?.sender?.name).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;') }}\",\n    \"content\": \"<table><tr><td><b>Solicitante:</b></td><td>{{ ($('init').item.json.body.conversation?.messages?.[0]?.sender?.name || $('init').item.json.body.meta?.sender?.name).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;') }}</td></tr><tr><td><b>E-mail:</b></td><td>{{ (($('init').item.json.body.conversation?.messages?.[0]?.sender?.email || $('init').item.json.body.meta?.sender?.email) || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;') || \"Não informado\" }}</td></tr><tr><td><b>Telefone:</b></td><td> {{ (($('init').item.json.body.conversation?.messages?.[0]?.sender?.phone_number || $('init').item.json.body.meta?.sender?.phone_number) || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;') }}</td></tr><tr><td><b>Link da conversa:</b></td><td><a href='https://conversas.upflowz.com/app/accounts/{{ ($('init').item.json.body.account?.id || 314) }}/conversations/{{ ($('init').item.json.body.conversation?.id || $('init').item.json.body.id) }}' target='_blank'>Acessar no Chatwoot</a></td></tr></table>\",\n    \"_groups_id_assign\": [ 6 ],\n    \"_municpiorequerentefield\": [ {{ $json.id_municipio_glpi || 87 }} ],\n    \"externalid\": \"{{ ($('init').item.json.body.conversation?.id || $('init').item.json.body.id) }}\"\n  }\n}",
+        "jsonBody": "={\n  \"input\": {\n    \"name\": \"Chamado via Chatwoot: {{ ($('init').item.json.body.conversation?.messages?.[0]?.sender?.name || $('init').item.json.body.meta?.sender?.name).replace(/[\\r\\n\\t]+/g,' ').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;').replace(/\\\\/g,'\\\\\\\\') }}\",\n    \"content\": \"<table><tr><td><b>Solicitante:</b></td><td>{{ ($('init').item.json.body.conversation?.messages?.[0]?.sender?.name || $('init').item.json.body.meta?.sender?.name).replace(/[\\r\\n\\t]+/g,' ').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;').replace(/\\\\/g,'\\\\\\\\') }}</td></tr><tr><td><b>E-mail:</b></td><td>{{ (($('init').item.json.body.conversation?.messages?.[0]?.sender?.email || $('init').item.json.body.meta?.sender?.email) || '').replace(/[\\r\\n\\t]+/g,' ').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;').replace(/\\\\/g,'\\\\\\\\') || \"Não informado\" }}</td></tr><tr><td><b>Telefone:</b></td><td> {{ (($('init').item.json.body.conversation?.messages?.[0]?.sender?.phone_number || $('init').item.json.body.meta?.sender?.phone_number) || '').replace(/[\\r\\n\\t]+/g,' ').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\"/g,'&quot;').replace(/\\\\/g,'\\\\\\\\') }}</td></tr><tr><td><b>Link da conversa:</b></td><td><a href='https://conversas.upflowz.com/app/accounts/{{ ($('init').item.json.body.account?.id || 314) }}/conversations/{{ ($('init').item.json.body.conversation?.id || $('init').item.json.body.id) }}' target='_blank'>Acessar no Chatwoot</a></td></tr></table>\",\n    \"_groups_id_assign\": [ 6 ],\n    \"_municpiorequerentefield\": [ {{ $('Tratando o Município (1)').item.json.id_municipio_glpi || 87 }} ],\n    \"externalid\": \"{{ ($('init').item.json.body.conversation?.id || $('init').item.json.body.id) }}\"\n  }\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -8720,
-        2560
+        -7360,
+        1024
       ],
       "id": "db078067-6a24-41c0-84a4-67c5da497570",
       "name": "Cria ticket no GLPI com descrição do cliente (1)",
@@ -3929,14 +3563,14 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"input\": {\n    \"items_id\": {{ $json.id }},\n    \"itemtype\": \"Ticket\",\n    \"plugin_fields_municpiorequerentefielddropdowns_id\": {{ $('Pega dados pessoais do cliente (2)').item.json.id_municipio_glpi || 88 }},\n    \"unidadedoclientefield\": \"{{ ($('Pega dados pessoais do cliente (2)').item.json.estabelecimento || '').replace(/\\\\/g,'\\\\\\\\').replace(/\"/g,'\\\\\"').replace(/\\r?\\n/g,'\\\\n') }}\"\n  }\n}",
+        "jsonBody": "={\n  \"input\": {\n    \"items_id\": {{ $json.id }},\n    \"itemtype\": \"Ticket\",\n    \"plugin_fields_municpiorequerentefielddropdowns_id\": {{ $('Pega dados pessoais do cliente (2)').item.json.id_municipio_glpi || 88 }},\n    \"plugin_fields_unidaderequerentefielddropdowns_id\": {{ $('Tratando a Unidade (1)').item.json.id_unidade_glpi || 530 }},\n    \"plugin_fields_unidadedoclientefield\": {{ JSON.stringify($('Tratando a Unidade (1)').item.json.texto_original || '') }}\n  }\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -8464,
-        2560
+        -7056,
+        1024
       ],
       "id": "88eafdca-47a2-4a77-b845-10a853e14796",
       "name": "Informa o campo de município requerente e sua base (2)",
@@ -3973,8 +3607,8 @@
       "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1.1,
       "position": [
-        -8464,
-        2768
+        -8256,
+        1024
       ],
       "id": "751c66ab-57b3-46c4-9cc4-21d056b87e6a",
       "name": "Pega dados pessoais do cliente (2)",
@@ -3982,13 +3616,13 @@
     },
     {
       "parameters": {
-        "jsCode": "// 1. Pega o valor correto da base de dados (agora a usar 'uf_municipio')\nconst valorOriginal = $json.uf_municipio || \"\";\n\n// 2. Dicionário de Cidades (ID 1 a 86)\nconst mapaCidades = {\n    // Estados (IDs 1 a 6)\n    \"bahia\": 1, \"piaui\": 2, \"ceara\": 3, \"minas gerais\": 4, \"maranhao\": 5, \"para\": 6,\n\n    // Cidades da Bahia\n    \"anage\": 7, \"angical\": 8, \"barra da estiva\": 9, \"barra do choca\": 10, \"brejolandia\": 11,\n    \"cacule\": 12, \"caetanos\": 13, \"canapolis\": 14, \"candiba\": 15, \"carinhanha\": 16,\n    \"cocos\": 17, \"dom basilio\": 18, \"erico cardoso\": 19, \"feira da mata\": 20, \"guanambi\": 21,\n    \"ibicui\": 22, \"ibipitanga\": 23, \"itabuna\": 24, \"itagiba\": 25, \"itagimirim\": 26,\n    \"itambe\": 27, \"itapebi\": 28, \"itororo\": 29, \"ituacu\": 30, \"iuiu\": 31, \"jaborandi\": 32,\n    \"jussiape\": 33, \"macaubas\": 34, \"malhada\": 35, \"morpara\": 36, \"nova canaa\": 37,\n    \"palmas de monte alto\": 38, \"palmeiras\": 39, \"paramirim\": 40, \"pindai\": 41, \"planalto\": 42,\n    \"riacho de santana\": 43, \"ribeirao do largo\": 44, \"rio de contas\": 45, \"rio do pires\": 46,\n    \"sao felix do coribe\": 47, \"sebastiao laranjeiras\": 48, \"serra dourada\": 49,\n    \"tabocas do brejo velho\": 50, \"tanhacu\": 51, \"tanque novo\": 52, \"tremedal\": 53,\n    \"una\": 54, \"urandi\": 55, \"vitoria da conquista\": 56,\n\n    // Cidades do Piauí\n    \"baixa grande do ribeiro\": 57, \"beneditinos\": 58, \"buriti dos montes\": 59, \"campo maior\": 60,\n    \"canto do buriti\": 61, \"castelo do piaui\": 62, \"colonia do gurgueia\": 63, \"curimata\": 64,\n    \"elesbao veloso\": 66, \"inhuma\": 67, \"isaias coelho\": 68, \"jaicos\": 69, \"juazeiro do piaui\": 70,\n    \"lagoa alegre\": 71, \"marcolandia\": 72, \"matias olimpio\": 73, \"piracuruca\": 74, \"piripiri\": 75,\n    \"santa filomena\": 76, \"sigefredo pacheco\": 77, \"valenca do piaui\": 78,\n\n    // Cidades do Ceará\n    \"brejo santo\": 79, \"itaicaba\": 80, \"senador de sa\": 82,\n\n    // Cidades de Minas Gerais\n    \"espinosa\": 83, \"pedra azul\": 84,\n\n    // Maranhão e Pará\n    \"colinas\": 85, \"ponta de pedras\": 86\n};\n\n// 3. Função para extrair apenas a cidade e normalizar o texto\nconst extrairENormalizar = (texto) => {\n    if (!texto) return \"\";\n    \n    // Passa para minúsculas e remove os acentos logo de cara\n    let textoLimpo = String(texto).toLowerCase().normalize(\"NFD\").replace(/[\\u0300-\\u036f]/g, \"\");\n\n    // Regex para encontrar siglas de estados no final da frase (com ou sem hífen ou espaços)\n    // O \\b garante que é uma palavra isolada (ex: ignora o \"ba\" no final de \"candiba\")\n    // Cobri todas as UFs para deixar a automação à prova de balas\n    textoLimpo = textoLimpo.replace(/\\s*-?\\s*\\b(ac|al|ap|am|ba|ce|df|es|go|ma|mt|ms|mg|pa|pb|pr|pe|pi|rj|rn|rs|ro|rr|sc|sp|se|to)\\b$/, \"\");\n    \n    // Remove os espaços extras que possam sobrar nas pontas\n    return textoLimpo.trim();\n};\n\nconst cidadeLimpa = extrairENormalizar(valorOriginal);\n\n// 4. Encontra o ID no mapa (se a cidade não existir na lista, retorna null)\nconst id_cidade_glpi = mapaCidades[cidadeLimpa] || null;\n\n// 5. Retorno para o nó seguinte\nreturn {\n    texto_original: valorOriginal,\n    cidade_processada: cidadeLimpa,\n    id_municipio_glpi: id_cidade_glpi\n};"
+        "jsCode": "// 1. Pega o valor correto da base de dados (agora a usar 'uf_municipio')\nconst valorOriginal = $json.uf_municipio || \"\";\n\n// 2. Dicionário de Cidades (ID 1 a 86)\nconst mapaCidades = {\n    // Estados (IDs 1 a 6)\n    \"bahia\": 1, \"piaui\": 2, \"ceara\": 3, \"minas gerais\": 4, \"maranhao\": 5, \"para\": 6,\n\n    // Cidades da Bahia\n    \"anage\": 7, \"angical\": 8, \"barra da estiva\": 9, \"barra do choca\": 10, \"brejolandia\": 11,\n    \"cacule\": 12, \"caetanos\": 13, \"canapolis\": 14, \"candiba\": 15, \"carinhanha\": 16,\n    \"cocos\": 17, \"dom basilio\": 18, \"erico cardoso\": 19, \"feira da mata\": 20, \"guanambi\": 21,\n    \"ibicui\": 22, \"ibipitanga\": 23, \"itabuna\": 24, \"itagiba\": 25, \"itagimirim\": 26,\n    \"itambe\": 27, \"itapebi\": 28, \"itororo\": 29, \"ituacu\": 30, \"iuiu\": 31, \"jaborandi\": 32,\n    \"jussiape\": 33, \"macaubas\": 34, \"malhada\": 35, \"morpara\": 36, \"nova canaa\": 37,\n    \"palmas de monte alto\": 38, \"palmeiras\": 39, \"paramirim\": 40, \"pindai\": 41, \"planalto\": 42,\n    \"riacho de santana\": 43, \"ribeirao do largo\": 44, \"rio de contas\": 45, \"rio do pires\": 46,\n    \"sao felix do coribe\": 47, \"sebastiao laranjeiras\": 48, \"serra dourada\": 49,\n    \"tabocas do brejo velho\": 50, \"tanhacu\": 51, \"tanque novo\": 52, \"tremedal\": 53,\n    \"una\": 54, \"urandi\": 55, \"vitoria da conquista\": 56,\n\n    // Cidades do Piauí\n    \"baixa grande do ribeiro\": 57, \"beneditinos\": 58, \"buriti dos montes\": 59, \"campo maior\": 60,\n    \"canto do buriti\": 61, \"castelo do piaui\": 62, \"colonia do gurgueia\": 63, \"curimata\": 64,\n    \"elesbao veloso\": 66, \"inhuma\": 67, \"isaias coelho\": 68, \"jaicos\": 69, \"juazeiro do piaui\": 70,\n    \"lagoa alegre\": 71, \"marcolandia\": 72, \"matias olimpio\": 73, \"piracuruca\": 74, \"piripiri\": 75,\n    \"santa filomena\": 76, \"sigefredo pacheco\": 77, \"valenca do piaui\": 78,\n\n    // Cidades do Ceará\n    \"brejo santo\": 79, \"itaicaba\": 80, \"senador de sa\": 82,\n\n    // Cidades de Minas Gerais\n    \"espinosa\": 83, \"pedra azul\": 84,\n\n    // Maranhão e Pará\n    \"colinas\": 85, \"ponta de pedras\": 86\n};\n\n// 3. Função para extrair apenas a cidade e normalizar o texto\nconst extrairENormalizar = (textoOriginal) => {\n    if (!textoOriginal) return \"\";\n\n    // Passa para minúsculas e remove os acentos logo de cara\n    let t = String(textoOriginal).toLowerCase().normalize(\"NFD\").replace(/[̀-ͯ]/g, \"\").trim();\n\n    // Lista de UFs (sigla ou nome completo) que o script sabe reconhecer\n    const UF = \"ac|al|ap|am|ba|ce|df|es|go|ma|mt|ms|mg|pa|pb|pr|pe|pi|rj|rn|rs|ro|rr|sc|sp|se|to|bahia|piaui|ceara|minas gerais|maranhao|para\";\n\n    // Remove sufixo \"Cidade - UF\" ou \"Cidade - Estado\" no final.\n    // Exige um separador de verdade (espaço, virgula ou hífen) antes da UF, pra nao apagar\n    // o nome do estado quando o cliente digita SO o estado (ex: \"Piauí\" sozinho continua \"piaui\").\n    const semSufixo = t.replace(new RegExp(\"[\\\\s,-]+\\\\b(\" + UF + \")\\\\b$\"), \"\").trim();\n    if (semSufixo !== t && semSufixo) return semSufixo;\n\n    // Remove prefixo \"UF - Cidade\" ou \"Estado - Cidade\" no inicio (ex: \"Piauí - Piripiri\").\n    // Exige separador real depois da UF, pra nao apagar o nome do estado sozinho tambem.\n    const semPrefixo = t.replace(new RegExp(\"^\\\\b(\" + UF + \")\\\\b[\\\\s,-]+\"), \"\").trim();\n    if (semPrefixo !== t && semPrefixo) return semPrefixo;\n\n    return t;\n};\n\nconst cidadeLimpa = extrairENormalizar(valorOriginal);\n\n// 4. Encontra o ID no mapa (se a cidade não existir na lista, retorna null)\nconst id_cidade_glpi = mapaCidades[cidadeLimpa] || null;\n\n// 5. Retorno para o nó seguinte\nreturn [{\n    json: {\n        texto_original: valorOriginal,\n        cidade_processada: cidadeLimpa,\n        id_municipio_glpi: id_cidade_glpi\n    },\n    pairedItem: { item: 0 }\n}];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -8976,
-        2560
+        -7968,
+        1024
       ],
       "id": "915b59ac-4b27-46d4-84eb-1ead2eabee33",
       "name": "Tratando o Município (1)"
@@ -4016,8 +3650,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -8976,
-        2080
+        -6784,
+        1024
       ],
       "id": "9fbe8594-979c-48e9-9e8a-04a6bdf23d81",
       "name": "Mensagem informando o protocolo para o cliente (1)",
@@ -4054,8 +3688,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -8720,
-        2080
+        -6528,
+        1024
       ],
       "id": "f90db8e2-3679-4d8d-8cef-2d05c342a189",
       "name": "Adiciona protocolo e chamado aos atributos da conversa e coloca o passo em_atendimento (1)1",
@@ -4126,8 +3760,8 @@
       "type": "n8n-nodes-base.dataTable",
       "typeVersion": 1.1,
       "position": [
-        -8464,
-        1696
+        -6272,
+        640
       ],
       "id": "3eeaac8c-80ce-4512-a65d-0e0695221723",
       "name": "Insere ticket na base de dados (1)"
@@ -4146,8 +3780,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -8720,
-        2768
+        -8736,
+        1024
       ],
       "id": "7503c8c3-2b9b-4f2c-a18a-7734d8622a0e",
       "name": "Retira as etiquetas para dar continuidade ao atendimento (1)",
@@ -4178,14 +3812,14 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"custom_attributes\": {\n    \"step_triagem\": \"em_atendimento\"\n  }\n}",
+        "jsonBody": "={{ { custom_attributes: Object.assign({}, ($('init').item.json.body.conversation?.custom_attributes || {}), { step_triagem: \"em_atendimento\" }) } }}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -9200,
-        2768
+        -8512,
+        1024
       ],
       "id": "9f1ccebc-f8f6-46b4-be01-1d2f5694ea29",
       "name": "Adiciona passo em_atendimento para forçar atendimento humano a conversa (1)",
@@ -4222,8 +3856,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -8464,
-        1888
+        -6272,
+        832
       ],
       "id": "8727280e-96c0-4dff-854d-88cf6ab0b32e",
       "name": "Nota privada: protocolo criado automaticamente",
@@ -4259,8 +3893,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -3296,
-        1840
+        -4480,
+        1792
       ],
       "credentials": {
         "httpHeaderAuth": {
@@ -4294,8 +3928,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -2288,
-        1968
+        -2944,
+        2080
       ],
       "credentials": {
         "httpHeaderAuth": {
@@ -4329,8 +3963,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -1008,
-        1680
+        -1824,
+        1664
       ],
       "credentials": {
         "httpHeaderAuth": {
@@ -4364,8 +3998,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -4192,
-        2400
+        -3408,
+        2560
       ],
       "credentials": {
         "httpHeaderAuth": {
@@ -4399,8 +4033,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -4944,
-        4224
+        -3808,
+        4096
       ],
       "credentials": {
         "httpHeaderAuth": {
@@ -4434,8 +4068,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        -8464,
-        2272
+        -6272,
+        1216
       ],
       "credentials": {
         "httpHeaderAuth": {
@@ -4446,111 +4080,15 @@
     },
     {
       "parameters": {
-        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/contacts/search?q={{ encodeURIComponent($('init').item.json.body.content) }}",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpHeaderAuth",
-        "options": {}
-      },
-      "id": "2adb2e2c-f61e-4409-95a5-6024efd4b8e4",
-      "name": "Busca contato por email no Chatwoot",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.3,
-      "position": [
-        -4448,
-        1712
-      ],
-      "retryOnFail": true,
-      "maxTries": 3,
-      "waitBetweenTries": 2000,
-      "credentials": {
-        "httpHeaderAuth": {
-          "id": "IV5ZFvAfaulH0LP9",
-          "name": "Token de Acesso Chatwoot (Playnee)"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "options": {
-            "version": 3,
-            "leftValue": "",
-            "caseSensitive": true,
-            "typeValidation": "strict"
-          },
-          "conditions": [
-            {
-              "id": "a1e1a111-1111-4111-8111-111111111111",
-              "leftValue": "={{ ($json.payload || []).filter(c => Number(c.id) !== Number($('init').item.json.body.conversation.contact_inbox.contact_id)).length }}",
-              "rightValue": 0,
-              "operator": {
-                "type": "number",
-                "operation": "gt"
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
-      },
-      "id": "5c219250-9232-45d9-8ba1-294a057abc48",
-      "name": "Verifica se email já pertence a outro contato",
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.3,
-      "position": [
-        -4128,
-        1472
-      ]
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').item.json.body.account.id }}/conversations/{{ $('init').item.json.body.conversation.messages[0].conversation_id }}/messages",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpHeaderAuth",
-        "sendHeaders": true,
-        "headerParameters": {
-          "parameters": [
-            {
-              "name": "Content-Type",
-              "value": "application/json"
-            }
-          ]
-        },
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "{\n  \"content\": \"Esse e-mail já está cadastrado para outro contato. Por favor, informe um e-mail diferente para continuarmos o atendimento.\\n\\nExemplo: usuario@email.com\",\n  \"message_type\": \"outgoing\",\n  \"private\": false,\n  \"content_type\": \"text\"\n}\n",
-        "options": {}
-      },
-      "id": "837b678f-f676-427b-8aa3-3c20a6b98ea6",
-      "name": "Informa que email já está em uso",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.3,
-      "position": [
-        -3808,
-        1328
-      ],
-      "retryOnFail": true,
-      "maxTries": 3,
-      "waitBetweenTries": 2000,
-      "credentials": {
-        "httpHeaderAuth": {
-          "id": "IV5ZFvAfaulH0LP9",
-          "name": "Token de Acesso Chatwoot (Playnee)"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "jsCode": "const initBody = $('init').item.json.body;\nconst ticketId = $('Cria ticket no GLPI com descrição do cliente (1)').item.json.id;\n\nreturn [{\n  json: {\n    body: {\n      ...initBody,\n      custom_attributes: {\n        ...(initBody.custom_attributes || {}),\n        protocolo: String(ticketId)\n      }\n    }\n  }\n}];"
+        "jsCode": "const initBody = $('init').item.json.body;\nconst ticketId = $('Cria ticket no GLPI com descrição do cliente (1)').item.json.id;\n\nreturn [{\n  json: {\n    body: {\n      ...initBody,\n      meta: {\n        ...(initBody.meta || {}),\n        team: (initBody.meta && initBody.meta.team && initBody.meta.team.name) ? initBody.meta.team : { id: 1097, name: \"service desk\" }\n      },\n      custom_attributes: {\n        ...(initBody.custom_attributes || {}),\n        protocolo: String(ticketId),\n        link_chamado: `https://glpi.wmsaude.com.br/front/ticket.form.php?id=${ticketId}`\n      }\n    }\n  }\n}];"
       },
       "id": "02f15f5b-de0d-4ff3-a4dc-47a0d0a89e9c",
       "name": "Monta payload associação",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -8464,
-        2080
+        -6272,
+        1024
       ]
     },
     {
@@ -4563,8 +4101,8 @@
       "type": "n8n-nodes-base.executeWorkflow",
       "typeVersion": 1,
       "position": [
-        -8208,
-        2080
+        -6016,
+        1024
       ]
     },
     {
@@ -4603,8 +4141,8 @@
       "type": "n8n-nodes-base.redis",
       "typeVersion": 1,
       "position": [
-        -8192,
-        2768
+        -8256,
+        1200
       ],
       "credentials": {
         "redis": {
@@ -4626,8 +4164,8 @@
       "type": "n8n-nodes-base.redis",
       "typeVersion": 1,
       "position": [
-        -3968,
-        2320
+        -3680,
+        2368
       ],
       "credentials": {
         "redis": {
@@ -4649,8 +4187,8 @@
       "type": "n8n-nodes-base.redis",
       "typeVersion": 1,
       "position": [
-        -4944,
-        4064
+        -3808,
+        3936
       ],
       "credentials": {
         "redis": {
@@ -4672,8 +4210,8 @@
       "type": "n8n-nodes-base.redis",
       "typeVersion": 1,
       "position": [
-        -8208,
-        1968
+        -5744,
+        1024
       ],
       "credentials": {
         "redis": {
@@ -4694,8 +4232,8 @@
       "type": "n8n-nodes-base.redis",
       "typeVersion": 1,
       "position": [
-        -9200,
-        3408
+        -10384,
+        3248
       ],
       "credentials": {
         "redis": {
@@ -4703,6 +4241,298 @@
           "name": "Autenticacao Redis para GLPI"
         }
       }
+    },
+    {
+      "parameters": {
+        "url": "=https://glpi.wmsaude.com.br/api.php/v1/Ticket/{{ $('Buscar dados do cliente no GLPI').item.json.id }}/Group_Ticket",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "App-Token",
+              "value": "JNEF4dhTLaty1BHSqxdEYHV2jhu1god37IHFHqOL"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -5808,
+        4080
+      ],
+      "id": "017ebb8a-f895-4515-9226-cecbd2866b16",
+      "name": "Busca grupo assign do ticket GLPI",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "aLAgkGobWooRkbRp",
+          "name": "Token de Sessao GLPI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://glpi.wmsaude.com.br/api.php/v1/Group",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "App-Token",
+              "value": "JNEF4dhTLaty1BHSqxdEYHV2jhu1god37IHFHqOL"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -5568,
+        4080
+      ],
+      "id": "573b50cd-49bd-464b-ab25-c0e3055374e0",
+      "name": "Busca grupos GLPI (lista)",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "aLAgkGobWooRkbRp",
+          "name": "Token de Sessao GLPI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{ $('init').item.json.body.account.id }}/teams",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -5392,
+        4080
+      ],
+      "id": "2ffcee2e-a17e-47ea-9c8e-d8c8b1d41c47",
+      "name": "Busca teams Chatwoot",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Traduz o grupo GLPI do ticket antigo pra team_id Chatwoot, casando por nome\nconst gruposAssign = $('Busca grupo assign do ticket GLPI').all().filter(i => i.json.type === 2);\nconst gruposGlpi = $('Busca grupos GLPI (lista)').all();\nconst teamsChatwoot = $('Busca teams Chatwoot').all();\n\nconst normalizar = (t) => (t || '').trim().toLowerCase().normalize(\"NFD\").replace(/[̀-ͯ]/g, \"\");\n\nconst FALLBACK_TEAM_ID = 1097; // service desk\n\nlet resultado;\n\nif (gruposAssign.length === 0) {\n    resultado = { team_id: FALLBACK_TEAM_ID, sem_match: true };\n} else {\n    const groupId = gruposAssign[0].json.groups_id;\n    const grupo = gruposGlpi.find(g => g.json.id === groupId);\n    if (!grupo) {\n        resultado = { team_id: FALLBACK_TEAM_ID, sem_match: true };\n    } else {\n        const nomeGrupoNormalizado = normalizar(grupo.json.name);\n        const team = teamsChatwoot.find(t => normalizar(t.json.name) === nomeGrupoNormalizado);\n        resultado = team\n            ? { team_id: team.json.id, sem_match: false }\n            : { team_id: FALLBACK_TEAM_ID, sem_match: true };\n    }\n}\n\nreturn [{ json: resultado, pairedItem: { item: 0 } }];\n"
+      },
+      "id": "19eeefc4-4611-4a6c-b5a4-e31be42ac04c",
+      "name": "Resolve equipe do ticket antigo",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -5200,
+        4080
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "23ce315f-0571-4265-b6fe-c4ffc6ff31ef",
+              "leftValue": "={{ $('Resolve equipe do ticket antigo').first().json.sem_match }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "464fd781-100a-44d0-91ec-06b21abcf20f",
+      "name": "Verifica se encontrou equipe anterior",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -4848,
+        4080
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://conversas.upflowz.com/api/v1/accounts/{{$('init').first().json.body.account.id }}/conversations/{{ $('init').first().json.body.conversation.messages[0].conversation_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"content\": \"Não consegui identificar a equipe anterior desse chamado, por favor identifique e associe\",\n  \"message_type\": \"outgoing\",\n  \"private\": true,\n  \"content_type\": \"text\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -4512,
+        4064
+      ],
+      "id": "c38ae110-7a38-45fb-98c6-241147950821",
+      "name": "Nota privada: equipe anterior não identificada",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "IV5ZFvAfaulH0LP9",
+          "name": "Token de Acesso Chatwoot (Playnee)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "propertyName": "lock_abrir_chamado",
+        "key": "=wmsaude:{{ $('init').item.json.body.account.id }}:lock_abrir_chamado:conv:{{ $('init').item.json.body.conversation.messages[0].conversation_id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -9680,
+        1008
+      ],
+      "id": "928d48da-98a1-4d23-b831-c6d788f61dcf",
+      "name": "Verifica lock de abertura recente",
+      "credentials": {
+        "redis": {
+          "id": "MynVI7yhhqqlbCcd",
+          "name": "Autenticacao Redis para GLPI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "934ae30a-ff67-43fe-84d3-91a3c92ca4e5",
+              "leftValue": "={{ $json.lock_abrir_chamado }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -9376,
+        1008
+      ],
+      "id": "044931f2-75fc-4dd8-b2d4-58963a6001e1",
+      "name": "Já tem abertura em andamento?"
+    },
+    {
+      "parameters": {
+        "operation": "set",
+        "key": "=wmsaude:{{ $('init').item.json.body.account.id }}:lock_abrir_chamado:conv:{{ $('init').item.json.body.conversation.messages[0].conversation_id }}",
+        "value": "1",
+        "expire": true,
+        "ttl": 8
+      },
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        -9040,
+        1024
+      ],
+      "id": "4ec06278-51eb-47db-8800-c83f5f415063",
+      "name": "Cria lock de abertura de chamado",
+      "credentials": {
+        "redis": {
+          "id": "MynVI7yhhqqlbCcd",
+          "name": "Autenticacao Redis para GLPI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Pega o valor digitado pelo cliente (campo \"estabelecimento\")\nconst valorOriginal = $('Pega dados pessoais do cliente (1)').item.json.estabelecimento || \"\";\n\n// 2. Dicionario de Unidades (nome normalizado -> ID GLPI)\nconst mapaUnidades = {\n    \"usf jose muniz dias\": 58, \"usf raulino bispo de oliveira\": 59, \"usf geneci ferreira dos santos\": 60, \"usf pe do morro\": 61, \"usf jose teixeira dos santos\": 62, \"usf francisco xavier pires\": 63, \"usf jeronimo jose da silva\": 64, \"usf monte alto\": 65, \"usf morada feliz\": 67, \"unidade de saude da familia de missao do aricobe\": 68, \"unidade de saude da familia do novo angical\": 69, \"unidadede basica de saude elpidio pereira\": 70, \"usf jose cordeiro vasco\": 71, \"nucleo multiprofissional de saude hermes passos filho\": 72, \"psf sao francisco ii\": 73, \"psf araujao ii\": 74, \"psf luzia leite\": 75, \"psf do sao francisco iii\": 76, \"psf do alto da bela vista\": 77, \"psf do rene lucena\": 78, \"psf da lagoa do mato\": 79, \"psf do vieira\": 80, \"psf sao felipe\": 81, \"psf do morro dourado\": 82, \"psf poco\": 83, \"psf do sao francisco\": 84, \"psf da vila da conceicao\": 85, \"psf do coracao de jesus\": 86, \"psf do araujao\": 87, \"psf olho dagua\": 88, \"centro de saude dr miranda tavares\": 89, \"psf coracao de maria\": 90, \"psf da lagoa do mato ii\": 91, \"psf do sao sebastiao\": 92, \"psf morro dourado ii\": 93, \"psf rene lucena ii\": 94, \"psf santissimo sacramento\": 95, \"psf nossa senhora de fatima\": 96, \"centro de referencia amai\": 97, \"psf i manoel miranda de oliveira\": 98, \"psf ii cesario gomes pereira\": 99, \"psf iii antonio alves de castro\": 100, \"psf iv antonino dos santos alves\": 101, \"psf v jose irio de souza\": 102, \"ps de nova olinda\": 103, \"ps buriti dos montes psf e nasf\": 104, \"usf de caldeirao de nicolau\": 105, \"usf bela vista\": 106, \"usf da serra verde\": 107, \"usf gregorios\": 108, \"usf jose alves teixeira\": 109, \"usf de alegre\": 110, \"usf badu\": 111, \"usf terra branca\": 112, \"centro de saude iii\": 113, \"unidade basica de saude esf matadouro estacao\": 114, \"centro de saude esf centro i\": 115, \"unidade basica de saude esf santa rita\": 116, \"centro de saude da sede\": 118, \"unidade de saude da familia da sede ii\": 119, \"centro de saude galheiro puba\": 120, \"centro de saude de galheiro puba\": 121, \"unidade basica dr jose francisco marchesine nunes\": 122, \"posto de saude\": 123, \"unidade basica de saude de piloes e vila neves\": 124, \"centro de saude governador joao durval carneiro\": 125, \"psf maria anisia de souza fernandes\": 126, \"eap sebastiao araujo\": 127, \"eap joaquim dias do nascimento\": 128, \"ubs retiro\": 129, \"ubs do centro\": 130, \"ubs fazenda nova\": 131, \"ps caju norte unidade de saude buriti agricola\": 132, \"ubs santa luz\": 133, \"ubs tanque do governo\": 134, \"ubs santo antonio\": 135, \"ubs antonio policarpo\": 136, \"ubs aeroporto\": 137, \"unidade de saude da familia juarez nunes de oliveira\": 138, \"unidade de saude da familia de sao joao do porto alegre\": 139, \"unidade de saude da familia dona lio ii\": 140, \"unidade de saude da familia feliciana souza dos reis\": 141, \"unidade de saude da familia arnulfo lacerda de moura\": 142, \"unidade de saude da familia mario souza barros\": 143, \"unidade de saude da familia luis cardoso bomfim\": 144, \"unidade de saude da familia dona lio\": 145, \"unidade de saude da familia manoel messias\": 146, \"unidade basica de saude sitio seco dos rochas\": 147, \"unidade basica de saude vovo noeme\": 148, \"centro de atencimento covid 19 de colinas\": 149, \"centro de saude joao batista macedo costa\": 150, \"centro de saude dr osano brandao\": 151, \"unidade basica de saude trezidela\": 152, \"unidade basica de saude liberdade\": 153, \"unidade basica de saude vila brandao\": 154, \"unidade basica de saude maravilha\": 155, \"unidade basica de saude serra negra\": 156, \"unidade basica de saude alto santo antonio\": 157, \"unidade basica de saude piquete\": 158, \"unidade basica de saude pavio\": 159, \"centro de saude polo almeida\": 160, \"unidade basica de saude sem terra\": 161, \"unidade basica de saude santo antonio\": 162, \"unidade basica de saude do curimata\": 163, \"unidade basica de saude do cambirimba\": 164, \"unidade basica de saude sao felix\": 165, \"unidade basica de saude serrinha\": 166, \"unidade basica de saude boa sorte\": 167, \"ubs padre jose de anchieta mauriz cortez\": 168, \"centro de saude alianca do gurgueia\": 169, \"ambulatorio municipal de colonia do gurgueia\": 170, \"centro de saude lagoa cercada\": 171, \"centro de saude vale do gurgueia\": 172, \"ubs centro de saude vale do gurgueia\": 173, \"ubs elenita rodrigues bastos\": 174, \"ubs estelita guerra de macedo\": 175, \"ubs olga rodrigues\": 176, \"ubs felicia guerra antunes\": 177, \"ubs livia alves rocha\": 178, \"usf centro\": 179, \"posto de saude santa luzia\": 180, \"usf centro 05\": 181, \"usf de barra do bernardo\": 182, \"usf centro ii\": 183, \"usf dom helio pascoal\": 184, \"ubs ismenia gomes monteiro\": 185, \"ubs mosqueada\": 186, \"ubs santa helena\": 187, \"ubs joao rodrigues coimbra\": 188, \"ubs sambaiba\": 189, \"ubs dr francisco ferreira ramos\": 190, \"ubs benoni portela leal\": 191, \"unidade de saude da familia do ramalho\": 192, \"unidade de saude da familia de feira da mata\": 193, \"unidade de saude da familia de varzea da cruz\": 194, \"usf antonio carlos kalil dourado\": 195, \"usf valdofredo sousa carmo\": 196, \"usf dr wanderley fraga lima\": 197, \"usf adeina silva galvao\": 198, \"usf dr paulo cesar santana andrade\": 199, \"usf francisco de almeida\": 200, \"usf abel cornelio de morais filho\": 201, \"usf marilelia benicio santana\": 202, \"usf francisco benicio\": 203, \"ubs lavignia magalhaes\": 204, \"ubs lourdes alves\": 205, \"conjunto penal de itabuna\": 206, \"usf simao fitterman\": 207, \"ubs roberto santos\": 208, \"ubs dilson cordier\": 209, \"ubs calixto midlej\": 210, \"ubs alberto teixeira barreto\": 211, \"usf corbiniano freire\": 212, \"usf ubiratan moreira\": 213, \"ubs dr jose maria de magalhaes neto\": 214, \"usf nova ferradas\": 215, \"ubs moise hage\": 216, \"ubs dr jose edites dos santos\": 217, \"usf dr joao monteiro\": 218, \"usf joao jose soares\": 219, \"usf jorge amado\": 220, \"usf manoel rodrigues\": 221, \"usf dr raymundo brandao freire\": 222, \"usf amalia lessa\": 223, \"unidade de saude mental\": 224, \"usf dr candido pereira\": 225, \"usf dr elson duarte\": 226, \"usf dr jacinto cabral\": 227, \"usf dr aurivaldo peixoto sampaio\": 228, \"usf dr nilton ramos\": 229, \"ubs isolina guimaraes\": 230, \"usf bairro de fatima ii\": 231, \"u s f dr mario alves peixoto\": 232, \"u s f john leahy\": 233, \"u s f bairro de fatima i\": 234, \"u s f dr antonio menezes filho\": 235, \"unidade de saude da familia bairro manoel leao\": 236, \"equipe emulti i\": 237, \"consultorio na rua mii\": 238, \"usf dr jose renan oliveira moreira\": 239, \"usf maria jose rocha passos\": 240, \"centro de saude dr raimundo bastos barreto\": 241, \"usf dr raimundo bastos barreto\": 242, \"usf dr gustavo henrique lopes pinheiro\": 243, \"usf dr gileno andrade fonseca\": 244, \"usf dr noe bonfim\": 245, \"usf dailva moraes de castro\": 246, \"centro de saude maria jose rocha passos\": 247, \"unidade de saude psf i\": 248, \"unidade de saude psf ii\": 249, \"unidade de saude psf iii\": 250, \"unidade psf alipio rodrigues mota\": 251, \"unidade psf de ventania\": 252, \"unidade de psf leonardo santos sarquis\": 253, \"unidade psf nilton manoel\": 254, \"unidade de psf joathan ribeiro cardoso\": 255, \"unidade de saude da familia dr olimpio aleluia\": 256, \"centro de saude manoel rodrigues santos\": 257, \"unidade de saude da familia jonas oliveira\": 258, \"unidade de saude da familia dr alcebiades cunha\": 259, \"unidade de saude da familia dr ruy costa\": 260, \"unidade de saude da familia jose fernando aragao\": 261, \"unidade de saude da familia eurico araujo\": 262, \"unidade de saude da familia do centro\": 263, \"usf de tranqueiras\": 264, \"usf do sao jose\": 265, \"usf sede 3\": 266, \"usf varzea\": 267, \"centro de atendimento sindromes respiratoria covid19 ituacu\": 268, \"usf da gruta da mangabeira\": 269, \"usf da lage\": 270, \"usf do campo grande\": 271, \"usf da sede\": 272, \"usf da ovelha\": 273, \"usf da sede 2\": 274, \"ubs dr carlos vagner lopes frota\": 275, \"ubs arnobio fernandes dos santos\": 276, \"ubs dr sebastiao pereira magalhaes\": 277, \"ubs valdomiro frota\": 278, \"ubs jose maria da costa\": 279, \"ubs maria de jesus almeida esf x\": 280, \"ubs amelia crisanto esf v\": 281, \"ubs domingos jose da silva esf ii\": 282, \"ubs marcos jose de sousa esf vii\": 283, \"ubs adao barbosa esf i\": 284, \"ubs jose francisco batista psf viii\": 285, \"ubs maria das merces de lima esf vi\": 286, \"ubs dra lourdinha crisanto esf iv\": 287, \"ubs joana carmina da costa esf iii\": 288, \"ubs alberto bessa luz esf ix\": 289, \"centro de saude wilson roriz\": 290, \"ubas maria helena de oliveira\": 291, \"posto saude do tamarindo\": 292, \"ps passagem do meio\": 293, \"ps bananeira\": 294, \"ps tanques\": 295, \"unidade basica de saude abilheirinhas\": 296, \"ps buriti do santo antonio\": 297, \"ubs de juazeiro do piaui\": 298, \"unidade de saude da familia de espinho\": 299, \"usf feliciano da silva assuncao\": 300, \"unidade de saude da familia de caraguatai\": 301, \"usf de sao jose\": 302, \"centro de saude angelica moita\": 303, \"ubs francisca de sousa barros fonseca\": 304, \"unidade de saude da familia zuleide nunes de araujo b sorte\": 305, \"usf maria olimpia da silva magalhaes\": 306, \"unidade de saude da familia ana maria da silva\": 307, \"unidade de saude da familia rosaria mendes ferreira\": 308, \"unidade saude da familia judith maria da paixao\": 309, \"unidade saude da familia joao teixeira sobrinho\": 310, \"estrategia de saude da familia centro de saude de morpara\": 311, \"estrategia de saude da familia nestor alves torres\": 312, \"estrategia de saude da familia vilmar andrade coimbra\": 313, \"usf valdemar andrade nascimento\": 314, \"centro de saude jesimiel norberto da silva\": 315, \"usf jovelino hora almeida\": 316, \"usf jose bruno dos santos\": 317, \"unidade de vigilancia sanitaria\": 318, \"usf veleda p nascimento\": 319, \"usf otavio barreto da silva\": 320, \"usf deraldo pereira da silva\": 321, \"usf endiretor\": 322, \"usf barro branco\": 323, \"unidade basica de saude nadir de castro pinto\": 324, \"unidade basica de saude jackson pereira baleeiro\": 325, \"unidade basica de saude erondino de castro malheiros\": 326, \"unidade basica de saude osorio neco nogueira\": 327, \"centro de saude cloves de andrade veiga\": 328, \"unidade basica de saude valdecina rocha dos santos\": 329, \"unidade basica de saude sebastiao rocha filho\": 330, \"unidade basica de saude zilda maria da cruz malheiros\": 331, \"unidade basica de saude edinon flores\": 332, \"usf do tanque\": 333, \"usf de guirapa\": 334, \"usf sede\": 335, \"usf severino moura arruda\": 336, \"eab da barriguda\": 337, \"usf de paus pretos\": 338, \"centro de referencia covid 19\": 339, \"ubs durvalina emidia santos\": 340, \"usf da tabua\": 341, \"ubs 12 varzea\": 342, \"ubs 30 parque recreio\": 343, \"ubs 08 germano\": 344, \"ubs 13 matadouro\": 345, \"ubs 07 caixa dagua\": 346, \"ubs 15 barcelona\": 347, \"ubs 06 sao joao\": 348, \"ubs 10 furnas\": 349, \"ubs 11 caldeirao\": 350, \"ubs 23 sao luis\": 351, \"ubs 16 vertentes\": 352, \"ubs 01 vista alegre\": 353, \"ubs 14 formosa\": 354, \"ubs 05 recreio\": 355, \"ubs 02 santa maria\": 356, \"ubs 04 paciencia 1\": 357, \"ubsf sertao de dentro psf 14\": 358, \"ubs 09 floresta\": 359, \"ubs 19 estacao\": 360, \"ubs 2024 petecas crioli\": 361, \"ubs 22 sussuarana\": 362, \"ubs 17 fonte dos matos\": 363, \"ubs 18 centro\": 364, \"ubs 03 prado\": 365, \"ubs 31 jenipapeiro\": 366, \"ubs 29 petecas iii iv\": 367, \"ubs 26 quebradas\": 368, \"ubs 25 pe do morro\": 369, \"ubs 27 banda\": 370, \"ubs 28 baixao\": 371, \"ubs 21 paciencia 2\": 372, \"usf alcebiades pereira de andrade conde\": 373, \"usf de lucaia\": 374, \"usf parafuso\": 375, \"usf do geriba\": 376, \"usf de saude lagoa do terto\": 378, \"usf morada do planalto\": 379, \"usf ceac\": 380, \"usf taquaral\": 381, \"usf urbis\": 382, \"unidade basica de saude da familia estrada e armazem\": 383, \"unidade basica de saude da familia nella ramella\": 384, \"unidade basica de saude da familia doralice boulhosa\": 385, \"unidade basica de saude da familia izabel damasceno\": 386, \"unidade basica de saude da familia miguel moraes martins\": 387, \"unidade basica de saude da familia dom angelo maria rivato\": 388, \"unidade basica de saude ribeirinha pedro fernandes de souza\": 389, \"unidade de saude da familia do santo antonio\": 390, \"unidade de saude da familia do jardim imperial\": 391, \"centro de atendimento covid 19 riacho de santana\": 392, \"unidade de saude da familia alexandrina alves de oliveira\": 393, \"unidade de saude da familia da vesperina\": 394, \"ubs de riacho de santana\": 395, \"unidade de saude da familia do cambaito\": 396, \"unidade de saude da familia de laguna\": 397, \"unidade de saude da familia de botuquara\": 398, \"ubs dr joao laranjeira centro\": 399, \"unidade de saude da familia do mato verde\": 400, \"unidade de saude da familia de santa rita\": 401, \"unidade de saude da familia do mato verde ii\": 402, \"unidade de saude da familia do belem\": 403, \"unidade de saude da familia de marcolino moura\": 404, \"sindicato\": 405, \"unidade de saude da familia de mato grosso\": 406, \"unidade de saude da familia de arapiranga\": 407, \"posto de saude do rio da caixa\": 408, \"centro de saude e psf da sede\": 409, \"unidade de saude da familia de joao vaz\": 410, \"e multi rio de contas\": 411, \"unidade de saude da familia do vermelhao\": 412, \"unidade de saude da familia de ibiajara\": 413, \"unidade de saude da familia de rio do pires\": 414, \"unidade de saude da familia de varzinha\": 415, \"unidade basica de saude da sede 4\": 416, \"unidade de saude da familia da placa\": 417, \"unidade basica de saude curral queimado\": 418, \"ubs dr ernani de paiva maia\": 419, \"ubs santa filomena\": 420, \"ubs zona rural\": 421, \"unidade basica de saude da familia i\": 422, \"unidade basica de saude da familia iii\": 423, \"unidade basica de saude da familia ii\": 424, \"unidade basica de saude da familia iv\": 425, \"unidade basica de saude da familia v\": 426, \"unidade de saude vi\": 427, \"ubs vii\": 428, \"unidade basica de saude do entroncamento\": 429, \"ps da malhada redonda\": 430, \"ps do saco da varzea\": 431, \"ubs sao jose do piaui sede\": 432, \"ps do caldeirao dos luis\": 433, \"ps do jua\": 434, \"ubs do atalho\": 435, \"psf da sede\": 436, \"unidade basica de saude mae bibia\": 437, \"ubs jose pereira de oliveira prefeito zeca pereira\": 438, \"ubs dr domingo jose de carvalho\": 439, \"ubs julio de melo paz\": 440, \"unidade saude da familia de ourives\": 442, \"central de atendimento ao covid de tanhacu\": 444, \"unidade de saude da familia sussuarana\": 445, \"unidade de saude da familia varzea da pedra\": 446, \"unidade de saude da familia riacho dantas\": 447, \"usf sucuarana ii\": 448, \"unidade de saude da familia cleriston andrade\": 449, \"unidade de saude da familia jurema\": 450, \"usf sede ii\": 451, \"ceadim tremedal\": 452, \"usf de tremedal\": 453, \"centro municipal de vigilancia a saude\": 454, \"usf manoel inacio pereira\": 455, \"usf de furado da cancela\": 456, \"usf dr gileno rocha\": 457, \"usf julia alves de souza pereira\": 458, \"usf juelita rosa santiago meira\": 459, \"farmacia basica municipal de tremedal\": 460, \"usf durval ferreira rocha\": 461, \"usf nana de gregorio\": 462, \"unidade de saude da familia de pedras\": 463, \"unidade de saude da familia vila brasil\": 464, \"centro de saude de una\": 465, \"unidade de saude da familia colonia\": 466, \"unidade de saude da familia do sucupira\": 467, \"unidade de saude da familia do bairro novo\": 468, \"unidade de saude da familia do bairro marcel ganem\": 469, \"unidade basica de saude da urbs\": 470, \"unidade basica de saude do distrito do outeiro\": 471, \"unidade basica de saude do distrito de colonia\": 472, \"unidade de saude da familia doutor olegario guimaraes\": 473, \"psf joao pereira dos santos\": 474, \"psf de estreito\": 475, \"psf dorivaldo dantas\": 476, \"psf de cantinho\": 477, \"psf dr antonio alberto silveira santos\": 478, \"cs dr joao melo filho\": 479, \"usf de pradoso\": 480, \"pab sao vicente cae ii\": 481, \"cs dr hugo de castro lima\": 482, \"unidade de saude primavera\": 483, \"unidade de saude ipe\": 484, \"casa de apoio de nova canaa vca\": 485, \"usf de bate pe\": 486, \"usf henrique ferraz graziani\": 487, \"usf de inhobim\": 488, \"usf solange hortelio franco csu\": 489, \"usf do bruno bacelar\": 490, \"usf do parque conveima i\": 491, \"pab do panorama\": 492, \"cs admario silva santos\": 493, \"usf de igua\": 494, \"usf professor nelson barros\": 495, \"usf da urbis vi\": 496, \"usf da urbis v\": 497, \"usf de jose goncalves\": 498, \"usf de cercadinho\": 499, \"usf de veredinha\": 500, \"cs regis pacheco\": 501, \"usf de sao sebastiao\": 502, \"usf do miro cairo\": 503, \"usf jose gomes novaes\": 504, \"usf nestor guimaraes\": 505, \"usf da limeira\": 506, \"usf do jardim valeria\": 507, \"programa conquista crianca\": 508, \"usf andre chagas leite\": 509, \"usf de lagoa formosa\": 510, \"usf da roseira\": 511, \"usf de sao joaquim\": 512, \"usf de lagoa das flores\": 513, \"usf do capinal\": 514, \"usf lagoa das flores ii\": 515, \"centro de referencia em hepatite\": 516, \"usf madalena santos sousa\": 517, \"usf pedrinhas\": 518, \"ubs campinhos\": 519, \"usf cidade modelo\": 520, \"usf recanto das aguas\": 521, \"usf morada dos passaros\": 522, \"usf do simao\": 523, \"presidio regional de vitoria da conquista\": 524, \"usf vila america\": 525, \"usf dr onildo pereira de oliveira filho\": 526, \"usf nova cidade\": 527, \"cpvc conjunto penal de vitoria da conquista\": 528, \"usf do jardim valeria iii\": 529,\n};\n\n// 2b. Dicionario por nucleo (tipo abreviado -> canonico, sem conectores) para casar\n// \"USF Ourives\" com \"Unidade Saude da Familia de Ourives\"\nconst mapaUnidadesNucleo = {\n    \"usf jose muniz dias\": 58, \"usf raulino bispo oliveira\": 59, \"usf geneci ferreira santos\": 60, \"usf pe morro\": 61, \"usf jose teixeira santos\": 62, \"usf francisco xavier pires\": 63, \"usf jeronimo jose silva\": 64, \"usf monte alto\": 65, \"usf morada feliz\": 67, \"usf missao aricobe\": 68, \"usf novo angical\": 69, \"unidadede basica saude elpidio pereira\": 70, \"usf jose cordeiro vasco\": 71, \"nucleo multiprofissional saude hermes passos filho\": 72, \"psf sao francisco ii\": 73, \"psf araujao ii\": 74, \"psf luzia leite\": 75, \"psf sao francisco iii\": 76, \"psf alto bela vista\": 77, \"psf rene lucena\": 78, \"psf lagoa mato\": 79, \"psf vieira\": 80, \"psf sao felipe\": 81, \"psf morro dourado\": 82, \"psf poco\": 83, \"psf sao francisco\": 84, \"psf vila conceicao\": 85, \"psf coracao jesus\": 86, \"psf araujao\": 87, \"psf olho dagua\": 88, \"cs dr miranda tavares\": 89, \"psf coracao maria\": 90, \"psf lagoa mato ii\": 91, \"psf sao sebastiao\": 92, \"psf morro dourado ii\": 93, \"psf rene lucena ii\": 94, \"psf santissimo sacramento\": 95, \"psf nossa senhora fatima\": 96, \"centro referencia amai\": 97, \"psf i manoel miranda oliveira\": 98, \"psf ii cesario gomes pereira\": 99, \"psf iii antonio alves castro\": 100, \"psf iv antonino santos alves\": 101, \"psf v jose irio souza\": 102, \"ps nova olinda\": 103, \"ps buriti montes psf e nasf\": 104, \"usf caldeirao nicolau\": 105, \"usf bela vista\": 106, \"usf serra verde\": 107, \"usf gregorios\": 108, \"usf jose alves teixeira\": 109, \"usf alegre\": 110, \"usf badu\": 111, \"usf terra branca\": 112, \"cs iii\": 113, \"ubs esf matadouro estacao\": 114, \"cs esf centro i\": 115, \"ubs esf santa rita\": 116, \"cs sede\": 118, \"unidade basica dr jose francisco marchesine nunes\": 122, \"ps\": 123, \"ubs piloes e vila neves\": 124, \"cs governador joao durval carneiro\": 125, \"psf maria anisia souza fernandes\": 126, \"eap sebastiao araujo\": 127, \"eap joaquim dias nascimento\": 128, \"ubs retiro\": 129, \"ubs centro\": 130, \"ubs fazenda nova\": 131, \"ps caju norte unidade saude buriti agricola\": 132, \"ubs santa luz\": 133, \"ubs tanque governo\": 134, \"ubs antonio policarpo\": 136, \"ubs aeroporto\": 137, \"usf juarez nunes oliveira\": 138, \"usf sao joao porto alegre\": 139, \"usf dona lio ii\": 140, \"usf feliciana souza reis\": 141, \"usf arnulfo lacerda moura\": 142, \"usf mario souza barros\": 143, \"usf luis cardoso bomfim\": 144, \"usf dona lio\": 145, \"usf manoel messias\": 146, \"ubs sitio seco rochas\": 147, \"ubs vovo noeme\": 148, \"centro atencimento covid 19 colinas\": 149, \"cs joao batista macedo costa\": 150, \"cs dr osano brandao\": 151, \"ubs trezidela\": 152, \"ubs liberdade\": 153, \"ubs vila brandao\": 154, \"ubs maravilha\": 155, \"ubs serra negra\": 156, \"ubs alto santo antonio\": 157, \"ubs piquete\": 158, \"ubs pavio\": 159, \"cs polo almeida\": 160, \"ubs sem terra\": 161, \"ubs curimata\": 163, \"ubs cambirimba\": 164, \"ubs sao felix\": 165, \"ubs serrinha\": 166, \"ubs boa sorte\": 167, \"ubs padre jose anchieta mauriz cortez\": 168, \"cs alianca gurgueia\": 169, \"ambulatorio municipal colonia gurgueia\": 170, \"cs lagoa cercada\": 171, \"cs vale gurgueia\": 172, \"ubs cs vale gurgueia\": 173, \"ubs elenita rodrigues bastos\": 174, \"ubs estelita guerra macedo\": 175, \"ubs olga rodrigues\": 176, \"ubs felicia guerra antunes\": 177, \"ubs livia alves rocha\": 178, \"ps santa luzia\": 180, \"usf centro 05\": 181, \"usf barra bernardo\": 182, \"usf centro ii\": 183, \"usf dom helio pascoal\": 184, \"ubs ismenia gomes monteiro\": 185, \"ubs mosqueada\": 186, \"ubs santa helena\": 187, \"ubs joao rodrigues coimbra\": 188, \"ubs sambaiba\": 189, \"ubs dr francisco ferreira ramos\": 190, \"ubs benoni portela leal\": 191, \"usf ramalho\": 192, \"usf feira mata\": 193, \"usf varzea cruz\": 194, \"usf antonio carlos kalil dourado\": 195, \"usf valdofredo sousa carmo\": 196, \"usf dr wanderley fraga lima\": 197, \"usf adeina silva galvao\": 198, \"usf dr paulo cesar santana andrade\": 199, \"usf francisco almeida\": 200, \"usf abel cornelio morais filho\": 201, \"usf marilelia benicio santana\": 202, \"usf francisco benicio\": 203, \"ubs lavignia magalhaes\": 204, \"ubs lourdes alves\": 205, \"conjunto penal itabuna\": 206, \"usf simao fitterman\": 207, \"ubs roberto santos\": 208, \"ubs dilson cordier\": 209, \"ubs calixto midlej\": 210, \"ubs alberto teixeira barreto\": 211, \"usf corbiniano freire\": 212, \"usf ubiratan moreira\": 213, \"ubs dr jose maria magalhaes neto\": 214, \"usf nova ferradas\": 215, \"ubs moise hage\": 216, \"ubs dr jose edites santos\": 217, \"usf dr joao monteiro\": 218, \"usf joao jose soares\": 219, \"usf jorge amado\": 220, \"usf manoel rodrigues\": 221, \"usf dr raymundo brandao freire\": 222, \"usf amalia lessa\": 223, \"unidade saude mental\": 224, \"usf dr candido pereira\": 225, \"usf dr elson duarte\": 226, \"usf dr jacinto cabral\": 227, \"usf dr aurivaldo peixoto sampaio\": 228, \"usf dr nilton ramos\": 229, \"ubs isolina guimaraes\": 230, \"usf bairro fatima ii\": 231, \"usf dr mario alves peixoto\": 232, \"usf john leahy\": 233, \"usf bairro fatima i\": 234, \"usf dr antonio menezes filho\": 235, \"usf bairro manoel leao\": 236, \"equipe emulti i\": 237, \"consultorio na rua mii\": 238, \"usf dr jose renan oliveira moreira\": 239, \"usf maria jose rocha passos\": 240, \"cs dr raimundo bastos barreto\": 241, \"usf dr raimundo bastos barreto\": 242, \"usf dr gustavo henrique lopes pinheiro\": 243, \"usf dr gileno andrade fonseca\": 244, \"usf dr noe bonfim\": 245, \"usf dailva moraes castro\": 246, \"cs maria jose rocha passos\": 247, \"unidade saude psf i\": 248, \"unidade saude psf ii\": 249, \"unidade saude psf iii\": 250, \"unidade psf alipio rodrigues mota\": 251, \"unidade psf ventania\": 252, \"unidade psf leonardo santos sarquis\": 253, \"unidade psf nilton manoel\": 254, \"unidade psf joathan ribeiro cardoso\": 255, \"usf dr olimpio aleluia\": 256, \"cs manoel rodrigues santos\": 257, \"usf jonas oliveira\": 258, \"usf dr alcebiades cunha\": 259, \"usf dr ruy costa\": 260, \"usf jose fernando aragao\": 261, \"usf eurico araujo\": 262, \"usf tranqueiras\": 264, \"usf sede 3\": 266, \"usf varzea\": 267, \"centro atendimento sindromes respiratoria covid19 ituacu\": 268, \"usf gruta mangabeira\": 269, \"usf lage\": 270, \"usf campo grande\": 271, \"usf ovelha\": 273, \"usf sede 2\": 274, \"ubs dr carlos vagner lopes frota\": 275, \"ubs arnobio fernandes santos\": 276, \"ubs dr sebastiao pereira magalhaes\": 277, \"ubs valdomiro frota\": 278, \"ubs jose maria costa\": 279, \"ubs maria jesus almeida esf x\": 280, \"ubs amelia crisanto esf v\": 281, \"ubs domingos jose silva esf ii\": 282, \"ubs marcos jose sousa esf vii\": 283, \"ubs adao barbosa esf i\": 284, \"ubs jose francisco batista psf viii\": 285, \"ubs maria merces lima esf vi\": 286, \"ubs dra lourdinha crisanto esf iv\": 287, \"ubs joana carmina costa esf iii\": 288, \"ubs alberto bessa luz esf ix\": 289, \"cs wilson roriz\": 290, \"ubas maria helena oliveira\": 291, \"posto saude tamarindo\": 292, \"ps passagem meio\": 293, \"ps bananeira\": 294, \"ps tanques\": 295, \"ubs abilheirinhas\": 296, \"ps buriti santo antonio\": 297, \"ubs juazeiro piaui\": 298, \"usf espinho\": 299, \"usf feliciano silva assuncao\": 300, \"usf caraguatai\": 301, \"cs angelica moita\": 303, \"ubs francisca sousa barros fonseca\": 304, \"usf zuleide nunes araujo b sorte\": 305, \"usf maria olimpia silva magalhaes\": 306, \"usf ana maria silva\": 307, \"usf rosaria mendes ferreira\": 308, \"usf judith maria paixao\": 309, \"usf joao teixeira sobrinho\": 310, \"usf cs morpara\": 311, \"usf nestor alves torres\": 312, \"usf vilmar andrade coimbra\": 313, \"usf valdemar andrade nascimento\": 314, \"cs jesimiel norberto silva\": 315, \"usf jovelino hora almeida\": 316, \"usf jose bruno santos\": 317, \"unidade vigilancia sanitaria\": 318, \"usf veleda p nascimento\": 319, \"usf otavio barreto silva\": 320, \"usf deraldo pereira silva\": 321, \"usf endiretor\": 322, \"usf barro branco\": 323, \"ubs nadir castro pinto\": 324, \"ubs jackson pereira baleeiro\": 325, \"ubs erondino castro malheiros\": 326, \"ubs osorio neco nogueira\": 327, \"cs cloves andrade veiga\": 328, \"ubs valdecina rocha santos\": 329, \"ubs sebastiao rocha filho\": 330, \"ubs zilda maria cruz malheiros\": 331, \"ubs edinon flores\": 332, \"usf tanque\": 333, \"usf guirapa\": 334, \"usf severino moura arruda\": 336, \"eab barriguda\": 337, \"usf paus pretos\": 338, \"centro referencia covid 19\": 339, \"ubs durvalina emidia santos\": 340, \"usf tabua\": 341, \"ubs 12 varzea\": 342, \"ubs 30 parque recreio\": 343, \"ubs 08 germano\": 344, \"ubs 13 matadouro\": 345, \"ubs 07 caixa dagua\": 346, \"ubs 15 barcelona\": 347, \"ubs 06 sao joao\": 348, \"ubs 10 furnas\": 349, \"ubs 11 caldeirao\": 350, \"ubs 23 sao luis\": 351, \"ubs 16 vertentes\": 352, \"ubs 01 vista alegre\": 353, \"ubs 14 formosa\": 354, \"ubs 05 recreio\": 355, \"ubs 02 santa maria\": 356, \"ubs 04 paciencia 1\": 357, \"ubsf sertao dentro psf 14\": 358, \"ubs 09 floresta\": 359, \"ubs 19 estacao\": 360, \"ubs 2024 petecas crioli\": 361, \"ubs 22 sussuarana\": 362, \"ubs 17 fonte matos\": 363, \"ubs 18 centro\": 364, \"ubs 03 prado\": 365, \"ubs 31 jenipapeiro\": 366, \"ubs 29 petecas iii iv\": 367, \"ubs 26 quebradas\": 368, \"ubs 25 pe morro\": 369, \"ubs 27 banda\": 370, \"ubs 28 baixao\": 371, \"ubs 21 paciencia 2\": 372, \"usf alcebiades pereira andrade conde\": 373, \"usf lucaia\": 374, \"usf parafuso\": 375, \"usf geriba\": 376, \"usf saude lagoa terto\": 378, \"usf morada planalto\": 379, \"usf ceac\": 380, \"usf taquaral\": 381, \"usf urbis\": 382, \"ubsf estrada e armazem\": 383, \"ubsf nella ramella\": 384, \"ubsf doralice boulhosa\": 385, \"ubsf izabel damasceno\": 386, \"ubsf miguel moraes martins\": 387, \"ubsf dom angelo maria rivato\": 388, \"ubs ribeirinha pedro fernandes souza\": 389, \"usf santo antonio\": 390, \"usf jardim imperial\": 391, \"centro atendimento covid 19 riacho santana\": 392, \"usf alexandrina alves oliveira\": 393, \"usf vesperina\": 394, \"ubs riacho santana\": 395, \"usf cambaito\": 396, \"usf laguna\": 397, \"usf botuquara\": 398, \"ubs dr joao laranjeira centro\": 399, \"usf mato verde\": 400, \"usf santa rita\": 401, \"usf mato verde ii\": 402, \"usf belem\": 403, \"usf marcolino moura\": 404, \"sindicato\": 405, \"usf mato grosso\": 406, \"usf arapiranga\": 407, \"ps rio caixa\": 408, \"cs e psf sede\": 409, \"usf joao vaz\": 410, \"e multi rio contas\": 411, \"usf vermelhao\": 412, \"usf ibiajara\": 413, \"usf rio pires\": 414, \"usf varzinha\": 415, \"ubs sede 4\": 416, \"usf placa\": 417, \"ubs curral queimado\": 418, \"ubs dr ernani paiva maia\": 419, \"ubs santa filomena\": 420, \"ubs zona rural\": 421, \"ubsf i\": 422, \"ubsf iii\": 423, \"ubsf ii\": 424, \"ubsf iv\": 425, \"ubsf v\": 426, \"unidade saude vi\": 427, \"ubs vii\": 428, \"ubs entroncamento\": 429, \"ps malhada redonda\": 430, \"ps saco varzea\": 431, \"ubs sao jose piaui sede\": 432, \"ps caldeirao luis\": 433, \"ps jua\": 434, \"ubs atalho\": 435, \"psf sede\": 436, \"ubs mae bibia\": 437, \"ubs jose pereira oliveira prefeito zeca pereira\": 438, \"ubs dr domingo jose carvalho\": 439, \"ubs julio melo paz\": 440, \"usf ourives\": 442, \"central atendimento ao covid tanhacu\": 444, \"usf sussuarana\": 445, \"usf varzea pedra\": 446, \"usf riacho dantas\": 447, \"usf sucuarana ii\": 448, \"usf cleriston andrade\": 449, \"usf jurema\": 450, \"ceadim tremedal\": 452, \"usf tremedal\": 453, \"centro municipal vigilancia a saude\": 454, \"usf manoel inacio pereira\": 455, \"usf furado cancela\": 456, \"usf dr gileno rocha\": 457, \"usf julia alves souza pereira\": 458, \"usf juelita rosa santiago meira\": 459, \"farmacia basica municipal tremedal\": 460, \"usf durval ferreira rocha\": 461, \"usf nana gregorio\": 462, \"usf pedras\": 463, \"usf vila brasil\": 464, \"cs una\": 465, \"usf colonia\": 466, \"usf sucupira\": 467, \"usf bairro novo\": 468, \"usf bairro marcel ganem\": 469, \"ubs urbs\": 470, \"ubs distrito outeiro\": 471, \"ubs distrito colonia\": 472, \"usf doutor olegario guimaraes\": 473, \"psf joao pereira santos\": 474, \"psf estreito\": 475, \"psf dorivaldo dantas\": 476, \"psf cantinho\": 477, \"psf dr antonio alberto silveira santos\": 478, \"cs dr joao melo filho\": 479, \"usf pradoso\": 480, \"pab sao vicente cae ii\": 481, \"cs dr hugo castro lima\": 482, \"unidade saude primavera\": 483, \"unidade saude ipe\": 484, \"casa apoio nova canaa vca\": 485, \"usf bate pe\": 486, \"usf henrique ferraz graziani\": 487, \"usf inhobim\": 488, \"usf solange hortelio franco csu\": 489, \"usf bruno bacelar\": 490, \"usf parque conveima i\": 491, \"pab panorama\": 492, \"cs admario silva santos\": 493, \"usf igua\": 494, \"usf professor nelson barros\": 495, \"usf urbis vi\": 496, \"usf urbis v\": 497, \"usf jose goncalves\": 498, \"usf cercadinho\": 499, \"usf veredinha\": 500, \"cs regis pacheco\": 501, \"usf sao sebastiao\": 502, \"usf miro cairo\": 503, \"usf jose gomes novaes\": 504, \"usf nestor guimaraes\": 505, \"usf limeira\": 506, \"usf jardim valeria\": 507, \"programa conquista crianca\": 508, \"usf andre chagas leite\": 509, \"usf lagoa formosa\": 510, \"usf roseira\": 511, \"usf sao joaquim\": 512, \"usf lagoa flores\": 513, \"usf capinal\": 514, \"usf lagoa flores ii\": 515, \"centro referencia em hepatite\": 516, \"usf madalena santos sousa\": 517, \"usf pedrinhas\": 518, \"ubs campinhos\": 519, \"usf cidade modelo\": 520, \"usf recanto aguas\": 521, \"usf morada passaros\": 522, \"usf simao\": 523, \"presidio regional vitoria conquista\": 524, \"usf vila america\": 525, \"usf dr onildo pereira oliveira filho\": 526, \"usf nova cidade\": 527, \"cpvc conjunto penal vitoria conquista\": 528, \"usf jardim valeria iii\": 529,\n};\n\n// 2c. Dicionario por nome puro (sem o tipo USF/UBS/CS/PS/PSF/UBSF na frente) - so tem\n// entrada aqui quando o nome puro identifica uma UNICA unidade em toda a base\nconst mapaUnidadesPuro = {\n    \"jose muniz dias\": 58, \"raulino bispo oliveira\": 59, \"geneci ferreira santos\": 60, \"pe morro\": 61, \"jose teixeira santos\": 62, \"francisco xavier pires\": 63, \"jeronimo jose silva\": 64, \"monte alto\": 65, \"morada feliz\": 67, \"missao aricobe\": 68, \"novo angical\": 69, \"unidadede basica saude elpidio pereira\": 70, \"jose cordeiro vasco\": 71, \"nucleo multiprofissional saude hermes passos filho\": 72, \"sao francisco ii\": 73, \"araujao ii\": 74, \"luzia leite\": 75, \"sao francisco iii\": 76, \"alto bela vista\": 77, \"rene lucena\": 78, \"lagoa mato\": 79, \"vieira\": 80, \"sao felipe\": 81, \"morro dourado\": 82, \"poco\": 83, \"sao francisco\": 84, \"vila conceicao\": 85, \"coracao jesus\": 86, \"araujao\": 87, \"olho dagua\": 88, \"dr miranda tavares\": 89, \"coracao maria\": 90, \"lagoa mato ii\": 91, \"morro dourado ii\": 93, \"rene lucena ii\": 94, \"santissimo sacramento\": 95, \"nossa senhora fatima\": 96, \"centro referencia amai\": 97, \"i manoel miranda oliveira\": 98, \"ii cesario gomes pereira\": 99, \"iii antonio alves castro\": 100, \"iv antonino santos alves\": 101, \"v jose irio souza\": 102, \"nova olinda\": 103, \"buriti montes psf e nasf\": 104, \"caldeirao nicolau\": 105, \"bela vista\": 106, \"serra verde\": 107, \"gregorios\": 108, \"jose alves teixeira\": 109, \"alegre\": 110, \"badu\": 111, \"terra branca\": 112, \"esf matadouro estacao\": 114, \"esf centro i\": 115, \"esf santa rita\": 116, \"unidade basica dr jose francisco marchesine nunes\": 122, \"piloes e vila neves\": 124, \"governador joao durval carneiro\": 125, \"maria anisia souza fernandes\": 126, \"sebastiao araujo\": 127, \"joaquim dias nascimento\": 128, \"retiro\": 129, \"fazenda nova\": 131, \"caju norte unidade saude buriti agricola\": 132, \"santa luz\": 133, \"tanque governo\": 134, \"antonio policarpo\": 136, \"aeroporto\": 137, \"juarez nunes oliveira\": 138, \"sao joao porto alegre\": 139, \"dona lio ii\": 140, \"feliciana souza reis\": 141, \"arnulfo lacerda moura\": 142, \"mario souza barros\": 143, \"luis cardoso bomfim\": 144, \"dona lio\": 145, \"manoel messias\": 146, \"sitio seco rochas\": 147, \"vovo noeme\": 148, \"centro atencimento covid 19 colinas\": 149, \"joao batista macedo costa\": 150, \"dr osano brandao\": 151, \"trezidela\": 152, \"liberdade\": 153, \"vila brandao\": 154, \"maravilha\": 155, \"serra negra\": 156, \"alto santo antonio\": 157, \"piquete\": 158, \"pavio\": 159, \"polo almeida\": 160, \"sem terra\": 161, \"curimata\": 163, \"cambirimba\": 164, \"sao felix\": 165, \"serrinha\": 166, \"boa sorte\": 167, \"padre jose anchieta mauriz cortez\": 168, \"alianca gurgueia\": 169, \"ambulatorio municipal colonia gurgueia\": 170, \"lagoa cercada\": 171, \"vale gurgueia\": 172, \"cs vale gurgueia\": 173, \"elenita rodrigues bastos\": 174, \"estelita guerra macedo\": 175, \"olga rodrigues\": 176, \"felicia guerra antunes\": 177, \"livia alves rocha\": 178, \"santa luzia\": 180, \"centro 05\": 181, \"barra bernardo\": 182, \"centro ii\": 183, \"dom helio pascoal\": 184, \"ismenia gomes monteiro\": 185, \"mosqueada\": 186, \"santa helena\": 187, \"joao rodrigues coimbra\": 188, \"sambaiba\": 189, \"dr francisco ferreira ramos\": 190, \"benoni portela leal\": 191, \"ramalho\": 192, \"feira mata\": 193, \"varzea cruz\": 194, \"antonio carlos kalil dourado\": 195, \"valdofredo sousa carmo\": 196, \"dr wanderley fraga lima\": 197, \"adeina silva galvao\": 198, \"dr paulo cesar santana andrade\": 199, \"francisco almeida\": 200, \"abel cornelio morais filho\": 201, \"marilelia benicio santana\": 202, \"francisco benicio\": 203, \"lavignia magalhaes\": 204, \"lourdes alves\": 205, \"conjunto penal itabuna\": 206, \"simao fitterman\": 207, \"roberto santos\": 208, \"dilson cordier\": 209, \"calixto midlej\": 210, \"alberto teixeira barreto\": 211, \"corbiniano freire\": 212, \"ubiratan moreira\": 213, \"dr jose maria magalhaes neto\": 214, \"nova ferradas\": 215, \"moise hage\": 216, \"dr jose edites santos\": 217, \"dr joao monteiro\": 218, \"joao jose soares\": 219, \"jorge amado\": 220, \"manoel rodrigues\": 221, \"dr raymundo brandao freire\": 222, \"amalia lessa\": 223, \"unidade saude mental\": 224, \"dr candido pereira\": 225, \"dr elson duarte\": 226, \"dr jacinto cabral\": 227, \"dr aurivaldo peixoto sampaio\": 228, \"dr nilton ramos\": 229, \"isolina guimaraes\": 230, \"bairro fatima ii\": 231, \"dr mario alves peixoto\": 232, \"john leahy\": 233, \"bairro fatima i\": 234, \"dr antonio menezes filho\": 235, \"bairro manoel leao\": 236, \"equipe emulti i\": 237, \"consultorio na rua mii\": 238, \"dr jose renan oliveira moreira\": 239, \"dr gustavo henrique lopes pinheiro\": 243, \"dr gileno andrade fonseca\": 244, \"dr noe bonfim\": 245, \"dailva moraes castro\": 246, \"unidade saude psf i\": 248, \"unidade saude psf ii\": 249, \"unidade saude psf iii\": 250, \"unidade psf alipio rodrigues mota\": 251, \"unidade psf ventania\": 252, \"unidade psf leonardo santos sarquis\": 253, \"unidade psf nilton manoel\": 254, \"unidade psf joathan ribeiro cardoso\": 255, \"dr olimpio aleluia\": 256, \"manoel rodrigues santos\": 257, \"jonas oliveira\": 258, \"dr alcebiades cunha\": 259, \"dr ruy costa\": 260, \"jose fernando aragao\": 261, \"eurico araujo\": 262, \"tranqueiras\": 264, \"sede 3\": 266, \"varzea\": 267, \"centro atendimento sindromes respiratoria covid19 ituacu\": 268, \"gruta mangabeira\": 269, \"lage\": 270, \"campo grande\": 271, \"ovelha\": 273, \"sede 2\": 274, \"dr carlos vagner lopes frota\": 275, \"arnobio fernandes santos\": 276, \"dr sebastiao pereira magalhaes\": 277, \"valdomiro frota\": 278, \"jose maria costa\": 279, \"maria jesus almeida esf x\": 280, \"amelia crisanto esf v\": 281, \"domingos jose silva esf ii\": 282, \"marcos jose sousa esf vii\": 283, \"adao barbosa esf i\": 284, \"jose francisco batista psf viii\": 285, \"maria merces lima esf vi\": 286, \"dra lourdinha crisanto esf iv\": 287, \"joana carmina costa esf iii\": 288, \"alberto bessa luz esf ix\": 289, \"wilson roriz\": 290, \"ubas maria helena oliveira\": 291, \"posto saude tamarindo\": 292, \"passagem meio\": 293, \"bananeira\": 294, \"tanques\": 295, \"abilheirinhas\": 296, \"buriti santo antonio\": 297, \"juazeiro piaui\": 298, \"espinho\": 299, \"feliciano silva assuncao\": 300, \"caraguatai\": 301, \"angelica moita\": 303, \"francisca sousa barros fonseca\": 304, \"zuleide nunes araujo b sorte\": 305, \"maria olimpia silva magalhaes\": 306, \"ana maria silva\": 307, \"rosaria mendes ferreira\": 308, \"judith maria paixao\": 309, \"joao teixeira sobrinho\": 310, \"cs morpara\": 311, \"nestor alves torres\": 312, \"vilmar andrade coimbra\": 313, \"valdemar andrade nascimento\": 314, \"jesimiel norberto silva\": 315, \"jovelino hora almeida\": 316, \"jose bruno santos\": 317, \"unidade vigilancia sanitaria\": 318, \"veleda p nascimento\": 319, \"otavio barreto silva\": 320, \"deraldo pereira silva\": 321, \"endiretor\": 322, \"barro branco\": 323, \"nadir castro pinto\": 324, \"jackson pereira baleeiro\": 325, \"erondino castro malheiros\": 326, \"osorio neco nogueira\": 327, \"cloves andrade veiga\": 328, \"valdecina rocha santos\": 329, \"sebastiao rocha filho\": 330, \"zilda maria cruz malheiros\": 331, \"edinon flores\": 332, \"tanque\": 333, \"guirapa\": 334, \"severino moura arruda\": 336, \"barriguda\": 337, \"paus pretos\": 338, \"centro referencia covid 19\": 339, \"durvalina emidia santos\": 340, \"tabua\": 341, \"12 varzea\": 342, \"30 parque recreio\": 343, \"08 germano\": 344, \"13 matadouro\": 345, \"07 caixa dagua\": 346, \"15 barcelona\": 347, \"06 sao joao\": 348, \"10 furnas\": 349, \"11 caldeirao\": 350, \"23 sao luis\": 351, \"16 vertentes\": 352, \"01 vista alegre\": 353, \"14 formosa\": 354, \"05 recreio\": 355, \"02 santa maria\": 356, \"04 paciencia 1\": 357, \"sertao dentro psf 14\": 358, \"09 floresta\": 359, \"19 estacao\": 360, \"2024 petecas crioli\": 361, \"22 sussuarana\": 362, \"17 fonte matos\": 363, \"18 centro\": 364, \"03 prado\": 365, \"31 jenipapeiro\": 366, \"29 petecas iii iv\": 367, \"26 quebradas\": 368, \"25 pe morro\": 369, \"27 banda\": 370, \"28 baixao\": 371, \"21 paciencia 2\": 372, \"alcebiades pereira andrade conde\": 373, \"lucaia\": 374, \"parafuso\": 375, \"geriba\": 376, \"saude lagoa terto\": 378, \"morada planalto\": 379, \"ceac\": 380, \"taquaral\": 381, \"urbis\": 382, \"estrada e armazem\": 383, \"nella ramella\": 384, \"doralice boulhosa\": 385, \"izabel damasceno\": 386, \"miguel moraes martins\": 387, \"dom angelo maria rivato\": 388, \"ribeirinha pedro fernandes souza\": 389, \"jardim imperial\": 391, \"centro atendimento covid 19 riacho santana\": 392, \"alexandrina alves oliveira\": 393, \"vesperina\": 394, \"riacho santana\": 395, \"cambaito\": 396, \"laguna\": 397, \"botuquara\": 398, \"dr joao laranjeira centro\": 399, \"mato verde\": 400, \"santa rita\": 401, \"mato verde ii\": 402, \"belem\": 403, \"marcolino moura\": 404, \"sindicato\": 405, \"mato grosso\": 406, \"arapiranga\": 407, \"rio caixa\": 408, \"e psf sede\": 409, \"joao vaz\": 410, \"e multi rio contas\": 411, \"vermelhao\": 412, \"ibiajara\": 413, \"rio pires\": 414, \"varzinha\": 415, \"sede 4\": 416, \"placa\": 417, \"curral queimado\": 418, \"dr ernani paiva maia\": 419, \"santa filomena\": 420, \"zona rural\": 421, \"i\": 422, \"ii\": 424, \"iv\": 425, \"v\": 426, \"unidade saude vi\": 427, \"vii\": 428, \"entroncamento\": 429, \"malhada redonda\": 430, \"saco varzea\": 431, \"sao jose piaui sede\": 432, \"caldeirao luis\": 433, \"jua\": 434, \"atalho\": 435, \"mae bibia\": 437, \"jose pereira oliveira prefeito zeca pereira\": 438, \"dr domingo jose carvalho\": 439, \"julio melo paz\": 440, \"ourives\": 442, \"central atendimento ao covid tanhacu\": 444, \"sussuarana\": 445, \"varzea pedra\": 446, \"riacho dantas\": 447, \"sucuarana ii\": 448, \"cleriston andrade\": 449, \"jurema\": 450, \"ceadim tremedal\": 452, \"tremedal\": 453, \"centro municipal vigilancia a saude\": 454, \"manoel inacio pereira\": 455, \"furado cancela\": 456, \"dr gileno rocha\": 457, \"julia alves souza pereira\": 458, \"juelita rosa santiago meira\": 459, \"farmacia basica municipal tremedal\": 460, \"durval ferreira rocha\": 461, \"nana gregorio\": 462, \"pedras\": 463, \"vila brasil\": 464, \"una\": 465, \"colonia\": 466, \"sucupira\": 467, \"bairro novo\": 468, \"bairro marcel ganem\": 469, \"urbs\": 470, \"distrito outeiro\": 471, \"distrito colonia\": 472, \"doutor olegario guimaraes\": 473, \"joao pereira santos\": 474, \"estreito\": 475, \"dorivaldo dantas\": 476, \"cantinho\": 477, \"dr antonio alberto silveira santos\": 478, \"dr joao melo filho\": 479, \"pradoso\": 480, \"sao vicente cae ii\": 481, \"dr hugo castro lima\": 482, \"unidade saude primavera\": 483, \"unidade saude ipe\": 484, \"casa apoio nova canaa vca\": 485, \"bate pe\": 486, \"henrique ferraz graziani\": 487, \"inhobim\": 488, \"solange hortelio franco csu\": 489, \"bruno bacelar\": 490, \"parque conveima i\": 491, \"panorama\": 492, \"admario silva santos\": 493, \"igua\": 494, \"professor nelson barros\": 495, \"urbis vi\": 496, \"urbis v\": 497, \"jose goncalves\": 498, \"cercadinho\": 499, \"veredinha\": 500, \"regis pacheco\": 501, \"miro cairo\": 503, \"jose gomes novaes\": 504, \"nestor guimaraes\": 505, \"limeira\": 506, \"jardim valeria\": 507, \"programa conquista crianca\": 508, \"andre chagas leite\": 509, \"lagoa formosa\": 510, \"roseira\": 511, \"sao joaquim\": 512, \"lagoa flores\": 513, \"capinal\": 514, \"lagoa flores ii\": 515, \"centro referencia em hepatite\": 516, \"madalena santos sousa\": 517, \"pedrinhas\": 518, \"campinhos\": 519, \"cidade modelo\": 520, \"recanto aguas\": 521, \"morada passaros\": 522, \"simao\": 523, \"presidio regional vitoria conquista\": 524, \"vila america\": 525, \"dr onildo pereira oliveira filho\": 526, \"nova cidade\": 527, \"cpvc conjunto penal vitoria conquista\": 528, \"jardim valeria iii\": 529,\n};\n\n// 3. Normaliza texto: minusculo, remove acento, colapsa espacos\nconst normalizarBase = (texto) => {\n    if (!texto) return \"\";\n    let limpo = String(texto).toLowerCase().normalize(\"NFD\").replace(/[̀-ͯ]/g, \"\");\n    limpo = limpo.replace(/\\s+/g, \" \").trim();\n    return limpo;\n};\n\n// 4. Expande sinonimos de tipo (USF/UBS/CS/PS/PSF/UBSF) para um token canonico\n// e remove conectores (de/da/do/dos/das), pra casar abreviacao com nome por extenso\nconst SINONIMOS = [\n    [\"unidade basica de saude da familia\", \"ubsf\"],\n    [\"unidade de saude da familia\", \"usf\"],\n    [\"unidade saude da familia\", \"usf\"],\n    [\"unidade basica de saude\", \"ubs\"],\n    [\"estrategia de saude da familia\", \"usf\"],\n    [\"centro de saude\", \"cs\"],\n    [\"posto de saude\", \"ps\"],\n    [\"programa saude da familia\", \"psf\"],\n    [\"u s f\", \"usf\"],\n];\nconst CONECTORES = new Set([\"de\", \"da\", \"do\", \"dos\", \"das\"]);\nconst TIPOS = new Set([\"usf\", \"ubs\", \"ubsf\", \"cs\", \"ps\", \"psf\", \"eap\", \"eab\", \"pab\"]);\n\nconst normalizarNucleo = (texto) => {\n    let t = normalizarBase(texto);\n    for (const [longa, curta] of SINONIMOS) {\n        t = t.replace(new RegExp(\"\\\\b\" + longa.replace(/[.*+?^${}()|[\\]\\\\]/g, \"\\\\$&\") + \"\\\\b\", \"g\"), curta);\n    }\n    const palavras = t.split(\" \").filter(w => w && !CONECTORES.has(w));\n    return palavras.join(\" \").trim();\n};\n\n// 5. Remove tambem o token de tipo (usf/ubs/cs/ps/psf/ubsf) do inicio, ficando so\n// com o \"nome puro\" da unidade (ex: \"USF Ourives\" -> \"ourives\")\nconst normalizarPuro = (texto) => {\n    const nucleo = normalizarNucleo(texto);\n    const palavras = nucleo.split(\" \");\n    if (palavras.length && TIPOS.has(palavras[0])) {\n        palavras.shift();\n    }\n    return palavras.join(\" \").trim();\n};\n\n// 6. Busca em 3 niveis:\n//    a) nome completo exato (bate com o nome cadastrado no GLPI, com ou sem sigla)\n//    b) nome puro, SEM o tipo - se so existir uma unidade com esse nome na base inteira,\n//       ja usa ela direto (ex: cliente digita so \"Ourives\" ou \"USF Ourives\", ambos acham\n//       a mesma unica unidade)\n//    c) se o nome puro bater em mais de uma unidade (ex: existe \"USF Sede\" em varios\n//       municipios, ou \"UBS Santo Antonio\" e \"USF Santo Antonio\"), usa o tipo que o\n//       cliente digitou (USF/UBS/CS/PS/PSF) pra desempatar entre as opcoes\nconst unidadeExata = normalizarBase(valorOriginal);\nconst unidadePuro = normalizarPuro(valorOriginal);\nconst unidadeNucleo = normalizarNucleo(valorOriginal);\n\nlet id_unidade_glpi = mapaUnidades[unidadeExata] || null;\nif (!id_unidade_glpi) {\n    id_unidade_glpi = mapaUnidadesPuro[unidadePuro] || null;\n}\nif (!id_unidade_glpi) {\n    id_unidade_glpi = mapaUnidadesNucleo[unidadeNucleo] || null;\n}\n\n// 7. Retorno para o no seguinte\nreturn [{\n    json: {\n        texto_original: valorOriginal,\n        unidade_processada: unidadeExata,\n        unidade_processada_puro: unidadePuro,\n        unidade_processada_nucleo: unidadeNucleo,\n        id_unidade_glpi: id_unidade_glpi\n    },\n    pairedItem: { item: 0 }\n}];\n"
+      },
+      "id": "8c889cb4-e5a8-49bb-a5e9-d6984916250f",
+      "name": "Tratando a Unidade",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -5008,
+        2560
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Pega o valor digitado pelo cliente (campo \"estabelecimento\")\nconst valorOriginal = $('Pega dados pessoais do cliente (2)').item.json.estabelecimento || \"\";\n\n// 2. Dicionario de Unidades (nome normalizado -> ID GLPI)\nconst mapaUnidades = {\n    \"usf jose muniz dias\": 58, \"usf raulino bispo de oliveira\": 59, \"usf geneci ferreira dos santos\": 60, \"usf pe do morro\": 61, \"usf jose teixeira dos santos\": 62, \"usf francisco xavier pires\": 63, \"usf jeronimo jose da silva\": 64, \"usf monte alto\": 65, \"usf morada feliz\": 67, \"unidade de saude da familia de missao do aricobe\": 68, \"unidade de saude da familia do novo angical\": 69, \"unidadede basica de saude elpidio pereira\": 70, \"usf jose cordeiro vasco\": 71, \"nucleo multiprofissional de saude hermes passos filho\": 72, \"psf sao francisco ii\": 73, \"psf araujao ii\": 74, \"psf luzia leite\": 75, \"psf do sao francisco iii\": 76, \"psf do alto da bela vista\": 77, \"psf do rene lucena\": 78, \"psf da lagoa do mato\": 79, \"psf do vieira\": 80, \"psf sao felipe\": 81, \"psf do morro dourado\": 82, \"psf poco\": 83, \"psf do sao francisco\": 84, \"psf da vila da conceicao\": 85, \"psf do coracao de jesus\": 86, \"psf do araujao\": 87, \"psf olho dagua\": 88, \"centro de saude dr miranda tavares\": 89, \"psf coracao de maria\": 90, \"psf da lagoa do mato ii\": 91, \"psf do sao sebastiao\": 92, \"psf morro dourado ii\": 93, \"psf rene lucena ii\": 94, \"psf santissimo sacramento\": 95, \"psf nossa senhora de fatima\": 96, \"centro de referencia amai\": 97, \"psf i manoel miranda de oliveira\": 98, \"psf ii cesario gomes pereira\": 99, \"psf iii antonio alves de castro\": 100, \"psf iv antonino dos santos alves\": 101, \"psf v jose irio de souza\": 102, \"ps de nova olinda\": 103, \"ps buriti dos montes psf e nasf\": 104, \"usf de caldeirao de nicolau\": 105, \"usf bela vista\": 106, \"usf da serra verde\": 107, \"usf gregorios\": 108, \"usf jose alves teixeira\": 109, \"usf de alegre\": 110, \"usf badu\": 111, \"usf terra branca\": 112, \"centro de saude iii\": 113, \"unidade basica de saude esf matadouro estacao\": 114, \"centro de saude esf centro i\": 115, \"unidade basica de saude esf santa rita\": 116, \"centro de saude da sede\": 118, \"unidade de saude da familia da sede ii\": 119, \"centro de saude galheiro puba\": 120, \"centro de saude de galheiro puba\": 121, \"unidade basica dr jose francisco marchesine nunes\": 122, \"posto de saude\": 123, \"unidade basica de saude de piloes e vila neves\": 124, \"centro de saude governador joao durval carneiro\": 125, \"psf maria anisia de souza fernandes\": 126, \"eap sebastiao araujo\": 127, \"eap joaquim dias do nascimento\": 128, \"ubs retiro\": 129, \"ubs do centro\": 130, \"ubs fazenda nova\": 131, \"ps caju norte unidade de saude buriti agricola\": 132, \"ubs santa luz\": 133, \"ubs tanque do governo\": 134, \"ubs santo antonio\": 135, \"ubs antonio policarpo\": 136, \"ubs aeroporto\": 137, \"unidade de saude da familia juarez nunes de oliveira\": 138, \"unidade de saude da familia de sao joao do porto alegre\": 139, \"unidade de saude da familia dona lio ii\": 140, \"unidade de saude da familia feliciana souza dos reis\": 141, \"unidade de saude da familia arnulfo lacerda de moura\": 142, \"unidade de saude da familia mario souza barros\": 143, \"unidade de saude da familia luis cardoso bomfim\": 144, \"unidade de saude da familia dona lio\": 145, \"unidade de saude da familia manoel messias\": 146, \"unidade basica de saude sitio seco dos rochas\": 147, \"unidade basica de saude vovo noeme\": 148, \"centro de atencimento covid 19 de colinas\": 149, \"centro de saude joao batista macedo costa\": 150, \"centro de saude dr osano brandao\": 151, \"unidade basica de saude trezidela\": 152, \"unidade basica de saude liberdade\": 153, \"unidade basica de saude vila brandao\": 154, \"unidade basica de saude maravilha\": 155, \"unidade basica de saude serra negra\": 156, \"unidade basica de saude alto santo antonio\": 157, \"unidade basica de saude piquete\": 158, \"unidade basica de saude pavio\": 159, \"centro de saude polo almeida\": 160, \"unidade basica de saude sem terra\": 161, \"unidade basica de saude santo antonio\": 162, \"unidade basica de saude do curimata\": 163, \"unidade basica de saude do cambirimba\": 164, \"unidade basica de saude sao felix\": 165, \"unidade basica de saude serrinha\": 166, \"unidade basica de saude boa sorte\": 167, \"ubs padre jose de anchieta mauriz cortez\": 168, \"centro de saude alianca do gurgueia\": 169, \"ambulatorio municipal de colonia do gurgueia\": 170, \"centro de saude lagoa cercada\": 171, \"centro de saude vale do gurgueia\": 172, \"ubs centro de saude vale do gurgueia\": 173, \"ubs elenita rodrigues bastos\": 174, \"ubs estelita guerra de macedo\": 175, \"ubs olga rodrigues\": 176, \"ubs felicia guerra antunes\": 177, \"ubs livia alves rocha\": 178, \"usf centro\": 179, \"posto de saude santa luzia\": 180, \"usf centro 05\": 181, \"usf de barra do bernardo\": 182, \"usf centro ii\": 183, \"usf dom helio pascoal\": 184, \"ubs ismenia gomes monteiro\": 185, \"ubs mosqueada\": 186, \"ubs santa helena\": 187, \"ubs joao rodrigues coimbra\": 188, \"ubs sambaiba\": 189, \"ubs dr francisco ferreira ramos\": 190, \"ubs benoni portela leal\": 191, \"unidade de saude da familia do ramalho\": 192, \"unidade de saude da familia de feira da mata\": 193, \"unidade de saude da familia de varzea da cruz\": 194, \"usf antonio carlos kalil dourado\": 195, \"usf valdofredo sousa carmo\": 196, \"usf dr wanderley fraga lima\": 197, \"usf adeina silva galvao\": 198, \"usf dr paulo cesar santana andrade\": 199, \"usf francisco de almeida\": 200, \"usf abel cornelio de morais filho\": 201, \"usf marilelia benicio santana\": 202, \"usf francisco benicio\": 203, \"ubs lavignia magalhaes\": 204, \"ubs lourdes alves\": 205, \"conjunto penal de itabuna\": 206, \"usf simao fitterman\": 207, \"ubs roberto santos\": 208, \"ubs dilson cordier\": 209, \"ubs calixto midlej\": 210, \"ubs alberto teixeira barreto\": 211, \"usf corbiniano freire\": 212, \"usf ubiratan moreira\": 213, \"ubs dr jose maria de magalhaes neto\": 214, \"usf nova ferradas\": 215, \"ubs moise hage\": 216, \"ubs dr jose edites dos santos\": 217, \"usf dr joao monteiro\": 218, \"usf joao jose soares\": 219, \"usf jorge amado\": 220, \"usf manoel rodrigues\": 221, \"usf dr raymundo brandao freire\": 222, \"usf amalia lessa\": 223, \"unidade de saude mental\": 224, \"usf dr candido pereira\": 225, \"usf dr elson duarte\": 226, \"usf dr jacinto cabral\": 227, \"usf dr aurivaldo peixoto sampaio\": 228, \"usf dr nilton ramos\": 229, \"ubs isolina guimaraes\": 230, \"usf bairro de fatima ii\": 231, \"u s f dr mario alves peixoto\": 232, \"u s f john leahy\": 233, \"u s f bairro de fatima i\": 234, \"u s f dr antonio menezes filho\": 235, \"unidade de saude da familia bairro manoel leao\": 236, \"equipe emulti i\": 237, \"consultorio na rua mii\": 238, \"usf dr jose renan oliveira moreira\": 239, \"usf maria jose rocha passos\": 240, \"centro de saude dr raimundo bastos barreto\": 241, \"usf dr raimundo bastos barreto\": 242, \"usf dr gustavo henrique lopes pinheiro\": 243, \"usf dr gileno andrade fonseca\": 244, \"usf dr noe bonfim\": 245, \"usf dailva moraes de castro\": 246, \"centro de saude maria jose rocha passos\": 247, \"unidade de saude psf i\": 248, \"unidade de saude psf ii\": 249, \"unidade de saude psf iii\": 250, \"unidade psf alipio rodrigues mota\": 251, \"unidade psf de ventania\": 252, \"unidade de psf leonardo santos sarquis\": 253, \"unidade psf nilton manoel\": 254, \"unidade de psf joathan ribeiro cardoso\": 255, \"unidade de saude da familia dr olimpio aleluia\": 256, \"centro de saude manoel rodrigues santos\": 257, \"unidade de saude da familia jonas oliveira\": 258, \"unidade de saude da familia dr alcebiades cunha\": 259, \"unidade de saude da familia dr ruy costa\": 260, \"unidade de saude da familia jose fernando aragao\": 261, \"unidade de saude da familia eurico araujo\": 262, \"unidade de saude da familia do centro\": 263, \"usf de tranqueiras\": 264, \"usf do sao jose\": 265, \"usf sede 3\": 266, \"usf varzea\": 267, \"centro de atendimento sindromes respiratoria covid19 ituacu\": 268, \"usf da gruta da mangabeira\": 269, \"usf da lage\": 270, \"usf do campo grande\": 271, \"usf da sede\": 272, \"usf da ovelha\": 273, \"usf da sede 2\": 274, \"ubs dr carlos vagner lopes frota\": 275, \"ubs arnobio fernandes dos santos\": 276, \"ubs dr sebastiao pereira magalhaes\": 277, \"ubs valdomiro frota\": 278, \"ubs jose maria da costa\": 279, \"ubs maria de jesus almeida esf x\": 280, \"ubs amelia crisanto esf v\": 281, \"ubs domingos jose da silva esf ii\": 282, \"ubs marcos jose de sousa esf vii\": 283, \"ubs adao barbosa esf i\": 284, \"ubs jose francisco batista psf viii\": 285, \"ubs maria das merces de lima esf vi\": 286, \"ubs dra lourdinha crisanto esf iv\": 287, \"ubs joana carmina da costa esf iii\": 288, \"ubs alberto bessa luz esf ix\": 289, \"centro de saude wilson roriz\": 290, \"ubas maria helena de oliveira\": 291, \"posto saude do tamarindo\": 292, \"ps passagem do meio\": 293, \"ps bananeira\": 294, \"ps tanques\": 295, \"unidade basica de saude abilheirinhas\": 296, \"ps buriti do santo antonio\": 297, \"ubs de juazeiro do piaui\": 298, \"unidade de saude da familia de espinho\": 299, \"usf feliciano da silva assuncao\": 300, \"unidade de saude da familia de caraguatai\": 301, \"usf de sao jose\": 302, \"centro de saude angelica moita\": 303, \"ubs francisca de sousa barros fonseca\": 304, \"unidade de saude da familia zuleide nunes de araujo b sorte\": 305, \"usf maria olimpia da silva magalhaes\": 306, \"unidade de saude da familia ana maria da silva\": 307, \"unidade de saude da familia rosaria mendes ferreira\": 308, \"unidade saude da familia judith maria da paixao\": 309, \"unidade saude da familia joao teixeira sobrinho\": 310, \"estrategia de saude da familia centro de saude de morpara\": 311, \"estrategia de saude da familia nestor alves torres\": 312, \"estrategia de saude da familia vilmar andrade coimbra\": 313, \"usf valdemar andrade nascimento\": 314, \"centro de saude jesimiel norberto da silva\": 315, \"usf jovelino hora almeida\": 316, \"usf jose bruno dos santos\": 317, \"unidade de vigilancia sanitaria\": 318, \"usf veleda p nascimento\": 319, \"usf otavio barreto da silva\": 320, \"usf deraldo pereira da silva\": 321, \"usf endiretor\": 322, \"usf barro branco\": 323, \"unidade basica de saude nadir de castro pinto\": 324, \"unidade basica de saude jackson pereira baleeiro\": 325, \"unidade basica de saude erondino de castro malheiros\": 326, \"unidade basica de saude osorio neco nogueira\": 327, \"centro de saude cloves de andrade veiga\": 328, \"unidade basica de saude valdecina rocha dos santos\": 329, \"unidade basica de saude sebastiao rocha filho\": 330, \"unidade basica de saude zilda maria da cruz malheiros\": 331, \"unidade basica de saude edinon flores\": 332, \"usf do tanque\": 333, \"usf de guirapa\": 334, \"usf sede\": 335, \"usf severino moura arruda\": 336, \"eab da barriguda\": 337, \"usf de paus pretos\": 338, \"centro de referencia covid 19\": 339, \"ubs durvalina emidia santos\": 340, \"usf da tabua\": 341, \"ubs 12 varzea\": 342, \"ubs 30 parque recreio\": 343, \"ubs 08 germano\": 344, \"ubs 13 matadouro\": 345, \"ubs 07 caixa dagua\": 346, \"ubs 15 barcelona\": 347, \"ubs 06 sao joao\": 348, \"ubs 10 furnas\": 349, \"ubs 11 caldeirao\": 350, \"ubs 23 sao luis\": 351, \"ubs 16 vertentes\": 352, \"ubs 01 vista alegre\": 353, \"ubs 14 formosa\": 354, \"ubs 05 recreio\": 355, \"ubs 02 santa maria\": 356, \"ubs 04 paciencia 1\": 357, \"ubsf sertao de dentro psf 14\": 358, \"ubs 09 floresta\": 359, \"ubs 19 estacao\": 360, \"ubs 2024 petecas crioli\": 361, \"ubs 22 sussuarana\": 362, \"ubs 17 fonte dos matos\": 363, \"ubs 18 centro\": 364, \"ubs 03 prado\": 365, \"ubs 31 jenipapeiro\": 366, \"ubs 29 petecas iii iv\": 367, \"ubs 26 quebradas\": 368, \"ubs 25 pe do morro\": 369, \"ubs 27 banda\": 370, \"ubs 28 baixao\": 371, \"ubs 21 paciencia 2\": 372, \"usf alcebiades pereira de andrade conde\": 373, \"usf de lucaia\": 374, \"usf parafuso\": 375, \"usf do geriba\": 376, \"usf de saude lagoa do terto\": 378, \"usf morada do planalto\": 379, \"usf ceac\": 380, \"usf taquaral\": 381, \"usf urbis\": 382, \"unidade basica de saude da familia estrada e armazem\": 383, \"unidade basica de saude da familia nella ramella\": 384, \"unidade basica de saude da familia doralice boulhosa\": 385, \"unidade basica de saude da familia izabel damasceno\": 386, \"unidade basica de saude da familia miguel moraes martins\": 387, \"unidade basica de saude da familia dom angelo maria rivato\": 388, \"unidade basica de saude ribeirinha pedro fernandes de souza\": 389, \"unidade de saude da familia do santo antonio\": 390, \"unidade de saude da familia do jardim imperial\": 391, \"centro de atendimento covid 19 riacho de santana\": 392, \"unidade de saude da familia alexandrina alves de oliveira\": 393, \"unidade de saude da familia da vesperina\": 394, \"ubs de riacho de santana\": 395, \"unidade de saude da familia do cambaito\": 396, \"unidade de saude da familia de laguna\": 397, \"unidade de saude da familia de botuquara\": 398, \"ubs dr joao laranjeira centro\": 399, \"unidade de saude da familia do mato verde\": 400, \"unidade de saude da familia de santa rita\": 401, \"unidade de saude da familia do mato verde ii\": 402, \"unidade de saude da familia do belem\": 403, \"unidade de saude da familia de marcolino moura\": 404, \"sindicato\": 405, \"unidade de saude da familia de mato grosso\": 406, \"unidade de saude da familia de arapiranga\": 407, \"posto de saude do rio da caixa\": 408, \"centro de saude e psf da sede\": 409, \"unidade de saude da familia de joao vaz\": 410, \"e multi rio de contas\": 411, \"unidade de saude da familia do vermelhao\": 412, \"unidade de saude da familia de ibiajara\": 413, \"unidade de saude da familia de rio do pires\": 414, \"unidade de saude da familia de varzinha\": 415, \"unidade basica de saude da sede 4\": 416, \"unidade de saude da familia da placa\": 417, \"unidade basica de saude curral queimado\": 418, \"ubs dr ernani de paiva maia\": 419, \"ubs santa filomena\": 420, \"ubs zona rural\": 421, \"unidade basica de saude da familia i\": 422, \"unidade basica de saude da familia iii\": 423, \"unidade basica de saude da familia ii\": 424, \"unidade basica de saude da familia iv\": 425, \"unidade basica de saude da familia v\": 426, \"unidade de saude vi\": 427, \"ubs vii\": 428, \"unidade basica de saude do entroncamento\": 429, \"ps da malhada redonda\": 430, \"ps do saco da varzea\": 431, \"ubs sao jose do piaui sede\": 432, \"ps do caldeirao dos luis\": 433, \"ps do jua\": 434, \"ubs do atalho\": 435, \"psf da sede\": 436, \"unidade basica de saude mae bibia\": 437, \"ubs jose pereira de oliveira prefeito zeca pereira\": 438, \"ubs dr domingo jose de carvalho\": 439, \"ubs julio de melo paz\": 440, \"unidade saude da familia de ourives\": 442, \"central de atendimento ao covid de tanhacu\": 444, \"unidade de saude da familia sussuarana\": 445, \"unidade de saude da familia varzea da pedra\": 446, \"unidade de saude da familia riacho dantas\": 447, \"usf sucuarana ii\": 448, \"unidade de saude da familia cleriston andrade\": 449, \"unidade de saude da familia jurema\": 450, \"usf sede ii\": 451, \"ceadim tremedal\": 452, \"usf de tremedal\": 453, \"centro municipal de vigilancia a saude\": 454, \"usf manoel inacio pereira\": 455, \"usf de furado da cancela\": 456, \"usf dr gileno rocha\": 457, \"usf julia alves de souza pereira\": 458, \"usf juelita rosa santiago meira\": 459, \"farmacia basica municipal de tremedal\": 460, \"usf durval ferreira rocha\": 461, \"usf nana de gregorio\": 462, \"unidade de saude da familia de pedras\": 463, \"unidade de saude da familia vila brasil\": 464, \"centro de saude de una\": 465, \"unidade de saude da familia colonia\": 466, \"unidade de saude da familia do sucupira\": 467, \"unidade de saude da familia do bairro novo\": 468, \"unidade de saude da familia do bairro marcel ganem\": 469, \"unidade basica de saude da urbs\": 470, \"unidade basica de saude do distrito do outeiro\": 471, \"unidade basica de saude do distrito de colonia\": 472, \"unidade de saude da familia doutor olegario guimaraes\": 473, \"psf joao pereira dos santos\": 474, \"psf de estreito\": 475, \"psf dorivaldo dantas\": 476, \"psf de cantinho\": 477, \"psf dr antonio alberto silveira santos\": 478, \"cs dr joao melo filho\": 479, \"usf de pradoso\": 480, \"pab sao vicente cae ii\": 481, \"cs dr hugo de castro lima\": 482, \"unidade de saude primavera\": 483, \"unidade de saude ipe\": 484, \"casa de apoio de nova canaa vca\": 485, \"usf de bate pe\": 486, \"usf henrique ferraz graziani\": 487, \"usf de inhobim\": 488, \"usf solange hortelio franco csu\": 489, \"usf do bruno bacelar\": 490, \"usf do parque conveima i\": 491, \"pab do panorama\": 492, \"cs admario silva santos\": 493, \"usf de igua\": 494, \"usf professor nelson barros\": 495, \"usf da urbis vi\": 496, \"usf da urbis v\": 497, \"usf de jose goncalves\": 498, \"usf de cercadinho\": 499, \"usf de veredinha\": 500, \"cs regis pacheco\": 501, \"usf de sao sebastiao\": 502, \"usf do miro cairo\": 503, \"usf jose gomes novaes\": 504, \"usf nestor guimaraes\": 505, \"usf da limeira\": 506, \"usf do jardim valeria\": 507, \"programa conquista crianca\": 508, \"usf andre chagas leite\": 509, \"usf de lagoa formosa\": 510, \"usf da roseira\": 511, \"usf de sao joaquim\": 512, \"usf de lagoa das flores\": 513, \"usf do capinal\": 514, \"usf lagoa das flores ii\": 515, \"centro de referencia em hepatite\": 516, \"usf madalena santos sousa\": 517, \"usf pedrinhas\": 518, \"ubs campinhos\": 519, \"usf cidade modelo\": 520, \"usf recanto das aguas\": 521, \"usf morada dos passaros\": 522, \"usf do simao\": 523, \"presidio regional de vitoria da conquista\": 524, \"usf vila america\": 525, \"usf dr onildo pereira de oliveira filho\": 526, \"usf nova cidade\": 527, \"cpvc conjunto penal de vitoria da conquista\": 528, \"usf do jardim valeria iii\": 529,\n};\n\n// 2b. Dicionario por nucleo (tipo abreviado -> canonico, sem conectores) para casar\n// \"USF Ourives\" com \"Unidade Saude da Familia de Ourives\"\nconst mapaUnidadesNucleo = {\n    \"usf jose muniz dias\": 58, \"usf raulino bispo de oliveira\": 59, \"usf geneci ferreira dos santos\": 60, \"usf pe do morro\": 61, \"usf jose teixeira dos santos\": 62, \"usf francisco xavier pires\": 63, \"usf jeronimo jose da silva\": 64, \"usf monte alto\": 65, \"usf morada feliz\": 67, \"usf missao aricobe\": 68, \"usf novo angical\": 69, \"unidadede basica saude elpidio pereira\": 70, \"usf jose cordeiro vasco\": 71, \"nucleo multiprofissional saude hermes passos filho\": 72, \"psf sao francisco ii\": 73, \"psf araujao ii\": 74, \"psf luzia leite\": 75, \"psf sao francisco iii\": 76, \"psf alto bela vista\": 77, \"psf rene lucena\": 78, \"psf lagoa mato\": 79, \"psf vieira\": 80, \"psf sao felipe\": 81, \"psf morro dourado\": 82, \"psf poco\": 83, \"psf sao francisco\": 84, \"psf vila conceicao\": 85, \"psf coracao jesus\": 86, \"psf araujao\": 87, \"psf olho dagua\": 88, \"cs dr miranda tavares\": 89, \"psf coracao maria\": 90, \"psf lagoa mato ii\": 91, \"psf sao sebastiao\": 92, \"psf morro dourado ii\": 93, \"psf rene lucena ii\": 94, \"psf santissimo sacramento\": 95, \"psf nossa senhora fatima\": 96, \"centro referencia amai\": 97, \"psf i manoel miranda oliveira\": 98, \"psf ii cesario gomes pereira\": 99, \"psf iii antonio alves castro\": 100, \"psf iv antonino santos alves\": 101, \"psf v jose irio souza\": 102, \"ps nova olinda\": 103, \"ps buriti montes psf e nasf\": 104, \"usf caldeirao nicolau\": 105, \"usf bela vista\": 106, \"usf serra verde\": 107, \"usf gregorios\": 108, \"usf jose alves teixeira\": 109, \"usf alegre\": 110, \"usf badu\": 111, \"usf terra branca\": 112, \"cs iii\": 113, \"ubs esf matadouro estacao\": 114, \"cs esf centro i\": 115, \"ubs esf santa rita\": 116, \"cs sede\": 118, \"unidade basica dr jose francisco marchesine nunes\": 122, \"ps\": 123, \"ubs piloes e vila neves\": 124, \"cs governador joao durval carneiro\": 125, \"psf maria anisia souza fernandes\": 126, \"eap sebastiao araujo\": 127, \"eap joaquim dias nascimento\": 128, \"ubs retiro\": 129, \"ubs centro\": 130, \"ubs fazenda nova\": 131, \"ps caju norte unidade saude buriti agricola\": 132, \"ubs santa luz\": 133, \"ubs tanque governo\": 134, \"ubs antonio policarpo\": 136, \"ubs aeroporto\": 137, \"usf juarez nunes oliveira\": 138, \"usf sao joao porto alegre\": 139, \"usf dona lio ii\": 140, \"usf feliciana souza reis\": 141, \"usf arnulfo lacerda moura\": 142, \"usf mario souza barros\": 143, \"usf luis cardoso bomfim\": 144, \"usf dona lio\": 145, \"usf manoel messias\": 146, \"ubs sitio seco rochas\": 147, \"ubs vovo noeme\": 148, \"centro atencimento covid 19 colinas\": 149, \"cs joao batista macedo costa\": 150, \"cs dr osano brandao\": 151, \"ubs trezidela\": 152, \"ubs liberdade\": 153, \"ubs vila brandao\": 154, \"ubs maravilha\": 155, \"ubs serra negra\": 156, \"ubs alto santo antonio\": 157, \"ubs piquete\": 158, \"ubs pavio\": 159, \"cs polo almeida\": 160, \"ubs sem terra\": 161, \"ubs curimata\": 163, \"ubs cambirimba\": 164, \"ubs sao felix\": 165, \"ubs serrinha\": 166, \"ubs boa sorte\": 167, \"ubs padre jose anchieta mauriz cortez\": 168, \"cs alianca gurgueia\": 169, \"ambulatorio municipal colonia gurgueia\": 170, \"cs lagoa cercada\": 171, \"cs vale gurgueia\": 172, \"ubs cs vale gurgueia\": 173, \"ubs elenita rodrigues bastos\": 174, \"ubs estelita guerra macedo\": 175, \"ubs olga rodrigues\": 176, \"ubs felicia guerra antunes\": 177, \"ubs livia alves rocha\": 178, \"ps santa luzia\": 180, \"usf centro 05\": 181, \"usf barra bernardo\": 182, \"usf centro ii\": 183, \"usf dom helio pascoal\": 184, \"ubs ismenia gomes monteiro\": 185, \"ubs mosqueada\": 186, \"ubs santa helena\": 187, \"ubs joao rodrigues coimbra\": 188, \"ubs sambaiba\": 189, \"ubs dr francisco ferreira ramos\": 190, \"ubs benoni portela leal\": 191, \"usf ramalho\": 192, \"usf feira mata\": 193, \"usf varzea cruz\": 194, \"usf antonio carlos kalil dourado\": 195, \"usf valdofredo sousa carmo\": 196, \"usf dr wanderley fraga lima\": 197, \"usf adeina silva galvao\": 198, \"usf dr paulo cesar santana andrade\": 199, \"usf francisco almeida\": 200, \"usf abel cornelio morais filho\": 201, \"usf marilelia benicio santana\": 202, \"usf francisco benicio\": 203, \"ubs lavignia magalhaes\": 204, \"ubs lourdes alves\": 205, \"conjunto penal itabuna\": 206, \"usf simao fitterman\": 207, \"ubs roberto santos\": 208, \"ubs dilson cordier\": 209, \"ubs calixto midlej\": 210, \"ubs alberto teixeira barreto\": 211, \"usf corbiniano freire\": 212, \"usf ubiratan moreira\": 213, \"ubs dr jose maria magalhaes neto\": 214, \"usf nova ferradas\": 215, \"ubs moise hage\": 216, \"ubs dr jose edites santos\": 217, \"usf dr joao monteiro\": 218, \"usf joao jose soares\": 219, \"usf jorge amado\": 220, \"usf manoel rodrigues\": 221, \"usf dr raymundo brandao freire\": 222, \"usf amalia lessa\": 223, \"unidade saude mental\": 224, \"usf dr candido pereira\": 225, \"usf dr elson duarte\": 226, \"usf dr jacinto cabral\": 227, \"usf dr aurivaldo peixoto sampaio\": 228, \"usf dr nilton ramos\": 229, \"ubs isolina guimaraes\": 230, \"usf bairro fatima ii\": 231, \"usf dr mario alves peixoto\": 232, \"usf john leahy\": 233, \"usf bairro fatima i\": 234, \"usf dr antonio menezes filho\": 235, \"usf bairro manoel leao\": 236, \"equipe emulti i\": 237, \"consultorio na rua mii\": 238, \"usf dr jose renan oliveira moreira\": 239, \"usf maria jose rocha passos\": 240, \"cs dr raimundo bastos barreto\": 241, \"usf dr raimundo bastos barreto\": 242, \"usf dr gustavo henrique lopes pinheiro\": 243, \"usf dr gileno andrade fonseca\": 244, \"usf dr noe bonfim\": 245, \"usf dailva moraes castro\": 246, \"cs maria jose rocha passos\": 247, \"unidade saude psf i\": 248, \"unidade saude psf ii\": 249, \"unidade saude psf iii\": 250, \"unidade psf alipio rodrigues mota\": 251, \"unidade psf ventania\": 252, \"unidade psf leonardo santos sarquis\": 253, \"unidade psf nilton manoel\": 254, \"unidade psf joathan ribeiro cardoso\": 255, \"usf dr olimpio aleluia\": 256, \"cs manoel rodrigues santos\": 257, \"usf jonas oliveira\": 258, \"usf dr alcebiades cunha\": 259, \"usf dr ruy costa\": 260, \"usf jose fernando aragao\": 261, \"usf eurico araujo\": 262, \"usf tranqueiras\": 264, \"usf sede 3\": 266, \"usf varzea\": 267, \"centro atendimento sindromes respiratoria covid19 ituacu\": 268, \"usf gruta mangabeira\": 269, \"usf lage\": 270, \"usf campo grande\": 271, \"usf ovelha\": 273, \"usf sede 2\": 274, \"ubs dr carlos vagner lopes frota\": 275, \"ubs arnobio fernandes santos\": 276, \"ubs dr sebastiao pereira magalhaes\": 277, \"ubs valdomiro frota\": 278, \"ubs jose maria costa\": 279, \"ubs maria jesus almeida esf x\": 280, \"ubs amelia crisanto esf v\": 281, \"ubs domingos jose silva esf ii\": 282, \"ubs marcos jose sousa esf vii\": 283, \"ubs adao barbosa esf i\": 284, \"ubs jose francisco batista psf viii\": 285, \"ubs maria merces lima esf vi\": 286, \"ubs dra lourdinha crisanto esf iv\": 287, \"ubs joana carmina costa esf iii\": 288, \"ubs alberto bessa luz esf ix\": 289, \"cs wilson roriz\": 290, \"ubas maria helena oliveira\": 291, \"posto saude tamarindo\": 292, \"ps passagem meio\": 293, \"ps bananeira\": 294, \"ps tanques\": 295, \"ubs abilheirinhas\": 296, \"ps buriti santo antonio\": 297, \"ubs juazeiro piaui\": 298, \"usf espinho\": 299, \"usf feliciano silva assuncao\": 300, \"usf caraguatai\": 301, \"cs angelica moita\": 303, \"ubs francisca sousa barros fonseca\": 304, \"usf zuleide nunes araujo b sorte\": 305, \"usf maria olimpia silva magalhaes\": 306, \"usf ana maria silva\": 307, \"usf rosaria mendes ferreira\": 308, \"usf judith maria paixao\": 309, \"usf joao teixeira sobrinho\": 310, \"usf cs morpara\": 311, \"usf nestor alves torres\": 312, \"usf vilmar andrade coimbra\": 313, \"usf valdemar andrade nascimento\": 314, \"cs jesimiel norberto silva\": 315, \"usf jovelino hora almeida\": 316, \"usf jose bruno santos\": 317, \"unidade vigilancia sanitaria\": 318, \"usf veleda p nascimento\": 319, \"usf otavio barreto silva\": 320, \"usf deraldo pereira silva\": 321, \"usf endiretor\": 322, \"usf barro branco\": 323, \"ubs nadir castro pinto\": 324, \"ubs jackson pereira baleeiro\": 325, \"ubs erondino castro malheiros\": 326, \"ubs osorio neco nogueira\": 327, \"cs cloves andrade veiga\": 328, \"ubs valdecina rocha santos\": 329, \"ubs sebastiao rocha filho\": 330, \"ubs zilda maria cruz malheiros\": 331, \"ubs edinon flores\": 332, \"usf tanque\": 333, \"usf guirapa\": 334, \"usf severino moura arruda\": 336, \"eab barriguda\": 337, \"usf paus pretos\": 338, \"centro referencia covid 19\": 339, \"ubs durvalina emidia santos\": 340, \"usf tabua\": 341, \"ubs 12 varzea\": 342, \"ubs 30 parque recreio\": 343, \"ubs 08 germano\": 344, \"ubs 13 matadouro\": 345, \"ubs 07 caixa dagua\": 346, \"ubs 15 barcelona\": 347, \"ubs 06 sao joao\": 348, \"ubs 10 furnas\": 349, \"ubs 11 caldeirao\": 350, \"ubs 23 sao luis\": 351, \"ubs 16 vertentes\": 352, \"ubs 01 vista alegre\": 353, \"ubs 14 formosa\": 354, \"ubs 05 recreio\": 355, \"ubs 02 santa maria\": 356, \"ubs 04 paciencia 1\": 357, \"ubsf sertao dentro psf 14\": 358, \"ubs 09 floresta\": 359, \"ubs 19 estacao\": 360, \"ubs 2024 petecas crioli\": 361, \"ubs 22 sussuarana\": 362, \"ubs 17 fonte matos\": 363, \"ubs 18 centro\": 364, \"ubs 03 prado\": 365, \"ubs 31 jenipapeiro\": 366, \"ubs 29 petecas iii iv\": 367, \"ubs 26 quebradas\": 368, \"ubs 25 pe morro\": 369, \"ubs 27 banda\": 370, \"ubs 28 baixao\": 371, \"ubs 21 paciencia 2\": 372, \"usf alcebiades pereira andrade conde\": 373, \"usf lucaia\": 374, \"usf parafuso\": 375, \"usf geriba\": 376, \"usf saude lagoa terto\": 378, \"usf morada planalto\": 379, \"usf ceac\": 380, \"usf taquaral\": 381, \"usf urbis\": 382, \"ubsf estrada e armazem\": 383, \"ubsf nella ramella\": 384, \"ubsf doralice boulhosa\": 385, \"ubsf izabel damasceno\": 386, \"ubsf miguel moraes martins\": 387, \"ubsf dom angelo maria rivato\": 388, \"ubs ribeirinha pedro fernandes souza\": 389, \"usf santo antonio\": 390, \"usf jardim imperial\": 391, \"centro atendimento covid 19 riacho santana\": 392, \"usf alexandrina alves oliveira\": 393, \"usf vesperina\": 394, \"ubs riacho santana\": 395, \"usf cambaito\": 396, \"usf laguna\": 397, \"usf botuquara\": 398, \"ubs dr joao laranjeira centro\": 399, \"usf mato verde\": 400, \"usf santa rita\": 401, \"usf mato verde ii\": 402, \"usf belem\": 403, \"usf marcolino moura\": 404, \"sindicato\": 405, \"usf mato grosso\": 406, \"usf arapiranga\": 407, \"ps rio caixa\": 408, \"cs e psf sede\": 409, \"usf joao vaz\": 410, \"e multi rio contas\": 411, \"usf vermelhao\": 412, \"usf ibiajara\": 413, \"usf rio pires\": 414, \"usf varzinha\": 415, \"ubs sede 4\": 416, \"usf placa\": 417, \"ubs curral queimado\": 418, \"ubs dr ernani paiva maia\": 419, \"ubs santa filomena\": 420, \"ubs zona rural\": 421, \"ubsf i\": 422, \"ubsf iii\": 423, \"ubsf ii\": 424, \"ubsf iv\": 425, \"ubsf v\": 426, \"unidade saude vi\": 427, \"ubs vii\": 428, \"ubs entroncamento\": 429, \"ps malhada redonda\": 430, \"ps saco varzea\": 431, \"ubs sao jose piaui sede\": 432, \"ps caldeirao luis\": 433, \"ps jua\": 434, \"ubs atalho\": 435, \"psf sede\": 436, \"ubs mae bibia\": 437, \"ubs jose pereira oliveira prefeito zeca pereira\": 438, \"ubs dr domingo jose carvalho\": 439, \"ubs julio melo paz\": 440, \"usf ourives\": 442, \"central atendimento ao covid tanhacu\": 444, \"usf sussuarana\": 445, \"usf varzea pedra\": 446, \"usf riacho dantas\": 447, \"usf sucuarana ii\": 448, \"usf cleriston andrade\": 449, \"usf jurema\": 450, \"ceadim tremedal\": 452, \"usf tremedal\": 453, \"centro municipal vigilancia a saude\": 454, \"usf manoel inacio pereira\": 455, \"usf furado cancela\": 456, \"usf dr gileno rocha\": 457, \"usf julia alves souza pereira\": 458, \"usf juelita rosa santiago meira\": 459, \"farmacia basica municipal tremedal\": 460, \"usf durval ferreira rocha\": 461, \"usf nana gregorio\": 462, \"usf pedras\": 463, \"usf vila brasil\": 464, \"cs una\": 465, \"usf colonia\": 466, \"usf sucupira\": 467, \"usf bairro novo\": 468, \"usf bairro marcel ganem\": 469, \"ubs urbs\": 470, \"ubs distrito outeiro\": 471, \"ubs distrito colonia\": 472, \"usf doutor olegario guimaraes\": 473, \"psf joao pereira santos\": 474, \"psf estreito\": 475, \"psf dorivaldo dantas\": 476, \"psf cantinho\": 477, \"psf dr antonio alberto silveira santos\": 478, \"cs dr joao melo filho\": 479, \"usf pradoso\": 480, \"pab sao vicente cae ii\": 481, \"cs dr hugo castro lima\": 482, \"unidade saude primavera\": 483, \"unidade saude ipe\": 484, \"casa apoio nova canaa vca\": 485, \"usf bate pe\": 486, \"usf henrique ferraz graziani\": 487, \"usf inhobim\": 488, \"usf solange hortelio franco csu\": 489, \"usf bruno bacelar\": 490, \"usf parque conveima i\": 491, \"pab panorama\": 492, \"cs admario silva santos\": 493, \"usf igua\": 494, \"usf professor nelson barros\": 495, \"usf urbis vi\": 496, \"usf urbis v\": 497, \"usf jose goncalves\": 498, \"usf cercadinho\": 499, \"usf veredinha\": 500, \"cs regis pacheco\": 501, \"usf sao sebastiao\": 502, \"usf miro cairo\": 503, \"usf jose gomes novaes\": 504, \"usf nestor guimaraes\": 505, \"usf limeira\": 506, \"usf jardim valeria\": 507, \"programa conquista crianca\": 508, \"usf andre chagas leite\": 509, \"usf lagoa formosa\": 510, \"usf roseira\": 511, \"usf sao joaquim\": 512, \"usf lagoa flores\": 513, \"usf capinal\": 514, \"usf lagoa flores ii\": 515, \"centro referencia em hepatite\": 516, \"usf madalena santos sousa\": 517, \"usf pedrinhas\": 518, \"ubs campinhos\": 519, \"usf cidade modelo\": 520, \"usf recanto aguas\": 521, \"usf morada passaros\": 522, \"usf simao\": 523, \"presidio regional vitoria conquista\": 524, \"usf vila america\": 525, \"usf dr onildo pereira oliveira filho\": 526, \"usf nova cidade\": 527, \"cpvc conjunto penal vitoria conquista\": 528, \"usf jardim valeria iii\": 529,\n};\n\n// 2c. Dicionario por nome puro (sem o tipo USF/UBS/CS/PS/PSF/UBSF na frente) - so tem\n// entrada aqui quando o nome puro identifica uma UNICA unidade em toda a base\nconst mapaUnidadesPuro = {\n    \"jose muniz dias\": 58, \"raulino bispo oliveira\": 59, \"geneci ferreira santos\": 60, \"pe morro\": 61, \"jose teixeira santos\": 62, \"francisco xavier pires\": 63, \"jeronimo jose silva\": 64, \"monte alto\": 65, \"morada feliz\": 67, \"missao aricobe\": 68, \"novo angical\": 69, \"unidadede basica saude elpidio pereira\": 70, \"jose cordeiro vasco\": 71, \"nucleo multiprofissional saude hermes passos filho\": 72, \"sao francisco ii\": 73, \"araujao ii\": 74, \"luzia leite\": 75, \"sao francisco iii\": 76, \"alto bela vista\": 77, \"rene lucena\": 78, \"lagoa mato\": 79, \"vieira\": 80, \"sao felipe\": 81, \"morro dourado\": 82, \"poco\": 83, \"sao francisco\": 84, \"vila conceicao\": 85, \"coracao jesus\": 86, \"araujao\": 87, \"olho dagua\": 88, \"dr miranda tavares\": 89, \"coracao maria\": 90, \"lagoa mato ii\": 91, \"morro dourado ii\": 93, \"rene lucena ii\": 94, \"santissimo sacramento\": 95, \"nossa senhora fatima\": 96, \"centro referencia amai\": 97, \"i manoel miranda oliveira\": 98, \"ii cesario gomes pereira\": 99, \"iii antonio alves castro\": 100, \"iv antonino santos alves\": 101, \"v jose irio souza\": 102, \"nova olinda\": 103, \"buriti montes psf e nasf\": 104, \"caldeirao nicolau\": 105, \"bela vista\": 106, \"serra verde\": 107, \"gregorios\": 108, \"jose alves teixeira\": 109, \"alegre\": 110, \"badu\": 111, \"terra branca\": 112, \"esf matadouro estacao\": 114, \"esf centro i\": 115, \"esf santa rita\": 116, \"unidade basica dr jose francisco marchesine nunes\": 122, \"piloes e vila neves\": 124, \"governador joao durval carneiro\": 125, \"maria anisia souza fernandes\": 126, \"sebastiao araujo\": 127, \"joaquim dias nascimento\": 128, \"retiro\": 129, \"fazenda nova\": 131, \"caju norte unidade saude buriti agricola\": 132, \"santa luz\": 133, \"tanque governo\": 134, \"antonio policarpo\": 136, \"aeroporto\": 137, \"juarez nunes oliveira\": 138, \"sao joao porto alegre\": 139, \"dona lio ii\": 140, \"feliciana souza reis\": 141, \"arnulfo lacerda moura\": 142, \"mario souza barros\": 143, \"luis cardoso bomfim\": 144, \"dona lio\": 145, \"manoel messias\": 146, \"sitio seco rochas\": 147, \"vovo noeme\": 148, \"centro atencimento covid 19 colinas\": 149, \"joao batista macedo costa\": 150, \"dr osano brandao\": 151, \"trezidela\": 152, \"liberdade\": 153, \"vila brandao\": 154, \"maravilha\": 155, \"serra negra\": 156, \"alto santo antonio\": 157, \"piquete\": 158, \"pavio\": 159, \"polo almeida\": 160, \"sem terra\": 161, \"curimata\": 163, \"cambirimba\": 164, \"sao felix\": 165, \"serrinha\": 166, \"boa sorte\": 167, \"padre jose anchieta mauriz cortez\": 168, \"alianca gurgueia\": 169, \"ambulatorio municipal colonia gurgueia\": 170, \"lagoa cercada\": 171, \"vale gurgueia\": 172, \"cs vale gurgueia\": 173, \"elenita rodrigues bastos\": 174, \"estelita guerra macedo\": 175, \"olga rodrigues\": 176, \"felicia guerra antunes\": 177, \"livia alves rocha\": 178, \"santa luzia\": 180, \"centro 05\": 181, \"barra bernardo\": 182, \"centro ii\": 183, \"dom helio pascoal\": 184, \"ismenia gomes monteiro\": 185, \"mosqueada\": 186, \"santa helena\": 187, \"joao rodrigues coimbra\": 188, \"sambaiba\": 189, \"dr francisco ferreira ramos\": 190, \"benoni portela leal\": 191, \"ramalho\": 192, \"feira mata\": 193, \"varzea cruz\": 194, \"antonio carlos kalil dourado\": 195, \"valdofredo sousa carmo\": 196, \"dr wanderley fraga lima\": 197, \"adeina silva galvao\": 198, \"dr paulo cesar santana andrade\": 199, \"francisco almeida\": 200, \"abel cornelio morais filho\": 201, \"marilelia benicio santana\": 202, \"francisco benicio\": 203, \"lavignia magalhaes\": 204, \"lourdes alves\": 205, \"conjunto penal itabuna\": 206, \"simao fitterman\": 207, \"roberto santos\": 208, \"dilson cordier\": 209, \"calixto midlej\": 210, \"alberto teixeira barreto\": 211, \"corbiniano freire\": 212, \"ubiratan moreira\": 213, \"dr jose maria magalhaes neto\": 214, \"nova ferradas\": 215, \"moise hage\": 216, \"dr jose edites santos\": 217, \"dr joao monteiro\": 218, \"joao jose soares\": 219, \"jorge amado\": 220, \"manoel rodrigues\": 221, \"dr raymundo brandao freire\": 222, \"amalia lessa\": 223, \"unidade saude mental\": 224, \"dr candido pereira\": 225, \"dr elson duarte\": 226, \"dr jacinto cabral\": 227, \"dr aurivaldo peixoto sampaio\": 228, \"dr nilton ramos\": 229, \"isolina guimaraes\": 230, \"bairro fatima ii\": 231, \"dr mario alves peixoto\": 232, \"john leahy\": 233, \"bairro fatima i\": 234, \"dr antonio menezes filho\": 235, \"bairro manoel leao\": 236, \"equipe emulti i\": 237, \"consultorio na rua mii\": 238, \"dr jose renan oliveira moreira\": 239, \"dr gustavo henrique lopes pinheiro\": 243, \"dr gileno andrade fonseca\": 244, \"dr noe bonfim\": 245, \"dailva moraes castro\": 246, \"unidade saude psf i\": 248, \"unidade saude psf ii\": 249, \"unidade saude psf iii\": 250, \"unidade psf alipio rodrigues mota\": 251, \"unidade psf ventania\": 252, \"unidade psf leonardo santos sarquis\": 253, \"unidade psf nilton manoel\": 254, \"unidade psf joathan ribeiro cardoso\": 255, \"dr olimpio aleluia\": 256, \"manoel rodrigues santos\": 257, \"jonas oliveira\": 258, \"dr alcebiades cunha\": 259, \"dr ruy costa\": 260, \"jose fernando aragao\": 261, \"eurico araujo\": 262, \"tranqueiras\": 264, \"sede 3\": 266, \"varzea\": 267, \"centro atendimento sindromes respiratoria covid19 ituacu\": 268, \"gruta mangabeira\": 269, \"lage\": 270, \"campo grande\": 271, \"ovelha\": 273, \"sede 2\": 274, \"dr carlos vagner lopes frota\": 275, \"arnobio fernandes santos\": 276, \"dr sebastiao pereira magalhaes\": 277, \"valdomiro frota\": 278, \"jose maria costa\": 279, \"maria jesus almeida esf x\": 280, \"amelia crisanto esf v\": 281, \"domingos jose silva esf ii\": 282, \"marcos jose sousa esf vii\": 283, \"adao barbosa esf i\": 284, \"jose francisco batista psf viii\": 285, \"maria merces lima esf vi\": 286, \"dra lourdinha crisanto esf iv\": 287, \"joana carmina costa esf iii\": 288, \"alberto bessa luz esf ix\": 289, \"wilson roriz\": 290, \"ubas maria helena oliveira\": 291, \"posto saude tamarindo\": 292, \"passagem meio\": 293, \"bananeira\": 294, \"tanques\": 295, \"abilheirinhas\": 296, \"buriti santo antonio\": 297, \"juazeiro piaui\": 298, \"espinho\": 299, \"feliciano silva assuncao\": 300, \"caraguatai\": 301, \"angelica moita\": 303, \"francisca sousa barros fonseca\": 304, \"zuleide nunes araujo b sorte\": 305, \"maria olimpia silva magalhaes\": 306, \"ana maria silva\": 307, \"rosaria mendes ferreira\": 308, \"judith maria paixao\": 309, \"joao teixeira sobrinho\": 310, \"cs morpara\": 311, \"nestor alves torres\": 312, \"vilmar andrade coimbra\": 313, \"valdemar andrade nascimento\": 314, \"jesimiel norberto silva\": 315, \"jovelino hora almeida\": 316, \"jose bruno santos\": 317, \"unidade vigilancia sanitaria\": 318, \"veleda p nascimento\": 319, \"otavio barreto silva\": 320, \"deraldo pereira silva\": 321, \"endiretor\": 322, \"barro branco\": 323, \"nadir castro pinto\": 324, \"jackson pereira baleeiro\": 325, \"erondino castro malheiros\": 326, \"osorio neco nogueira\": 327, \"cloves andrade veiga\": 328, \"valdecina rocha santos\": 329, \"sebastiao rocha filho\": 330, \"zilda maria cruz malheiros\": 331, \"edinon flores\": 332, \"tanque\": 333, \"guirapa\": 334, \"severino moura arruda\": 336, \"barriguda\": 337, \"paus pretos\": 338, \"centro referencia covid 19\": 339, \"durvalina emidia santos\": 340, \"tabua\": 341, \"12 varzea\": 342, \"30 parque recreio\": 343, \"08 germano\": 344, \"13 matadouro\": 345, \"07 caixa dagua\": 346, \"15 barcelona\": 347, \"06 sao joao\": 348, \"10 furnas\": 349, \"11 caldeirao\": 350, \"23 sao luis\": 351, \"16 vertentes\": 352, \"01 vista alegre\": 353, \"14 formosa\": 354, \"05 recreio\": 355, \"02 santa maria\": 356, \"04 paciencia 1\": 357, \"sertao dentro psf 14\": 358, \"09 floresta\": 359, \"19 estacao\": 360, \"2024 petecas crioli\": 361, \"22 sussuarana\": 362, \"17 fonte matos\": 363, \"18 centro\": 364, \"03 prado\": 365, \"31 jenipapeiro\": 366, \"29 petecas iii iv\": 367, \"26 quebradas\": 368, \"25 pe morro\": 369, \"27 banda\": 370, \"28 baixao\": 371, \"21 paciencia 2\": 372, \"alcebiades pereira andrade conde\": 373, \"lucaia\": 374, \"parafuso\": 375, \"geriba\": 376, \"saude lagoa terto\": 378, \"morada planalto\": 379, \"ceac\": 380, \"taquaral\": 381, \"urbis\": 382, \"estrada e armazem\": 383, \"nella ramella\": 384, \"doralice boulhosa\": 385, \"izabel damasceno\": 386, \"miguel moraes martins\": 387, \"dom angelo maria rivato\": 388, \"ribeirinha pedro fernandes souza\": 389, \"jardim imperial\": 391, \"centro atendimento covid 19 riacho santana\": 392, \"alexandrina alves oliveira\": 393, \"vesperina\": 394, \"riacho santana\": 395, \"cambaito\": 396, \"laguna\": 397, \"botuquara\": 398, \"dr joao laranjeira centro\": 399, \"mato verde\": 400, \"santa rita\": 401, \"mato verde ii\": 402, \"belem\": 403, \"marcolino moura\": 404, \"sindicato\": 405, \"mato grosso\": 406, \"arapiranga\": 407, \"rio caixa\": 408, \"e psf sede\": 409, \"joao vaz\": 410, \"e multi rio contas\": 411, \"vermelhao\": 412, \"ibiajara\": 413, \"rio pires\": 414, \"varzinha\": 415, \"sede 4\": 416, \"placa\": 417, \"curral queimado\": 418, \"dr ernani paiva maia\": 419, \"santa filomena\": 420, \"zona rural\": 421, \"i\": 422, \"ii\": 424, \"iv\": 425, \"v\": 426, \"unidade saude vi\": 427, \"vii\": 428, \"entroncamento\": 429, \"malhada redonda\": 430, \"saco varzea\": 431, \"sao jose piaui sede\": 432, \"caldeirao luis\": 433, \"jua\": 434, \"atalho\": 435, \"mae bibia\": 437, \"jose pereira oliveira prefeito zeca pereira\": 438, \"dr domingo jose carvalho\": 439, \"julio melo paz\": 440, \"ourives\": 442, \"central atendimento ao covid tanhacu\": 444, \"sussuarana\": 445, \"varzea pedra\": 446, \"riacho dantas\": 447, \"sucuarana ii\": 448, \"cleriston andrade\": 449, \"jurema\": 450, \"ceadim tremedal\": 452, \"tremedal\": 453, \"centro municipal vigilancia a saude\": 454, \"manoel inacio pereira\": 455, \"furado cancela\": 456, \"dr gileno rocha\": 457, \"julia alves souza pereira\": 458, \"juelita rosa santiago meira\": 459, \"farmacia basica municipal tremedal\": 460, \"durval ferreira rocha\": 461, \"nana gregorio\": 462, \"pedras\": 463, \"vila brasil\": 464, \"una\": 465, \"colonia\": 466, \"sucupira\": 467, \"bairro novo\": 468, \"bairro marcel ganem\": 469, \"urbs\": 470, \"distrito outeiro\": 471, \"distrito colonia\": 472, \"doutor olegario guimaraes\": 473, \"joao pereira santos\": 474, \"estreito\": 475, \"dorivaldo dantas\": 476, \"cantinho\": 477, \"dr antonio alberto silveira santos\": 478, \"dr joao melo filho\": 479, \"pradoso\": 480, \"sao vicente cae ii\": 481, \"dr hugo castro lima\": 482, \"unidade saude primavera\": 483, \"unidade saude ipe\": 484, \"casa apoio nova canaa vca\": 485, \"bate pe\": 486, \"henrique ferraz graziani\": 487, \"inhobim\": 488, \"solange hortelio franco csu\": 489, \"bruno bacelar\": 490, \"parque conveima i\": 491, \"panorama\": 492, \"admario silva santos\": 493, \"igua\": 494, \"professor nelson barros\": 495, \"urbis vi\": 496, \"urbis v\": 497, \"jose goncalves\": 498, \"cercadinho\": 499, \"veredinha\": 500, \"regis pacheco\": 501, \"miro cairo\": 503, \"jose gomes novaes\": 504, \"nestor guimaraes\": 505, \"limeira\": 506, \"jardim valeria\": 507, \"programa conquista crianca\": 508, \"andre chagas leite\": 509, \"lagoa formosa\": 510, \"roseira\": 511, \"sao joaquim\": 512, \"lagoa flores\": 513, \"capinal\": 514, \"lagoa flores ii\": 515, \"centro referencia em hepatite\": 516, \"madalena santos sousa\": 517, \"pedrinhas\": 518, \"campinhos\": 519, \"cidade modelo\": 520, \"recanto aguas\": 521, \"morada passaros\": 522, \"simao\": 523, \"presidio regional vitoria conquista\": 524, \"vila america\": 525, \"dr onildo pereira oliveira filho\": 526, \"nova cidade\": 527, \"cpvc conjunto penal vitoria conquista\": 528, \"jardim valeria iii\": 529,\n};\n\n// 3. Normaliza texto: minusculo, remove acento, colapsa espacos\nconst normalizarBase = (texto) => {\n    if (!texto) return \"\";\n    let limpo = String(texto).toLowerCase().normalize(\"NFD\").replace(/[̀-ͯ]/g, \"\");\n    limpo = limpo.replace(/\\s+/g, \" \").trim();\n    return limpo;\n};\n\n// 4. Expande sinonimos de tipo (USF/UBS/CS/PS/PSF/UBSF) para um token canonico\n// e remove conectores (de/da/do/dos/das), pra casar abreviacao com nome por extenso\nconst SINONIMOS = [\n    [\"unidade basica de saude da familia\", \"ubsf\"],\n    [\"unidade de saude da familia\", \"usf\"],\n    [\"unidade saude da familia\", \"usf\"],\n    [\"unidade basica de saude\", \"ubs\"],\n    [\"estrategia de saude da familia\", \"usf\"],\n    [\"centro de saude\", \"cs\"],\n    [\"posto de saude\", \"ps\"],\n    [\"programa saude da familia\", \"psf\"],\n    [\"u s f\", \"usf\"],\n];\nconst CONECTORES = new Set([\"de\", \"da\", \"do\", \"dos\", \"das\"]);\nconst TIPOS = new Set([\"usf\", \"ubs\", \"ubsf\", \"cs\", \"ps\", \"psf\", \"eap\", \"eab\", \"pab\"]);\n\nconst normalizarNucleo = (texto) => {\n    let t = normalizarBase(texto);\n    for (const [longa, curta] of SINONIMOS) {\n        t = t.replace(new RegExp(\"\\\\b\" + longa.replace(/[.*+?^${}()|[\\]\\\\]/g, \"\\\\$&\") + \"\\\\b\", \"g\"), curta);\n    }\n    const palavras = t.split(\" \").filter(w => w && !CONECTORES.has(w));\n    return palavras.join(\" \").trim();\n};\n\n// 5. Remove tambem o token de tipo (usf/ubs/cs/ps/psf/ubsf) do inicio, ficando so\n// com o \"nome puro\" da unidade (ex: \"USF Ourives\" -> \"ourives\")\nconst normalizarPuro = (texto) => {\n    const nucleo = normalizarNucleo(texto);\n    const palavras = nucleo.split(\" \");\n    if (palavras.length && TIPOS.has(palavras[0])) {\n        palavras.shift();\n    }\n    return palavras.join(\" \").trim();\n};\n\n// 6. Busca em 3 niveis:\n//    a) nome completo exato (bate com o nome cadastrado no GLPI, com ou sem sigla)\n//    b) nome puro, SEM o tipo - se so existir uma unidade com esse nome na base inteira,\n//       ja usa ela direto (ex: cliente digita so \"Ourives\" ou \"USF Ourives\", ambos acham\n//       a mesma unica unidade)\n//    c) se o nome puro bater em mais de uma unidade (ex: existe \"USF Sede\" em varios\n//       municipios, ou \"UBS Santo Antonio\" e \"USF Santo Antonio\"), usa o tipo que o\n//       cliente digitou (USF/UBS/CS/PS/PSF) pra desempatar entre as opcoes\nconst unidadeExata = normalizarBase(valorOriginal);\nconst unidadePuro = normalizarPuro(valorOriginal);\nconst unidadeNucleo = normalizarNucleo(valorOriginal);\n\nlet id_unidade_glpi = mapaUnidades[unidadeExata] || null;\nif (!id_unidade_glpi) {\n    id_unidade_glpi = mapaUnidadesPuro[unidadePuro] || null;\n}\nif (!id_unidade_glpi) {\n    id_unidade_glpi = mapaUnidadesNucleo[unidadeNucleo] || null;\n}\n\n// 7. Retorno para o no seguinte\nreturn [{\n    json: {\n        texto_original: valorOriginal,\n        unidade_processada: unidadeExata,\n        unidade_processada_puro: unidadePuro,\n        unidade_processada_nucleo: unidadeNucleo,\n        id_unidade_glpi: id_unidade_glpi\n    },\n    pairedItem: { item: 0 }\n}];\n"
+      },
+      "id": "d45a24b6-2730-47bb-bf29-9d8e32068623",
+      "name": "Tratando a Unidade (1)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -7680,
+        1024
+      ]
     }
   ],
   "pinData": {
@@ -4715,216 +4545,143 @@
             "user-agent": "Ruby",
             "host": "136.248.125.55:5678",
             "content-type": "application/json",
-            "x-chatwoot-delivery": "6ef0a968-1310-47bd-ad3a-71d64435fbc5",
-            "x-chatwoot-timestamp": "1785151208",
-            "x-chatwoot-signature": "sha256=4854840b5a88ef30a48144bb9889ce85432694d43725344b619ea5546fc65fd3",
-            "content-length": "4089"
+            "x-chatwoot-delivery": "975fb175-7c40-4c0a-a32c-19b65e7c2167",
+            "x-chatwoot-timestamp": "1788523908",
+            "x-chatwoot-signature": "sha256=12ec33ceff7f18179f8e6d4b6051b7c2ddc3af1d8d33abbacc53441b43a243ff",
+            "content-length": "2396"
           },
           "params": {},
           "query": {},
           "body": {
-            "account": {
-              "id": 314,
-              "name": "WM Saúde - Gestão e Tecnologia"
-            },
             "additional_attributes": {},
-            "content_attributes": {},
-            "content_type": "text",
-            "content": "1",
-            "conversation": {
-              "additional_attributes": {},
-              "can_reply": true,
-              "channel": "Channel::Whatsapp",
-              "contact_inbox": {
-                "id": 120358,
-                "contact_id": 5887,
-                "inbox_id": 83,
-                "source_id": "557788057996",
-                "created_at": "2026-06-15T13:47:06.484Z",
-                "updated_at": "2026-06-15T13:47:06.484Z",
-                "hmac_verified": false,
-                "pubsub_token": "mEbFXbwQyf5jQuzXeqBb14fm"
-              },
-              "id": 3601,
+            "can_reply": true,
+            "channel": "Channel::Whatsapp",
+            "contact_inbox": {
+              "id": 6135198,
+              "contact_id": 120583,
               "inbox_id": 83,
-              "messages": [
-                {
-                  "id": 442101,
-                  "content": "1",
-                  "account_id": 314,
-                  "inbox_id": 83,
-                  "conversation_id": 3601,
-                  "message_type": 0,
-                  "created_at": 1785151208,
-                  "updated_at": "2026-07-27T11:20:08.648Z",
-                  "private": false,
-                  "status": "sent",
-                  "source_id": "wamid.HBgMNTU3Nzg4MDU3OTk2FQIAEhggQUMwOEYyMUI4QTM5MzcwRjM3QTMwODFCMkYxMjdEMkMA",
-                  "content_type": "text",
-                  "content_attributes": {},
-                  "sender_type": "Contact",
-                  "sender_id": 5887,
-                  "external_source_ids": {},
-                  "additional_attributes": {},
-                  "processed_message_content": "1",
-                  "sentiment": {},
-                  "conversation": {
-                    "assignee_id": 3116,
-                    "unread_count": 6,
-                    "last_activity_at": 1785151208,
-                    "contact_inbox": {
-                      "source_id": "557788057996"
-                    }
-                  },
-                  "sender": {
-                    "additional_attributes": {
-                      "city": "Vitória da Conquista",
-                      "country": "Brazil",
-                      "description": "",
-                      "company_name": "",
-                      "country_code": "BR",
-                      "avatar_url_hash": "b84ae77aa758826b7b60f8ffb810f7f9ed5513cb66433e8521a4ae787debd5af",
-                      "social_profiles": {
-                        "github": "",
-                        "tiktok": "",
-                        "twitter": "",
-                        "facebook": "",
-                        "linkedin": "",
-                        "telegram": "",
-                        "instagram": ""
-                      },
-                      "last_avatar_sync_at": "2026-06-15T14:51:51Z"
-                    },
-                    "custom_attributes": {
-                      "ocupacao": "Enfermeira",
-                      "localidade": "Vitória da Conquista , BA",
-                      "estabelecimento": "USF Lagoa das Flores II"
-                    },
-                    "email": "juliedeninha@gmail.com",
-                    "id": 5887,
-                    "identifier": null,
-                    "name": "Juliede Rosa",
-                    "phone_number": "+557788057996",
-                    "thumbnail": "",
-                    "blocked": false,
-                    "type": "contact"
+              "source_id": "557788454746",
+              "created_at": "2026-08-21T13:47:03.439Z",
+              "updated_at": "2026-08-21T13:47:03.439Z",
+              "hmac_verified": false,
+              "pubsub_token": "gntQADRh1brQ1u5ZF6eSK5fi"
+            },
+            "id": 8337,
+            "inbox_id": 83,
+            "messages": [
+              {
+                "id": 836410,
+                "content": "Mande eles abrir um chamado.",
+                "account_id": 314,
+                "inbox_id": 83,
+                "conversation_id": 8337,
+                "message_type": 1,
+                "created_at": 1788523449,
+                "updated_at": "2026-09-04T12:04:11.369Z",
+                "private": false,
+                "status": "delivered",
+                "source_id": "wamid.HBgMNTU3Nzg4NDU0NzQ2FQIAERgUQ0U3QjVBQ0I0QzMyQzRCQTUyODcA",
+                "content_type": "text",
+                "content_attributes": {},
+                "sender_type": "User",
+                "sender_id": 3119,
+                "external_source_ids": {},
+                "additional_attributes": {},
+                "processed_message_content": "Mande eles abrir um chamado.",
+                "sentiment": {},
+                "conversation": {
+                  "assignee_id": 3119,
+                  "unread_count": 0,
+                  "last_activity_at": 1788523908,
+                  "contact_inbox": {
+                    "source_id": "557788454746"
                   }
-                }
-              ],
-              "labels": [],
-              "meta": {
-                "sender": {
-                  "additional_attributes": {
-                    "city": "Vitória da Conquista",
-                    "country": "Brazil",
-                    "description": "",
-                    "company_name": "",
-                    "country_code": "BR",
-                    "avatar_url_hash": "b84ae77aa758826b7b60f8ffb810f7f9ed5513cb66433e8521a4ae787debd5af",
-                    "social_profiles": {
-                      "github": "",
-                      "tiktok": "",
-                      "twitter": "",
-                      "facebook": "",
-                      "linkedin": "",
-                      "telegram": "",
-                      "instagram": ""
-                    },
-                    "last_avatar_sync_at": "2026-06-15T14:51:51Z"
-                  },
-                  "custom_attributes": {
-                    "ocupacao": "Enfermeira",
-                    "localidade": "Vitória da Conquista , BA",
-                    "estabelecimento": "USF Lagoa das Flores II"
-                  },
-                  "email": "juliedeninha@gmail.com",
-                  "id": 5887,
-                  "identifier": null,
-                  "name": "Juliede Rosa",
-                  "phone_number": "+557788057996",
-                  "thumbnail": "",
-                  "blocked": false,
-                  "type": "contact"
                 },
-                "assignee": {
-                  "id": 3116,
-                  "name": "Jeniffer Victoria",
-                  "available_name": "Jeniffer Victoria",
+                "sender": {
+                  "id": 3119,
+                  "name": "Luiz Fernando",
+                  "available_name": "Luiz Fernando",
                   "avatar_url": "",
                   "type": "user",
                   "availability_status": null,
                   "thumbnail": ""
+                }
+              }
+            ],
+            "labels": [
+              "abrir_chamado_glpi"
+            ],
+            "meta": {
+              "sender": {
+                "additional_attributes": {},
+                "custom_attributes": {
+                  "ocupacao": "ACS",
+                  "localidade": "Rio de contas BA",
+                  "estabelecimento": "PSF João vaz"
                 },
-                "assignee_type": "User",
-                "team": {
-                  "id": 1097,
-                  "name": "service desk"
-                },
-                "hmac_verified": false
+                "email": null,
+                "id": 120583,
+                "identifier": null,
+                "name": "Aqui é \nVanderlei Aguiar Silva",
+                "phone_number": "+557788454746",
+                "thumbnail": "",
+                "blocked": false,
+                "type": "contact"
               },
-              "status": "open",
-              "custom_attributes": {
-                "step_triagem": "triagem"
+              "assignee": {
+                "id": 3119,
+                "name": "Luiz Fernando",
+                "available_name": "Luiz Fernando",
+                "avatar_url": "",
+                "type": "user",
+                "availability_status": null,
+                "thumbnail": ""
               },
-              "snoozed_until": null,
-              "unread_count": 6,
-              "first_reply_created_at": "2026-07-27T11:11:32.456Z",
-              "priority": null,
-              "waiting_since": 1785151208,
-              "agent_last_seen_at": 1785151123,
-              "contact_last_seen_at": 0,
-              "last_activity_at": 1785151208,
-              "timestamp": 1785151208,
-              "created_at": 1785150690,
-              "updated_at": 1785151208.669249
+              "assignee_type": "User",
+              "team": {
+                "id": 1099,
+                "name": "dti remoto"
+              },
+              "hmac_verified": false
             },
-            "created_at": "2026-07-27T11:20:08.648Z",
-            "id": 442101,
-            "inbox": {
-              "id": 83,
-              "name": "Wm Saúde"
+            "status": "open",
+            "custom_attributes": {
+              "step_triagem": "em_atendimento"
             },
-            "message_type": "incoming",
-            "private": false,
-            "sender": {
-              "account": {
-                "id": 314,
-                "name": "WM Saúde - Gestão e Tecnologia"
+            "snoozed_until": null,
+            "unread_count": 0,
+            "first_reply_created_at": "2026-09-04T11:46:10.387Z",
+            "priority": null,
+            "waiting_since": 0,
+            "agent_last_seen_at": 1788523720,
+            "contact_last_seen_at": 0,
+            "last_activity_at": 1788523908,
+            "timestamp": 1788523908,
+            "created_at": 1788522368,
+            "updated_at": 1788523908.368547,
+            "event": "conversation_updated",
+            "changed_attributes": [
+              {
+                "updated_at": {
+                  "previous_value": "2026-09-04T12:08:40.355Z",
+                  "current_value": "2026-09-04T12:11:48.338Z"
+                }
               },
-              "additional_attributes": {
-                "city": "Vitória da Conquista",
-                "country": "Brazil",
-                "description": "",
-                "company_name": "",
-                "country_code": "BR",
-                "avatar_url_hash": "b84ae77aa758826b7b60f8ffb810f7f9ed5513cb66433e8521a4ae787debd5af",
-                "social_profiles": {
-                  "github": "",
-                  "tiktok": "",
-                  "twitter": "",
-                  "facebook": "",
-                  "linkedin": "",
-                  "telegram": "",
-                  "instagram": ""
-                },
-                "last_avatar_sync_at": "2026-06-15T14:51:51Z"
+              {
+                "cached_label_list": {
+                  "previous_value": "",
+                  "current_value": "abrir_chamado_glpi"
+                }
               },
-              "avatar": "",
-              "custom_attributes": {
-                "ocupacao": "Enfermeira",
-                "localidade": "Vitória da Conquista , BA",
-                "estabelecimento": "USF Lagoa das Flores II"
-              },
-              "email": "juliedeninha@gmail.com",
-              "id": 5887,
-              "identifier": null,
-              "name": "Juliede Rosa",
-              "phone_number": "+557788057996",
-              "thumbnail": "",
-              "blocked": false
-            },
-            "source_id": "wamid.HBgMNTU3Nzg4MDU3OTk2FQIAEhggQUMwOEYyMUI4QTM5MzcwRjM3QTMwODFCMkYxMjdEMkMA",
-            "event": "message_created"
+              {
+                "label_list": {
+                  "previous_value": [],
+                  "current_value": [
+                    "abrir_chamado_glpi"
+                  ]
+                }
+              }
+            ]
           },
           "webhookUrl": "http://localhost:5678/webhook/fluxo-principal-playnee",
           "executionMode": "production"
@@ -5024,54 +4781,7 @@
         ],
         [
           {
-            "node": "Verifica se tem email",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Verifica se tem email": {
-      "main": [
-        [
-          {
             "node": "Verifica se tem ocupacao",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Verifica se email é valido",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Pede email ao cliente",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Pede email ao cliente": {
-      "main": [
-        [
-          {
-            "node": "Adiciona o passo: email_pendente",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Salva email do cliente no contato": {
-      "main": [
-        [
-          {
-            "node": "Tira o passo: email_pendente",
             "type": "main",
             "index": 0
           }
@@ -5189,44 +4899,11 @@
         ]
       ]
     },
-    "Tira o passo: nome_pendente": {
-      "main": [
-        [
-          {
-            "node": "Verifica se tem email",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Adiciona o passo: email_pendente": {
-      "main": [
-        [
-          {
-            "node": "Cria regra de timeout (2)",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Adiciona o passo: ocupacao_pendente": {
       "main": [
         [
           {
             "node": "Cria regra de timeout (3)",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Tira o passo: email_pendente": {
-      "main": [
-        [
-          {
-            "node": "Verifica se tem ocupacao",
             "type": "main",
             "index": 0
           }
@@ -5576,7 +5253,7 @@
       "main": [
         [
           {
-            "node": "Adiciona ao time Suporte N1 (1)",
+            "node": "Busca grupo assign do ticket GLPI",
             "type": "main",
             "index": 0
           }
@@ -5587,7 +5264,7 @@
       "main": [
         [
           {
-            "node": "Mensagem informando que o cliente foi encaminhado para o setor responsável",
+            "node": "Verifica se encontrou equipe anterior",
             "type": "main",
             "index": 0
           }
@@ -5791,51 +5468,11 @@
         ]
       ]
     },
-    "Tratando o Município": {
-      "main": [
-        [
-          {
-            "node": "Cria ticket no GLPI com descrição do cliente",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Verifica se email é valido": {
-      "main": [
-        [
-          {
-            "node": "Busca contato por email no Chatwoot",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Informa que não conseguiu entender o email informado e pede que envie novamente da forma correta",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Informa o campo de município requerente e sua base": {
       "main": [
         [
           {
             "node": "Mensagem informando o protocolo para o cliente",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Informa que não conseguiu entender o email informado e pede que envie novamente da forma correta": {
-      "main": [
-        [
-          {
-            "node": "Cria regra de timeout (13)",
             "type": "main",
             "index": 0
           }
@@ -5967,7 +5604,7 @@
       "main": [
         [
           {
-            "node": "Retira as etiquetas para dar continuidade ao atendimento (1)",
+            "node": "Verifica lock de abertura recente",
             "type": "main",
             "index": 0
           }
@@ -6008,17 +5645,6 @@
         [
           {
             "node": "Tratando o Município (1)",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Tratando o Município (1)": {
-      "main": [
-        [
-          {
-            "node": "Cria ticket no GLPI com descrição do cliente (1)",
             "type": "main",
             "index": 0
           }
@@ -6110,46 +5736,6 @@
         ]
       ]
     },
-    "Busca contato por email no Chatwoot": {
-      "main": [
-        [
-          {
-            "node": "Verifica se email já pertence a outro contato",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Verifica se email já pertence a outro contato": {
-      "main": [
-        [
-          {
-            "node": "Informa que email já está em uso",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Salva email do cliente no contato",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Informa que email já está em uso": {
-      "main": [
-        [
-          {
-            "node": "Cria regra de timeout (13)",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Monta payload associação": {
       "main": [
         [
@@ -6182,6 +5768,168 @@
           }
         ]
       ]
+    },
+    "Tira o passo: nome_pendente": {
+      "main": [
+        [
+          {
+            "node": "Verifica se tem ocupacao",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Busca grupo assign do ticket GLPI": {
+      "main": [
+        [
+          {
+            "node": "Busca grupos GLPI (lista)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Busca grupos GLPI (lista)": {
+      "main": [
+        [
+          {
+            "node": "Busca teams Chatwoot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Busca teams Chatwoot": {
+      "main": [
+        [
+          {
+            "node": "Resolve equipe do ticket antigo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resolve equipe do ticket antigo": {
+      "main": [
+        [
+          {
+            "node": "Adiciona ao time Suporte N1 (1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifica se encontrou equipe anterior": {
+      "main": [
+        [
+          {
+            "node": "Nota privada: equipe anterior não identificada",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mensagem informando que o cliente foi encaminhado para o setor responsável",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Nota privada: equipe anterior não identificada": {
+      "main": [
+        [
+          {
+            "node": "Mensagem informando que o cliente foi encaminhado para o setor responsável",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verifica lock de abertura recente": {
+      "main": [
+        [
+          {
+            "node": "Já tem abertura em andamento?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Já tem abertura em andamento?": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Cria lock de abertura de chamado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cria lock de abertura de chamado": {
+      "main": [
+        [
+          {
+            "node": "Retira as etiquetas para dar continuidade ao atendimento (1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tratando o Município": {
+      "main": [
+        [
+          {
+            "node": "Tratando a Unidade",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tratando a Unidade": {
+      "main": [
+        [
+          {
+            "node": "Cria ticket no GLPI com descrição do cliente",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tratando o Município (1)": {
+      "main": [
+        [
+          {
+            "node": "Tratando a Unidade (1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tratando a Unidade (1)": {
+      "main": [
+        [
+          {
+            "node": "Cria ticket no GLPI com descrição do cliente (1)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": true,
@@ -6190,7 +5938,7 @@
     "availableInMCP": false,
     "callerPolicy": "workflowsFromSameOwner"
   },
-  "versionId": "9059dcf3-d9f9-4768-bd36-d59d3429ded7",
+  "versionId": "cf6293d4-acec-416c-a268-146f75edf2b1",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "20d61d4346ce6060f90882f582ec82333f0d0ef83add04f61cda543f312ca8da"
